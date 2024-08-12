@@ -26,12 +26,12 @@
 
   <!-- Run Setup Script -->
   <genericsetup:importStep
-      name="setup_id_formatting"
+      name="bes.lims.setup_handler"
       title="BES LIMS: Run Setup Handler"
       description="
         SENAITE extension profile providing shared functionalities,
         customizations and configurations for laboratories implemented under
         the leadership of Beyond Essential Systems"
-      handler="bes.lims.setuphandlers.setupHandler"/>
+      handler=".setuphandlers.setup_handler"/>
 
 </configure>

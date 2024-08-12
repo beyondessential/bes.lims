@@ -25,7 +25,7 @@ COLUMNS = [
 ]
 
 
-def setupHandler(context):
+def setup_handler(context):
     """Setup handler
     """
 
