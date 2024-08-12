@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- BaseAnalysis Indexer -->
+  <adapter name="department_uid" factory=".baseanalysis.department_uid"/>
+
+</configure>

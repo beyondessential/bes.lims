@@ -1,0 +1,16 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Package includes -->
+  <include package=".forms" />
+
+  <!-- Statistic reports view -->
+  <browser:page
+      for="*"
+      name="statistic_reports"
+      class=".reportview.StatisticReportsView"
+      permission="zope2.View"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+</configure>

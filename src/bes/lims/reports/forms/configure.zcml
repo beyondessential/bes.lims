@@ -1,0 +1,61 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Samples received by month -->
+  <browser:page
+      for="*"
+      name="samples_received_by_month"
+      class=".samples_received_by_month.SamplesReceivedByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Samples received by department -->
+  <browser:page
+      for="*"
+      name="samples_received_by_department"
+      class=".samples_received_by_department.SamplesReceivedByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Samples rejection rate by month -->
+  <browser:page
+      for="*"
+      name="samples_rejection_rate_by_month"
+      class=".samples_rejection_rate_by_month.SamplesRejectionRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Samples rejection rate by specimen type -->
+  <browser:page
+      for="*"
+      name="samples_rejection_rate_by_specimen_type"
+      class=".samples_rejection_rate_by_specimen_type.SamplesRejectionRateBySpecimenType"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Sample rejection summary  -->
+  <browser:page
+      for="*"
+      name="samples_rejected_summary"
+      class=".samples_rejected_summary.SamplesRejectedSummary"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Analyses Lab Departments by month  -->
+  <browser:page
+      for="*"
+      name="analyses_lab_departments_by_month"
+      class=".analyses_lab_departments_by_month.AnalysesLabDepartmentsByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Analyses Results  -->
+  <browser:page
+      for="*"
+      name="analyses_results"
+      class=".analyses_results.AnalysesResults"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+</configure>

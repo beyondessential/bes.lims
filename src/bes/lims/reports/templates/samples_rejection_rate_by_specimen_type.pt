@@ -1,0 +1,31 @@
+<tal:r i18n:domain="bes.lims"
+       define="report_id string:samples_rejection_rate_by_specimen_type">
+
+  <h2 i18n:translate="">
+    5.2 Sample rejection rate by specimen type
+  </h2>
+
+  <form method="post">
+
+    <div class="form-group form-inline">
+
+      <!-- Year control -->
+      <tal:year replace="structure python:view.year_control()"/>
+
+    </div>
+
+    <!-- Submit button -->
+    <input tabindex=""
+           class="searchButton allowMultiSubmit"
+           type="submit"
+           name="submit"
+           value="Generate report"
+           i18n:attributes="value"/>
+
+    <!-- hidden fields -->
+    <input tal:replace="structure context/@@authenticator/authenticator"/>
+    <input type="hidden" name="report_id" tal:attributes="value report_id"/>
+
+  </form>
+
+</tal:r>

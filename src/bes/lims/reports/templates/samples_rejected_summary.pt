@@ -1,0 +1,31 @@
+<tal:r i18n:domain="bes.lims"
+       define="report_id string:samples_rejected_summary">
+
+  <h2 i18n:translate="">
+    Sample rejection summary
+  </h2>
+
+  <form method="post">
+
+    <div class="form-group form-inline">
+
+      <!-- Date control -->
+      <tal:date replace="structure python:view.date_control()"/>
+
+    </div>
+
+    <!-- Submit button -->
+    <input tabindex=""
+           class="searchButton allowMultiSubmit"
+           type="submit"
+           name="submit"
+           value="Generate report"
+           i18n:attributes="value"/>
+
+    <!-- hidden fields -->
+    <input tal:replace="structure context/@@authenticator/authenticator"/>
+    <input type="hidden" name="report_id" tal:attributes="value report_id"/>
+
+  </form>
+
+</tal:r>

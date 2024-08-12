@@ -1,0 +1,15 @@
+<tal:control i18n:domain="bes.lims">
+
+  <!-- Target Patient -->
+  <label for="target_patient" class="field mr-2" i18n:translate="">Choose target patient</label>
+  <select name="target_patient" class="form-control form-control-sm mr-2">
+    <tal:options
+      define="target_patients python:view.get_target_patients();"
+      repeat="item target_patients">
+      <option tal:attributes="value item"
+              tal:content="python: target_patients.getValue(item)">
+      </option>
+    </tal:options>
+  </select>
+
+</tal:control>

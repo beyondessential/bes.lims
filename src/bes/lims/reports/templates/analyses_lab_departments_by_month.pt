@@ -1,0 +1,40 @@
+<tal:r i18n:domain="bes.lims"
+  define="report_id string:analyses_lab_departments_by_month">
+
+  <h2 i18n:translate="">
+    Number of lab departments analyses received by month
+  </h2>
+
+  <form method="post">
+
+    <p i18n:translate="">
+      Number of analyses for a given department from samples received within a
+      year, grouped by month. Only analyses in any of the following statuses
+      are considered: 'To be verified', 'Verified' or 'Published'
+    </p>
+
+    <div class="form-group form-inline">
+
+      <!-- Year control -->
+      <tal:year replace="structure python:view.year_control()"/>
+
+      <!-- Department control -->
+      <tal:department replace="structure python:view.department_control()"/>
+
+    </div>
+
+    <!-- Submit button -->
+    <input tabindex=""
+           class="searchButton allowMultiSubmit"
+           type="submit"
+           name="submit"
+           value="Generate report"
+           i18n:attributes="value"/>
+
+    <!-- hidden fields -->
+    <input tal:replace="structure context/@@authenticator/authenticator"/>
+    <input type="hidden" name="report_id" tal:attributes="value report_id"/>
+
+  </form>
+
+</tal:r>

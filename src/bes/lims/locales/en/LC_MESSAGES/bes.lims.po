@@ -1,0 +1,254 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2024-08-12 11:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: DOMAIN\n"
+
+#: bes/lims/reports/templates/samples_received_by_month.pt:4
+msgid "1.1 Number of each sample type received by month"
+msgstr ""
+
+#: bes/lims/reports/templates/samples_received_by_department.pt:4
+msgid "1.2 Number of samples received and stratified by department"
+msgstr ""
+
+#: bes/lims/reports/templates/samples_rejection_rate_by_month.pt:4
+msgid "5.1 Sample rejection rate by month"
+msgstr ""
+
+#: bes/lims/reports/templates/samples_rejection_rate_by_specimen_type.pt:4
+msgid "5.2 Sample rejection rate by specimen type"
+msgstr ""
+
+#: bes/lims/config.py:30
+msgid "Adult patient"
+msgstr ""
+
+#: bes/lims/reports/templates/analyses_results.pt:4
+msgid "Analyses results"
+msgstr ""
+
+#: bes/lims/config.py:18
+msgid "April"
+msgstr ""
+
+#: bes/lims/config.py:22
+msgid "August"
+msgstr ""
+
+#: bes/lims/reports/controls/target_patient.pt:4
+msgid "Choose target patient"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:31
+msgid "Client Name"
+msgstr ""
+
+#: bes/lims/config.py:26
+msgid "December"
+msgstr ""
+
+#: bes/lims/reports/controls/department.pt:4
+#: bes/lims/reports/forms/samples_received_by_department.py:29
+msgid "Department"
+msgstr ""
+
+#: bes/lims/config.py:16
+msgid "February"
+msgstr ""
+
+#: bes/lims/reports/controls/date.pt:4
+msgid "From samples collected between"
+msgstr ""
+
+#: bes/lims/reports/templates/analyses_lab_departments_by_month.pt:27
+#: bes/lims/reports/templates/analyses_results.pt:22
+#: bes/lims/reports/templates/samples_received_by_department.pt:18
+msgid "Generate report"
+msgstr ""
+
+#: bes/lims/config.py:15
+msgid "January"
+msgstr ""
+
+#: bes/lims/config.py:21
+msgid "July"
+msgstr ""
+
+#: bes/lims/config.py:20
+msgid "June"
+msgstr ""
+
+#: bes/lims/config.py:17
+msgid "March"
+msgstr ""
+
+#: bes/lims/config.py:19
+msgid "May"
+msgstr ""
+
+#: bes/lims/config.py:25
+msgid "November"
+msgstr ""
+
+#: bes/lims/reports/templates/analyses_lab_departments_by_month.pt:10
+msgid "Number of analyses for a given department from samples received within a year, grouped by month. Only analyses in any of the following statuses are considered: 'To be verified', 'Verified' or 'Published'"
+msgstr ""
+
+#: bes/lims/reports/templates/analyses_lab_departments_by_month.pt:4
+msgid "Number of lab departments analyses received by month"
+msgstr ""
+
+#: bes/lims/config.py:24
+msgid "October"
+msgstr ""
+
+#: bes/lims/config.py:31
+msgid "Paediatric patient"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:41
+msgid "Patient Date of Birth"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:42
+msgid "Patient Gender"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:40
+msgid "Patient Hospital #"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:37
+msgid "Patient Name"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:39
+msgid "Patient Other Names"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:38
+msgid "Patient Surname"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:36
+msgid "Reason For Rejection"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:32
+msgid "Referring Doctor"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:51
+msgid "Requesting Physician"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:36
+#: bes/lims/reports/forms/samples_rejected_summary.py:30
+msgid "Sample ID"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:34
+msgid "Sample Received Date"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:35
+msgid "Sample Rejection Date"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejected_summary.py:33
+msgid "Sample Type"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejection_rate_by_month.py:32
+#: bes/lims/reports/forms/samples_rejection_rate_by_specimen_type.py:35
+msgid "Sample rejection rate (%)"
+msgstr ""
+
+#: bes/lims/reports/templates/samples_rejected_summary.pt:4
+msgid "Sample rejection summary"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_received_by_month.py:26
+msgid "Sample type"
+msgstr ""
+
+#: bes/lims/config.py:23
+msgid "September"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:50
+msgid "Site"
+msgstr ""
+
+#: bes/lims/reports/templates/statistic_reports.pt:31
+msgid "Statistic Reports"
+msgstr ""
+
+#: bes/lims/profiles/default/actions.xml
+msgid "Statistic reports"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:45
+msgid "Test Category"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:43
+msgid "Test Date Collected"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:44
+msgid "Test Date Tested"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:46
+msgid "Test Department"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:47
+msgid "Test ID"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:49
+msgid "Test Result"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_results.py:48
+msgid "Test Type"
+msgstr ""
+
+#: bes/lims/reports/forms/analyses_lab_departments_by_month.py:39
+msgid "Total"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejection_rate_by_month.py:30
+#: bes/lims/reports/forms/samples_rejection_rate_by_specimen_type.py:33
+msgid "Total samples received"
+msgstr ""
+
+#: bes/lims/reports/forms/samples_rejection_rate_by_month.py:31
+#: bes/lims/reports/forms/samples_rejection_rate_by_specimen_type.py:34
+msgid "Total samples rejected"
+msgstr ""
+
+#: bes/lims/reports/controls/department.pt:6
+msgid "Without department assigned"
+msgstr ""
+
+#: bes/lims/reports/controls/year.pt:4
+msgid "Year"
+msgstr ""
+
+#: bes/lims/reports/controls/date.pt:12
+msgid "and"
+msgstr ""

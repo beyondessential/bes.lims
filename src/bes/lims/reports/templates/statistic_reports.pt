@@ -1,0 +1,91 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="bes.lims">
+
+  <head>
+
+    <metal:block fill-slot="senaite_legacy_css">
+      <style type="text/css">
+        .report-section {
+          border: 1px solid #cdcdcd; border-radius: 5px;
+          background-color: #efefef;
+          margin-bottom: 10px;
+        }
+        .report-section h2 {
+          font-weight:bold;
+          font-size:110%;
+          padding:10px;
+          background-color: #dedede;
+        }
+        .report-section form { padding: 10px; }
+      </style>
+    </metal:block>
+
+  </head>
+  <body>
+
+    <metal:content-title fill-slot="content-title">
+      <h1 i18n:translate="">Statistic Reports</h1>
+    </metal:content-title>
+
+    <metal:content-description fill-slot="content-description">
+    </metal:content-description>
+
+    <metal:content-core fill-slot="content-core">
+
+      <div class="reports-view statistic-reports-view">
+      <!-- 1. Number of microbiology samples received -->
+
+        <!-- 1.1 Number of each sample type received by month -->
+        <div class="report-section"
+             tal:define="id string:samples_received_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 1.2 Number of samples received and stratified by department -->
+        <div class="report-section"
+             tal:define="id string:samples_received_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+      <!-- 5. Sample rejection -->
+
+        <!-- 5.1 Sample rejection rate by month -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_rate_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 5.2 Sample rejection rate by specimen type -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_rate_by_specimen_type"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- Sample rejection summary  -->
+        <div class="report-section"
+             tal:define="id string:samples_rejected_summary"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- Analyses Lab Departments by month  -->
+        <div class="report-section"
+             tal:define="id string:analyses_lab_departments_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- Analyses Results  -->
+        <div class="report-section"
+             tal:define="id string:analyses_results"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+      </div>
+
+    </metal:content-core>
+
+  </body>
+</html>

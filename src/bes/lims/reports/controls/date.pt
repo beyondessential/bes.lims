@@ -1,0 +1,19 @@
+<tal:control i18n:domain="bes.lims">
+
+  <!-- Date from -->
+  <label for="created_from" class="field mr-2"
+         i18n:translate="">From samples collected between</label>
+  <input type="date"
+         class="form-control form-control-sm mr-2"
+         name="date_from"
+         tal:attributes="value python: view.date_from"/>
+
+  <!-- Date to -->
+  <label for="date_to" class="field mr-2"
+         i18n:translate="">and</label>
+  <input type="date"
+         class="form-control form-control-sm mr-2"
+         name="date_to"
+         tal:attributes="value python: view.date_to"/>
+
+</tal:control>

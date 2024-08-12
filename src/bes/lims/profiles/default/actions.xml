@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+  name="portal_actions"
+  meta_type="Plone Actions Tool"
+  purge="False">
+
+  <!-- Portal Tabs (Located in the upper right button) -->
+  <object name="portal_tabs" meta_type="CMF Action Category" purge="False">
+
+    <!-- Statistic reports -->
+    <object name="statistic_reports" meta_type="CMF Action" i18n:domain="bes.lims">
+      <property name="title" i18n:translate="">Statistic reports</property>
+      <property name="description" i18n:translate="Statistic reports"/>
+      <property name="url_expr">string:$portal_url/statistic_reports</property>
+      <property name="link_target"/>
+      <property name="icon_expr"/>
+      <property name="available_expr"/>
+      <property name="permissions">
+        <element value="View"/>
+      </property>
+      <property name="visible">True</property>
+    </object>
+
+  </object>
+
+</object>

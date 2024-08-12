@@ -1,0 +1,37 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml">
+
+  <five:registerPackage package="." initialize=".initialize"/>
+
+  <!-- Import senaite.core permissions -->
+  <include package="bika.lims" file="permissions.zcml" />
+
+  <!-- Package includes -->
+  <include package=".catalog"/>
+  <include package=".reports"/>
+
+  <!-- Installation Profile -->
+  <genericsetup:registerProfile
+      name="default"
+      title="BES LIMS"
+      directory="profiles/default"
+      description="
+        SENAITE extension profile providing shared functionalities,
+        customizations and configurations for laboratories implemented under
+        the leadership of Beyond Essential Systems"
+      provides="Products.GenericSetup.interfaces.EXTENSION"/>
+
+  <!-- Run Setup Script -->
+  <genericsetup:importStep
+      name="setup_id_formatting"
+      title="BES LIMS: Run Setup Handler"
+      description="
+        SENAITE extension profile providing shared functionalities,
+        customizations and configurations for laboratories implemented under
+        the leadership of Beyond Essential Systems"
+      handler="bes.lims.setuphandlers.setupHandler"/>
+
+</configure>

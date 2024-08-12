@@ -1,0 +1,13 @@
+<tal:control i18n:domain="bes.lims">
+
+  <!-- Year -->
+  <label for="year" class="field mr-2" i18n:translate="">Year</label>
+  <select name="year" class="form-control form-control-sm mr-2">
+    <tal:options repeat="year python:view.get_years()">
+      <option tal:attributes="value year"
+              tal:content="year">
+      </option>
+    </tal:options>
+  </select>
+
+</tal:control>
