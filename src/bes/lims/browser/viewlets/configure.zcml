@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- BES Support Center icon -->
+  <browser:viewlet
+      for="*"
+      name="bes.lims.viewlet.bessupport"
+      manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+      class=".bessupport.BESSupportViewlet"
+      permission="zope2.View"
+      layer="bes.lims.interfaces.IBESLimsLayer" />
+
+</configure>
