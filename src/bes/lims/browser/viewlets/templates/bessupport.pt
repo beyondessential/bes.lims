@@ -1,0 +1,3 @@
+<tal:snippet condition="python: view.is_visible()">
+<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ee74fccc-f27c-4c3b-bce0-4ba3da676722"></script>
+</tal:snippet>

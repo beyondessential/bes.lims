@@ -1,8 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
-    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    xmlns:zcml="http://namespaces.zope.org/zcml">
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <five:registerPackage package="." initialize=".initialize"/>
 
@@ -10,6 +9,7 @@
   <include package="bika.lims" file="permissions.zcml" />
 
   <!-- Package includes -->
+  <include package=".browser"/>
   <include package=".catalog"/>
   <include package=".reports"/>
 

@@ -4,4 +4,4 @@ Changelog
 1.0.0
 -----
 
-- unreleased
+- #1 Add Zendesk's BES Support Centre Icon
