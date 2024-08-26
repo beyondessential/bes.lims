@@ -1,0 +1,13 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Product-specific controller view for results reports -->
+  <adapter
+      for="zope.interface.Interface
+         bes.lims.interfaces.IBESLimsLayer"
+      name="AnalysisRequest"
+      factory=".reportview.DefaultReportView"
+      provides="senaite.impress.interfaces.IReportView"
+      permission="zope2.View"/>
+
+</configure>
