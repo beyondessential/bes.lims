@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
+
+  <!-- Schema extender for Client -->
+  <adapter
+      name="bes.lims.client.schemaextender"
+      provides="archetypes.schemaextender.interfaces.ISchemaExtender"
+      factory=".client.ClientSchemaExtender"/>
+
+  <!-- Getters/Setters -->
+  <monkey:patch
+      class="bika.lims.content.client.Client"
+      original="getReportLogo"
+      ignoreOriginal="True"
+      replacement=".client.getReportLogo"/>
+
+  <monkey:patch
+      class="bika.lims.content.client.Client"
+      original="setReportLogo"
+      ignoreOriginal="True"
+      replacement=".client.setReportLogo"/>
+
+</configure>
