@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Package includes -->
+  <include package="archetypes.schemaextender"/>
+
+  <!-- File includes -->
+  <include file="client.zcml"/>
+  <include file="setup.zcml"/>
+
+</configure>
