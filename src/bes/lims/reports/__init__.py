@@ -55,8 +55,9 @@ def group_by(objs, func):
             # group by title
             value = api.get_title(value)
 
-        elif dtime.is_date(value):
+        elif dtime.is_d(value) or dtime.is_dt(value) or dtime.is_DT(value):
             # group by month
+            value = dtime.to_DT(value)
             value = int(value.month())
 
         elif not value and value != 0:
