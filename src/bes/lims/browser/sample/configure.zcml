@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Analyses listing -->
+  <subscriber
+    for="bika.lims.browser.analyses.view.AnalysesView
+         bika.lims.interfaces.IAnalysisRequest"
+    provides="senaite.app.listing.interfaces.IListingViewAdapter"
+    factory=".analyses.SampleAnalysesListingAdapter" />
+
+</configure>

@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Include all upgrade steps for 1.0.0 -->
+  <include file="v01_00_000.zcml"/>
+
+</configure>

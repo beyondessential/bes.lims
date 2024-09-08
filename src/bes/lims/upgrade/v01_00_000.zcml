@@ -1,0 +1,18 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
+
+  <genericsetup:upgradeStep
+      title="Add Reagent Out of Stock Analysis transition"
+      description="
+        Re-runs the workflow import step to add the transition set_out_of_stock
+        and the status out_of_stock. It also walks through all assigned and
+        unassigned analyses and update their role mappings for the analysis
+        workflow.
+      "
+      source="1000"
+      destination="1001"
+      handler=".v01_00_000.setup_analysis_workflow"
+      profile="bes.lims:default"/>
+
+</configure>

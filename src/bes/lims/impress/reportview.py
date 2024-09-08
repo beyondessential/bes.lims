@@ -636,3 +636,8 @@ class DefaultReportView(SingleReportView):
         if not submitters:
             return None
         return max(submitters.values())
+
+    def is_out_of_stock(self, analysis):
+        """Returns whether the analysis passed-in is out-of-stock
+        """
+        return api.get_review_status(analysis) == "out_of_stock"
