@@ -1,0 +1,8 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- After upgrade step event handler -->
+  <subscriber
+    for="senaite.core.events.upgrade.IAfterUpgradeStepEvent"
+    handler=".upgrade.afterUpgradeStepHandler"/>
+
+</configure>

@@ -29,3 +29,24 @@ def is_reportable(analysis):
 
     status = api.get_review_status(analysis)
     return status in ANALYSIS_REPORTABLE_STATUSES
+
+
+def get_previous_status(instance, before=None, default=None):
+    """Returns the previous state for the given instance and status from
+    review history. If before is None, returns the state of the sample before
+    its current status.
+    """
+    if not before:
+        before = api.get_review_status(instance)
+
+    # Get the review history, most recent actions first
+    found = False
+    history = api.get_review_history(instance)
+    for item in history:
+        status = item.get("review_state")
+        if status == before:
+            found = True
+            continue
+        if found:
+            return status
+    return default

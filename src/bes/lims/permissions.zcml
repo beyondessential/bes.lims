@@ -1,0 +1,7 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Transition Permissions -->
+  <permission id="bes.lims.permissions.TransitionSetOutOfStock" title="bes.lims: Transition: Set Out Of Stock"/>
+  <permission id="bes.lims.permissions.Rollback" title="bes.lims: Transition: Rollback"/>
+
+</configure>
