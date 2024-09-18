@@ -4,6 +4,7 @@
 #
 # Copyright 2024 Beyond Essential Systems Pty Ltd
 
+from bika.lims import api
 from bes.lims import logger
 from bes.lims import permissions
 from senaite.core.setuphandlers import setup_core_catalogs
@@ -24,6 +25,13 @@ INDEXES = [
 
 COLUMNS = [
     # Tuples of (catalog, column_name)
+]
+
+# Tuples of (portal_type, list of behaviors)
+BEHAVIORS = [
+    ("SampleType", [
+        "bes.lims.behaviors.sampletype.IExtendedSampleTypeBehavior",
+    ]),
 ]
 
 # Workflow updates
@@ -100,6 +108,27 @@ def setup_catalogs(portal):
     setup_other_catalogs(portal, indexes=INDEXES, columns=COLUMNS)
 
     logger.info("Setup Catalogs [DONE]")
+
+
+def setup_behaviors(portal):
+    """Assigns additional behaviors to existing content types
+    """
+    logger.info("Setup Behaviors ...")
+    pt = api.get_tool("portal_types")
+    for portal_type, behavior_ids in BEHAVIORS:
+        fti = pt.get(portal_type)
+        if not hasattr(fti, "behaviors"):
+            # Skip, type is not registered yet probably (AT2DX migration)
+            logger.warn("Behaviors is missing: {} [SKIP]".format(portal_type))
+            continue
+        fti_behaviors = fti.behaviors
+        additional = filter(lambda b: b not in fti_behaviors, behavior_ids)
+        if additional:
+            fti_behaviors = list(fti_behaviors)
+            fti_behaviors.extend(additional)
+            fti.behaviors = tuple(fti_behaviors)
+
+    logger.info("Setup Behaviors [DONE]")
 
 
 def setup_workflows(portal):

@@ -1,0 +1,62 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
+
+  <plone:behavior
+      name="bes.lims.behavior.sampletype"
+      title="ExtendedSampleType"
+      description="Extends SampleType with additional fields"
+      provides=".sampletype.IExtendedSampleTypeBehavior"
+      factory=".sampletype.ExtendedSampleType"
+      for="senaite.core.interfaces.ISampleType" />
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="getRequireCollectorOrSampler"
+      ignoreOriginal="True"
+      replacement=".sampletype.getRequireCollectorOrSampler"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="setRequireCollectorOrSampler"
+      ignoreOriginal="True"
+      replacement=".sampletype.setRequireCollectorOrSampler"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="getContainerWidget"
+      ignoreOriginal="True"
+      replacement=".sampletype.getContainerWidget"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="setContainerWidget"
+      ignoreOriginal="True"
+      replacement=".sampletype.setContainerWidget"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="getInsufficientVolumeText"
+      ignoreOriginal="True"
+      replacement=".sampletype.getInsufficientVolumeText"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="setInsufficientVolumeText"
+      ignoreOriginal="True"
+      replacement=".sampletype.setInsufficientVolumeText"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="getMaximumVolume"
+      ignoreOriginal="True"
+      replacement=".sampletype.getMaximumVolume"/>
+
+  <monkey:patch
+      class="senaite.core.content.sampletype.SampleType"
+      original="setMaximumVolume"
+      ignoreOriginal="True"
+      replacement=".sampletype.setMaximumVolume"/>
+
+</configure>

@@ -1,0 +1,9 @@
+.ArchetypesBottlesWidget fieldset {
+  text-align:left;
+}
+.ArchetypesBottlesWidget table {
+  width:inherit;
+}
+.ArchetypesBottlesWidget table tr td input.form-control {
+  min-width: unset;
+}

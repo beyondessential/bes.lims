@@ -1,0 +1,8 @@
+<configure  xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Container type widgets vocabulary -->
+  <utility
+      component=".vocabularies.ContainerTypeWidgetsVocabularyFactory"
+      name="bes.lims.vocabularies.container_type_widgets" />
+
+</configure>

@@ -2,9 +2,12 @@
 
 from bes.lims import logger
 from bes.lims import PRODUCT_NAME as product
+from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_workflows
 from bika.lims import api
 from senaite.core.catalog import ANALYSIS_CATALOG
+from senaite.core.catalog import SETUP_CATALOG
+from senaite.core.migration.migrator import get_attribute_storage
 from senaite.core.upgrade import upgradestep
 from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.workflow import ANALYSIS_WORKFLOW
@@ -60,3 +63,45 @@ def setup_analysis_workflow(tool):
         obj._p_deactivate()
 
     logger.info("Setup analysis workflow [DONE]")
+
+
+def setup_sampletype_behavior(tool):
+    logger.info("Setup SampleType behavior ...")
+    portal = tool.aq_inner.aq_parent
+
+    # register the new behavior
+    setup_behaviors(portal)
+
+    # walk-through all sample types and update field values
+    sc = api.get_tool(SETUP_CATALOG)
+    for brain in sc(portal_type="SampleType"):
+        obj = api.get_object(brain)
+        storage = get_attribute_storage(obj)
+
+        require_collector = storage.get("RequireCollectorOrSampler")
+        obj.setRequireCollectorOrSampler(require_collector)
+
+        container_widget = storage.get("ContainerWidget")
+        if container_widget:
+            obj.setContainerWidget(container_widget)
+
+        insufficient_volume = storage.get("InsufficientVolumeText")
+        if insufficient_volume:
+            obj.setInsufficientVolumeText(insufficient_volume.raw)
+
+        maximum_volume = storage.get("MaximumVolume")
+        if maximum_volume:
+            obj.setMaximumVolume(maximum_volume)
+
+        obj.reindexObject()
+        obj._p_deactivate()
+
+    logger.info("Setup SampleType behavior [DONE]")
+
+
+def setup_skins(tool):
+    logger.info("Setup bes.lims skin layer ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "skins")
+    logger.info("Setup bes.lims skin layer [DONE]")
