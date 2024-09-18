@@ -97,3 +97,11 @@ def setup_sampletype_behavior(tool):
         obj._p_deactivate()
 
     logger.info("Setup SampleType behavior [DONE]")
+
+
+def setup_skins(tool):
+    logger.info("Setup SampleType behavior ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "skins")
+    logger.info("Setup SampleType behavior [DONE]")

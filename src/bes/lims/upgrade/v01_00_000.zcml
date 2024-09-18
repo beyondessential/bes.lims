@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Port BottlesWidget"
+      description="Ports the BottlesWidget from palau.lims"
+      source="1002"
+      destination="1003"
+      handler=".v01_00_000.setup_skins"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Compatibility with core#2584"
       description="Replaces the SampleType extender by a behavior"
       source="1001"

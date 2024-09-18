@@ -1,9 +1,13 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:cmf="http://namespaces.zope.org/cmf"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <five:registerPackage package="." initialize=".initialize"/>
+
+  <!-- Filesystem directory view -->
+  <cmf:registerDirectory name="skins" directory="skins" recursive="True"/>
 
   <!-- Import senaite.core permissions -->
   <include package="bika.lims" file="permissions.zcml"/>
