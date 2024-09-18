@@ -100,8 +100,8 @@ def setup_sampletype_behavior(tool):
 
 
 def setup_skins(tool):
-    logger.info("Setup SampleType behavior ...")
+    logger.info("Setup bes.lims skin layer ...")
     portal = tool.aq_inner.aq_parent
     setup = portal.portal_setup
     setup.runImportStepFromProfile(profile, "skins")
-    logger.info("Setup SampleType behavior [DONE]")
+    logger.info("Setup bes.lims skin layer [DONE]")
