@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- SampleTypes listing -->
+  <subscriber
+    for="senaite.core.browser.controlpanel.sampletypes.view.SampleTypesView
+         *"
+    provides="senaite.app.listing.interfaces.IListingViewAdapter"
+    factory=".sampletypes.SampleTypesClientsListingAdapter" />
+
+</configure>

@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Compatibility with core#2584"
+      description="Replaces the SampleType extender by a behavior"
+      source="1001"
+      destination="1002"
+      handler=".v01_00_000.setup_sampletype_behavior"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Add Reagent Out of Stock Analysis transition"
       description="
         Re-runs the workflow import step to add the transition set_out_of_stock

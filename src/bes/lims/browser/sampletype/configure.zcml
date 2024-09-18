@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Add Sample Type view invoked from ++add++ traverser -->
+  <adapter
+      for="Products.CMFCore.interfaces.IFolderish
+           bes.lims.interfaces.IBESLimsLayer
+           plone.dexterity.interfaces.IDexterityFTI"
+      provides="zope.publisher.interfaces.browser.IBrowserPage"
+      factory=".add.SampleTypeAddView"
+      name="SampleType"/>
+
+  <!-- Edit SampleType -->
+  <browser:page
+      for="senaite.core.interfaces.ISampleType"
+      name="edit"
+      class=".edit.SampleTypeEditForm"
+      permission="cmf.ModifyPortalContent"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+</configure>
