@@ -25,19 +25,19 @@ class SampleViewLayoutController
 
       ["#content h1",
        "div[id=ar-attachments]",
-       "palau-lims-sample-header"],
+       "-sample-header"],
 
       ["div.remarks-widget h3",
        "div.remarks-widget div",
-       "palau-lims-sample-remarks-section"],
+       "-sample-remarks-section"],
 
       ["div.analysis-listing-table h3",
        "div.analysis-listing-table form",
-       "palau-lims-sample-analyses-section"],
+       "-sample-analyses-section"],
 
       ["div[id=results-interpretation] h3",
        "div[id=results-interpretation] form",
-       "palau-lims-sample-results-interpretation-section"],
+       "-sample-results-interpretation-section"],
     ]
 
     # Initializes toggle sections
@@ -72,7 +72,7 @@ class SampleViewLayoutController
     el = event.currentTarget
 
     section_id = el.getAttribute "target-section"
-    sections = document.querySelectorAll "[section=#{ section_id }]"
+    sections = document.querySelectorAll "[section$=#{ section_id }]"
     for section in sections
       if not section
         continue
@@ -130,6 +130,6 @@ class SampleViewLayoutController
   Prints a debug message in console with this component name prefixed
   ###
   debug: (message) =>
-    console.debug "[palau.lims]", "SampleViewLayoutController::"+message
+    console.debug "[bes.lims]", "SampleViewLayoutController::"+message
 
 export default SampleViewLayoutController

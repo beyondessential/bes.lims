@@ -384,7 +384,7 @@ class SampleTypeContainerController
   Prints a debug message in console with this component name prefixed
   ###
   debug: (message) =>
-    console.debug "[palau.lims]", "SampleTypeController::"+message
+    console.debug "[bes.lims]", "SampleTypeController::"+message
 
   ###
   Returns the AnalysisRequestAdd controller
