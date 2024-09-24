@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #6 Port scripts from palau.lims
 - #5 Compatibility with senaite.core#2584 (SampleType to DX)
 - #4 Add Rollback transition for analyses in out-of-stock status
 - #4 Consider specification ranges with a max of '0' to be within normal values
