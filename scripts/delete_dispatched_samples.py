@@ -13,7 +13,10 @@ def assigned_to_worksheets(sample):
     """
     brains = sample.getAnalyses()
     for brain in brains:
-        analysis = api.get_object(brain)
+        try:
+            analysis = api.get_object(brain)
+        except AttributeError:
+            continue
         if analysis.getWorksheetUID():
             return True
     return False
