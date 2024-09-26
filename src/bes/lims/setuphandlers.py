@@ -93,6 +93,9 @@ def setup_handler(context):
     # Setup Catalogs
     setup_catalogs(portal)
 
+    # Add behaviors
+    setup_behaviors(portal)
+
     # Setup workflows
     setup_workflows(portal)
 
