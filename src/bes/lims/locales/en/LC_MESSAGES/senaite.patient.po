@@ -1,0 +1,89 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2020-02-05 14:04+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: DOMAIN\n"
+
+#: senaite/patient/browser/controlpanel.py:219
+msgid "Allow to publish samples with a temporary MRN"
+msgstr "Allow to publish samples with a temporary Hospital Number"
+
+#: senaite/patient/browser/controlpanel.py:210
+msgid "Allow to verify samples with a temporary MRN"
+msgstr "Allow to verify samples with a temporary Hospital Number"
+
+#: senaite/patient/browser/controlpanel.py:228
+msgid "Display an alert icon on samples with a temporary MRN"
+msgstr "Display an alert icon on samples with a temporary Hospital Number"
+
+#: senaite/patient/browser/controlpanel.py:220
+msgid "If selected, users will be able to publish samples that have a Patient assigned with a temporary Medical Record Number (MRN)."
+msgstr "If selected, users will be able to publish samples that have a Patient assigned with a temporary Hospital Number."
+
+#: senaite/patient/browser/controlpanel.py:211
+msgid "If selected, users will be able to verify samples that have a Patient assigned with a temporary Medical Record Number (MRN)."
+msgstr "If selected, users will be able to verify samples that have a Patient assigned with a temporary Hospital Number."
+
+#: senaite/patient/adapters/listing.py:59
+#: senaite/patient/content/analysisrequest.py:92
+msgid "MRN"
+msgstr "Hospital Number"
+
+#: senaite/patient/browser/controlpanel.py:201
+msgid "Make the MRN field mandatory in the sample registration form and when creating or modifying patients."
+msgstr "Make the Hospital Number field mandatory in the sample registration form and when creating or modifying patients."
+
+#: senaite/patient/browser/patientfolder.py:75
+#: senaite/patient/content/analysisrequest.py:66
+msgid "Medical Record #"
+msgstr "Hospital Number"
+
+#: senaite/patient/adapters/listing.py:131
+msgid "Patient MRN of sample is not equal to %s"
+msgstr "Patient Hospital Number of sample is not equal to %s"
+
+#: senaite/patient/content/patient.py:328
+msgid "Patient Medical Record # must be unique"
+msgstr "Patient Hospital Number must be unique"
+
+#: senaite/patient/content/patient.py:109
+msgid "Patient Medical Record Number"
+msgstr "Patient Hospital Number"
+
+#: senaite/patient/content/patient.py:322
+msgid "Patient Medical Record is missing or empty"
+msgstr "Patient Hospital Number is missing or empty"
+
+#: senaite/patient/browser/controlpanel.py:200
+msgid "Require Medical Record Number (MRN)"
+msgstr "Require Hospital Number"
+
+#: senaite/patient/adapters/listing.py:39
+msgid "Temporary MRN"
+msgstr "Temp Hospital Number"
+
+#: senaite/patient/browser/viewlets/templates/temporary_mrn_viewlet.pt:13
+msgid "The Medical Record Number (MRN) assigned to this sample is temporary"
+msgstr "The Hospital Number assigned to this sample is temporary"
+
+#: senaite/patient/browser/controlpanel.py:229
+msgid "When selected, an alert icon is displayed in samples listing for samples that have a Patient assigned with a temporary Medical Record Number (MRN)."
+msgstr "When selected, an alert icon is displayed in samples listing for samples that have a Patient assigned with a temporary Hospital Number."
+
+#: senaite/patient/subscribers/analysisrequest.py:106
+msgid "You are not allowed to add a patient in {} folder. Medical Record Number set to Temporary."
+msgstr "You are not allowed to add a patient in {} folder. Hospital Number set to Temporary."
+
+#: senaite/patient/content/patient.py:108
+msgid "label_patient_mrn"
+msgstr "Hospital Number"
