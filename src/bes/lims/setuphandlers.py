@@ -7,6 +7,7 @@
 from bes.lims import logger
 from bes.lims import permissions
 from bika.lims import api
+from bika.lims.api import security as sapi
 from plone import api as ploneapi
 from senaite.core import permissions as core_permissions
 from senaite.core.api import workflow as wapi
@@ -33,6 +34,18 @@ COLUMNS = [
 BEHAVIORS = [
     ("SampleType", [
         "bes.lims.behaviors.sampletype.IExtendedSampleTypeBehavior",
+    ]),
+]
+
+
+# List of tuples of (role, path, [(permissions, acquire), ...])
+# When path is empty/None, the permissions are applied to portal object
+# This allows to programmatically add roles for a given permission without
+# having to overwrite the existing permission assignment in our rolemap.xml
+ROLES = [
+    ("Scientist", "", [
+        # Allow Scientist role to add analyses by default
+        (core_permissions.AddAnalysis, 0),
     ]),
 ]
 
@@ -109,6 +122,9 @@ def setup_handler(context):
 
     portal = context.getSite()
 
+    # Setup roles
+    setup_roles(portal)
+
     # Setup groups
     setup_groups(portal)
 
@@ -163,6 +179,19 @@ def setup_workflows(portal):
     for wf_id, settings in WORKFLOWS_TO_UPDATE.items():
         wapi.update_workflow(wf_id, **settings)
     logger.info("Setup workflows [DONE]")
+
+
+def setup_roles(portal):
+    """Setup roles
+    """
+    logger.info("Setup roles ...")
+    for role, path, perms in ROLES:
+        folder_path = path or api.get_path(portal)
+        folder = api.get_object_by_path(folder_path)
+        for permission, acq in perms:
+            logger.info("{} {} {} (acquire={})".format(role, folder_path,
+                                                       permission, acq))
+            sapi.grant_permission_for(folder, permission, role, acquire=acq)
 
 
 def setup_groups(portal):

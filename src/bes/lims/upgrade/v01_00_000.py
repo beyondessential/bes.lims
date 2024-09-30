@@ -4,6 +4,7 @@ from bes.lims import logger
 from bes.lims import PRODUCT_NAME as product
 from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_groups
+from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
 from bika.lims import api
 from senaite.core.api import workflow as wapi
@@ -118,6 +119,9 @@ def setup_scientist(tool):
 
     # Re-import rolemap
     setup.runImportStepFromProfile(profile, "rolemap")
+
+    # Setup roles
+    setup_roles(portal)
 
     # Create groups
     setup_groups(portal)

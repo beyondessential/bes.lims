@@ -5,6 +5,7 @@ from bes.lims import PRODUCT_NAME
 from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_catalogs
 from bes.lims.setuphandlers import setup_groups
+from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
 from bika.lims.api import get_portal
 
@@ -20,6 +21,9 @@ def afterUpgradeStepHandler(event):  # noqa CamelCase
     profile = "profile-{0}:default".format(PRODUCT_NAME)
     setup.runImportStepFromProfile(profile, "actions")
     setup.runImportStepFromProfile(profile, "rolemap")
+
+    # Setup roles
+    setup_roles(portal)
 
     # Setup groups
     setup_groups(portal)

@@ -32,6 +32,11 @@
 
   <permissions>
 
+    <!--
+      Note setup_roles in setuphandlers, that allows to **add** new roles for
+      existing permissions programmatically, without the need of overwrite
+    -->
+
     <!-- Transition permissions -->
     <permission name="bes.lims: Transition: Set Out Of Stock" acquire="False">
       <role name="LabClerk"/>
