@@ -24,6 +24,10 @@
     <role name="Reader"/>
     <role name="Reviewer"/>
     <role name="Site Administrator"/>
+
+    <!-- BES ROLES -->
+    <role name="Scientist"/>
+
   </roles>
 
   <permissions>

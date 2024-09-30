@@ -3,14 +3,18 @@
 from bes.lims import logger
 from bes.lims import PRODUCT_NAME as product
 from bes.lims.setuphandlers import setup_behaviors
+from bes.lims.setuphandlers import setup_groups
 from bes.lims.setuphandlers import setup_workflows
 from bika.lims import api
+from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
+from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.migration.migrator import get_attribute_storage
 from senaite.core.upgrade import upgradestep
 from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.workflow import ANALYSIS_WORKFLOW
+from senaite.core.workflow import SAMPLE_WORKFLOW
 
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
@@ -105,3 +109,32 @@ def setup_skins(tool):
     setup = portal.portal_setup
     setup.runImportStepFromProfile(profile, "skins")
     logger.info("Setup bes.lims skin layer [DONE]")
+
+
+def setup_scientist(tool):
+    logger.info("Setup Scientist role and Scientists group ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Re-import rolemap
+    setup.runImportStepFromProfile(profile, "rolemap")
+
+    # Create groups
+    setup_groups(portal)
+
+    # Update workflows
+    setup_workflows(portal)
+
+    # Update role mappings for existing samples in to_be_verified status
+    query = {
+        "portal_type": "AnalysisRequest",
+        "review_state": "to_be_verified"
+    }
+    wf = wapi.get_workflow(SAMPLE_WORKFLOW)
+    brains = api.search(query, SAMPLE_CATALOG)
+    for brain in brains:
+        sample = api.get_object(brain)
+        wf.updateRoleMappingsFor(sample)
+        sample._p_deactivate()
+
+    logger.info("Setup Scientist role and Scientists group [DONE]")
