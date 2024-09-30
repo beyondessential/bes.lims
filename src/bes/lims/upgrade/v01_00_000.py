@@ -112,6 +112,13 @@ def setup_skins(tool):
     logger.info("Setup bes.lims skin layer [DONE]")
 
 
+def get_object(thing, default=None):
+    try:
+        return api.get_object(thing)
+    except AttributeError:
+        return default
+
+
 def setup_scientist(tool):
     logger.info("Setup Scientist role and Scientists group ...")
     portal = tool.aq_inner.aq_parent
@@ -137,8 +144,39 @@ def setup_scientist(tool):
     wf = wapi.get_workflow(SAMPLE_WORKFLOW)
     brains = api.search(query, SAMPLE_CATALOG)
     for brain in brains:
-        sample = api.get_object(brain)
+        sample = get_object(brain)
+        if not sample:
+            continue
         wf.updateRoleMappingsFor(sample)
         sample._p_deactivate()
 
     logger.info("Setup Scientist role and Scientists group [DONE]")
+
+
+def setup_rejector(tool):
+    logger.info("Setup Rejector role and Rejectors group ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Re-import rolemap
+    setup.runImportStepFromProfile(profile, "rolemap")
+
+    # Setup roles
+    setup_roles(portal)
+
+    # Create groups
+    setup_groups(portal)
+
+    # Update Analyses rolemap
+    wf = wapi.get_workflow(ANALYSIS_WORKFLOW)
+    states = ["assigned", "unassigned", "to_be_verified"]
+    query = {"portal_type": "Analysis", "review_state": states}
+    brains = api.search(query, ANALYSIS_CATALOG)
+    for brain in brains:
+        analysis = get_object(brain)
+        if not analysis:
+            continue
+        wf.updateRoleMappingsFor(analysis)
+        analysis._p_deactivate()
+
+    logger.info("Setup Rejector role and Rejectors group [DONE]")

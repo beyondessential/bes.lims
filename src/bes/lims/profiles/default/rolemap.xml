@@ -26,6 +26,7 @@
     <role name="Site Administrator"/>
 
     <!-- BES ROLES -->
+    <role name="Rejector"/>
     <role name="Scientist"/>
 
   </roles>
