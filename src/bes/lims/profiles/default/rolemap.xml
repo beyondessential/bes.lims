@@ -24,9 +24,18 @@
     <role name="Reader"/>
     <role name="Reviewer"/>
     <role name="Site Administrator"/>
+
+    <!-- BES ROLES -->
+    <role name="Scientist"/>
+
   </roles>
 
   <permissions>
+
+    <!--
+      Note setup_roles in setuphandlers, that allows to **add** new roles for
+      existing permissions programmatically, without the need of overwrite
+    -->
 
     <!-- Transition permissions -->
     <permission name="bes.lims: Transition: Set Out Of Stock" acquire="False">

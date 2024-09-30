@@ -4,15 +4,18 @@
 #
 # Copyright 2024 Beyond Essential Systems Pty Ltd
 
-from bika.lims import api
 from bes.lims import logger
 from bes.lims import permissions
+from bika.lims import api
+from bika.lims.api import security as sapi
+from plone import api as ploneapi
+from senaite.core import permissions as core_permissions
+from senaite.core.api import workflow as wapi
+from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.setuphandlers import setup_other_catalogs
-from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.workflow import ANALYSIS_WORKFLOW
-from senaite.core.api import workflow as wapi
-
+from senaite.core.workflow import SAMPLE_WORKFLOW
 
 CATALOGS = (
     # Add-on specific Catalogs (list of core's BaseCatalog objects)
@@ -31,6 +34,25 @@ COLUMNS = [
 BEHAVIORS = [
     ("SampleType", [
         "bes.lims.behaviors.sampletype.IExtendedSampleTypeBehavior",
+    ]),
+]
+
+
+# List of tuples of (role, path, [(permissions, acquire), ...])
+# When path is empty/None, the permissions are applied to portal object
+# This allows to programmatically add roles for a given permission without
+# having to overwrite the existing permission assignment in our rolemap.xml
+ROLES = [
+    ("Scientist", "", [
+        # Allow Scientist role to add analyses by default
+        (core_permissions.AddAnalysis, 0),
+    ]),
+]
+
+# List of tuples of (id, title, roles)
+GROUPS = [
+    ("Scientists", "Scientists", [
+        "Member", "Analyst", "Scientist",
     ]),
 ]
 
@@ -76,6 +98,16 @@ WORKFLOWS_TO_UPDATE = {
             },
         }
     },
+    SAMPLE_WORKFLOW: {
+        "states": {
+            "to_be_verified": {
+                "permissions": {
+                    # allow Scientist role to add analyses in to_be_verified
+                    core_permissions.AddAnalysis: ["Scientist", ]
+                }
+            }
+        }
+    }
 }
 
 
@@ -89,6 +121,12 @@ def setup_handler(context):
     logger.info("BES setup handler [BEGIN]")
 
     portal = context.getSite()
+
+    # Setup roles
+    setup_roles(portal)
+
+    # Setup groups
+    setup_groups(portal)
 
     # Setup Catalogs
     setup_catalogs(portal)
@@ -141,3 +179,38 @@ def setup_workflows(portal):
     for wf_id, settings in WORKFLOWS_TO_UPDATE.items():
         wapi.update_workflow(wf_id, **settings)
     logger.info("Setup workflows [DONE]")
+
+
+def setup_roles(portal):
+    """Setup roles
+    """
+    logger.info("Setup roles ...")
+    for role, path, perms in ROLES:
+        folder_path = path or api.get_path(portal)
+        folder = api.get_object_by_path(folder_path)
+        for permission, acq in perms:
+            logger.info("{} {} {} (acquire={})".format(role, folder_path,
+                                                       permission, acq))
+            sapi.grant_permission_for(folder, permission, role, acquire=acq)
+
+
+def setup_groups(portal):
+    """Setup roles and groups
+    """
+    logger.info("Setup groups ...")
+    portal_groups = api.get_tool("portal_groups")
+    for group_id, title, roles in GROUPS:
+
+        # create the group and grant the roles
+        if group_id not in portal_groups.listGroupIds():
+            logger.info("Adding group {} ({}): {}".format(
+                title, group_id, ", ".join(roles)))
+            portal_groups.addGroup(group_id, title=title, roles=roles)
+
+        # grant the roles to the existing group
+        else:
+            ploneapi.group.grant_roles(groupname=group_id, roles=roles)
+            logger.info("Granting roles for group {} ({}): {}".format(
+                title, group_id, ", ".join(roles)))
+
+    logger.info("Setup groups [DONE]")

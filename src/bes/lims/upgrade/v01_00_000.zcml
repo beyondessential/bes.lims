@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Add Scientist role and Scientists group"
+      description="Add Scientist role and Scientists group"
+      source="1003"
+      destination="1004"
+      handler=".v01_00_000.setup_scientist"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Port BottlesWidget"
       description="Ports the BottlesWidget from palau.lims"
       source="1002"
