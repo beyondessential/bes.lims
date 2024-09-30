@@ -16,6 +16,9 @@
       <!-- Date control -->
       <tal:date replace="structure python:view.date_control()"/>
 
+      <!-- Department control -->
+      <tal:department replace="structure python:view.department_control()"/>
+
     </div>
 
     <!-- Submit button -->

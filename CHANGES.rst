@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #8 Add Department filter for "Analyses results" statistics report
 - #7 Add Scientist role and Scientists group
 - #6 Port scripts from palau.lims
 - #5 Compatibility with senaite.core#2584 (SampleType to DX)

@@ -26,8 +26,10 @@ class AnalysesResults(CSVReport):
         # Collect the analyses filters (date received)
         date_from, date_to = self.parse_date_for_query()
 
-        # Get the filtered analyses list
-        brains = get_analyses(date_from, date_to, review_state=statuses)
+        # search by requested department
+        department_uid = self.request.form.get("department")
+        brains = get_analyses(date_from, date_to, review_state=statuses,
+                              department_uid=department_uid)
         objs = map(api.get_object, brains)
         analyses = [analysis for analysis in objs if is_reportable(analysis)]
 
