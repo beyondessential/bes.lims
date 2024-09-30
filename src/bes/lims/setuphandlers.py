@@ -47,6 +47,10 @@ ROLES = [
         # Allow Scientist role to add analyses by default
         (core_permissions.AddAnalysis, 0),
     ]),
+    ("Rejector", "", [
+        # Allow Rejector role to reject analyses by default
+        (core_permissions.TransitionRejectAnalysis, 0),
+    ]),
 ]
 
 # List of tuples of (id, title, roles)
@@ -54,6 +58,9 @@ GROUPS = [
     ("Scientists", "Scientists", [
         "Member", "Analyst", "Scientist",
     ]),
+    ("Rejectors", "Rejectors", [
+        "Member", "Analyst", "Rejector",
+    ])
 ]
 
 # Workflow updates

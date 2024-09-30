@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #9 Added Rejector role and Rejectors group
 - #8 Add Department filter for "Analyses results" statistics report
 - #7 Add Scientist role and Scientists group
 - #6 Port scripts from palau.lims
