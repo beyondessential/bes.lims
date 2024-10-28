@@ -27,7 +27,7 @@ def get_zope_conf():
     raise Exception("Could not find zope.conf in {}".format(lookup_paths))
 
 
-def setup_script_environment(app, stream_out=True, username="admin",
+def setup_script_environment(app, stream_out=False, username="admin",
                              logger=DEFAULT_LOGGER):
     """Setup the suitable environment for running scripts from terminal
     """
