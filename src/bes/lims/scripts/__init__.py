@@ -27,17 +27,26 @@ def get_zope_conf():
     raise Exception("Could not find zope.conf in {}".format(lookup_paths))
 
 
-def setup_script_environment(app, stream_out=True, username="admin"):
+def setup_script_environment(app, stream_out=True, username="admin",
+                             loggers=None):
     """Setup the suitable environment for running scripts from terminal
     """
     # Load zope configuration
     zope_conf = get_zope_conf()
     configure(zope_conf)
 
-    # Verbose logging
-    logger.setLevel(logging.DEBUG)
-    if stream_out:
-        logger.addHandler(logging.StreamHandler())
+    # add custom loggers
+    if not loggers:
+        loggers = []
+
+    # add this product logger to the list
+    loggers.append(logger)
+
+    for logger_obj in loggers:
+        # Verbose logging
+        logger_obj.setLevel(logging.DEBUG)
+        if stream_out:
+            logger_obj.addHandler(logging.StreamHandler())
 
     # Load site
     site = app.senaite

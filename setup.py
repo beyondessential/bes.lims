@@ -28,7 +28,7 @@ setup(
     keywords="",
     author="NARALABS",
     author_email="info@naralabs.com",
-    url="https://github.com/naralabs/bes.lims",
+    url="https://github.com/beyondessential/bes.lims",
     license="GPLv2",
     packages=find_packages(where="src", include=["bes*"]),
     package_dir={"": "src"},
