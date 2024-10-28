@@ -4,7 +4,7 @@ import logging
 import os
 
 from AccessControl.SecurityManagement import newSecurityManager
-from bes.lims import logger
+from bes.lims import logger as DEFAULT_LOGGER
 from senaite.core.scripts.utils import setup_site
 from Zope2 import configure
 
@@ -28,25 +28,17 @@ def get_zope_conf():
 
 
 def setup_script_environment(app, stream_out=True, username="admin",
-                             loggers=None):
+                             logger=DEFAULT_LOGGER):
     """Setup the suitable environment for running scripts from terminal
     """
     # Load zope configuration
     zope_conf = get_zope_conf()
     configure(zope_conf)
 
-    # add custom loggers
-    if not loggers:
-        loggers = []
-
-    # add this product logger to the list
-    loggers.append(logger)
-
-    for logger_obj in loggers:
-        # Verbose logging
-        logger_obj.setLevel(logging.DEBUG)
-        if stream_out:
-            logger_obj.addHandler(logging.StreamHandler())
+    # Verbose logging
+    logger.setLevel(logging.DEBUG)
+    if stream_out:
+        logger.addHandler(logging.StreamHandler())
 
     # Load site
     site = app.senaite
