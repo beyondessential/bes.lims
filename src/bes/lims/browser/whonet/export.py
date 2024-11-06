@@ -4,13 +4,13 @@
 #
 # Copyright 2023-2024 Beyond Essential Systems Pty Ltd
 
+from bes.lims.config import CULTURE_INTERPRETATION_KEYWORD
+from bes.lims.utils import get_field_value
 from bika.lims import api
 from bika.lims.interfaces import IVerified
 from datetime import datetime
 from plone.app.layout.globals.interfaces import IViewView
 from plone.memoize.view import memoize
-from kiribati.lims.config import CULTURE_INTERPRETATION_KEYWORD
-from kiribati.lims.utils import get_field_value
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -299,11 +299,10 @@ class WHONETExportView(BrowserView):
     def get_sample_info(self, sample):
         """Returns a dictionary that represents the sample object passed-in
         """
-        patient_name = get_field_value(sample, "PatientFullName", default={})
-        mrn = get_field_value(sample, "MedicalRecordNumber", default={})
-        mrn = mrn.get("value", "")
+        patient_name = sample.getPatientFullName()
+        mrn = sample.getMedicalRecordNumberValue()
         dob = sample.getDateOfBirth()[0]
-        ward = get_field_value(sample, "Ward")
+        ward = sample.getWard()
         if ward:
             ward = api.get_title(ward)
 
@@ -312,6 +311,7 @@ class WHONETExportView(BrowserView):
         date_sampled = sample.getDateSampled()
         date_received = sample.getDateReceived()
         clinical_info = sample.getClinicalInformation()
+        # XXX Port CurrentAntibiotics functionality from kiribati/palau/...
         antibiotics = get_field_value(sample, "CurrentAntibiotics")
         antibiotics = antibiotics or []
         antibiotics = ", ".join(map(api.get_title, antibiotics))

@@ -7,6 +7,7 @@
 from bes.lims import _
 from Products.Archetypes import DisplayList
 
+CULTURE_INTERPRETATION_KEYWORD = "CINTER"
 
 ANALYSIS_REPORTABLE_STATUSES = (
     "to_be_verified",
