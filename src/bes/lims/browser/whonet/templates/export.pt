@@ -1,0 +1,62 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="bes.lims">
+  <head>
+  </head>
+  <body>
+
+    <!-- Title -->
+    <metal:content-title fill-slot="content-title">
+      <h1 i18n:translate="">WHONET Export</h1>
+    </metal:content-title>
+
+    <!-- Description -->
+    <metal:content-description fill-slot="content-description">
+      <div class="visualClear"></div>
+    </metal:content-description>
+
+    <!-- Content -->
+    <metal:core fill-slot="content-core">
+      <div id="whonet-export-view" class="row">
+        <div class="col-sm-12">
+
+          <form class="form form-inline" id="whonet_export_form" method="post">
+
+
+            <input type="hidden" name="submitted" value="1"/>
+            <input tal:replace="structure context/@@authenticator/authenticator"/>
+
+            <div class="form-group">
+
+              <!-- Verified from -->
+              <label for="created_from" class="field mr-2"
+                     i18n:translate="">Verified and published analyses, from samples collected between</label>
+              <input type="date"
+                     class="form-control form-control-sm mr-2"
+                     name="created_from"
+                     tal:attributes="value python: view.created_from"/>
+
+              <!-- Verified to -->
+              <label for="created_to" class="field mr-2"
+                     i18n:translate="">and</label>
+              <input type="date"
+                     class="form-control form-control-sm mr-2"
+                     name="created_to"
+                     tal:attributes="value python: view.created_to"/>
+
+              <input name="button_export"
+                     type="submit"
+                     class="btn btn-primary btn-sm mr-2"
+                     i18n:attributes="value"
+                     value="Generate CSV file"/>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </metal:core>
+
+  </body>
+</html>

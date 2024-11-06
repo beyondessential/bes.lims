@@ -180,3 +180,13 @@ def setup_rejector(tool):
         analysis._p_deactivate()
 
     logger.info("Setup Rejector role and Rejectors group [DONE]")
+
+
+def setup_whonet_export_action(tool):
+    """Adds the whonet export portal action
+    """
+    logger.info("Setup WHONET export ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "actions")
+    logger.info("Setup WHONET export [DONE]")
