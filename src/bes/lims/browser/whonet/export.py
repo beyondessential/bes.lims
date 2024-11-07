@@ -299,7 +299,6 @@ class WHONETExportView(BrowserView):
     def get_sample_info(self, sample):
         """Returns a dictionary that represents the sample object passed-in
         """
-        patient_name = sample.getPatientFullName()
         mrn = sample.getMedicalRecordNumberValue()
         dob = sample.getDateOfBirth()[0]
         ward = sample.getWard()
@@ -316,11 +315,15 @@ class WHONETExportView(BrowserView):
         antibiotics = antibiotics or []
         antibiotics = ", ".join(map(api.get_title, antibiotics))
 
+        patient_field = sample.getField("PatientFullName")
+        firstname = patient_field.get_firstname(sample)
+        lastname = patient_field.get_lastname(sample)
+
         return {
             "client": api.get_title(client),
             "mrn": mrn,
-            "patient_firstname": patient_name.get("firstname", ""),
-            "patient_lastname": patient_name.get("lastname", ""),
+            "patient_firstname": firstname,
+            "patient_lastname": lastname,
             "dob": self.format_date(dob),
             "age": self.get_age_ymd(dob, date_sampled),
             "sex": sample.getSex(),
