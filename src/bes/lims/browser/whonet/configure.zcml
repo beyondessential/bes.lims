@@ -1,0 +1,15 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- View for the export of AST results to a delimited text file format that
+   can be imported into WHONET software (https://www.whonet.org) through
+   the data import module BacLink -->
+  <browser:page
+    for="*"
+    name="export_whonet"
+    class=".export.WHONETExportView"
+    permission="senaite.core.permissions.ManageAnalysisRequests"
+    layer="bes.lims.interfaces.IBESLimsLayer" />
+
+</configure>

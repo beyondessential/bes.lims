@@ -99,3 +99,14 @@ def is_enough_volume(brain_or_sample):
     min_volume = mapi.get_magnitude(min_volume, default="0 ml")
     obj_volume = mapi.get_magnitude(obj_volume, default="0 ml")
     return obj_volume >= min_volume
+
+
+def get_field_value(instance, field_name, default=None):
+    """Returns the value of a Schema field
+    """
+    fields = api.get_fields(instance)
+    field = fields.get(field_name)
+    if not field:
+        return default
+
+    return field.get(instance)

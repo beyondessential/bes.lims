@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup WHONET report action"
+      description="Setup WHONET report action"
+      source="1005"
+      destination="1006"
+      handler=".v01_00_000.setup_whonet_export_action"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Add Rejector role and Rejectors group"
       description="Add Rejector role and Rejectors group"
       source="1004"

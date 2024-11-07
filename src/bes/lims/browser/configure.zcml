@@ -8,6 +8,7 @@
   <include package=".sample"/>
   <include package=".sampletype"/>
   <include package=".viewlets"/>
+  <include package=".whonet"/>
 
   <!-- Static directory for js, css and image resources -->
   <plone:static
