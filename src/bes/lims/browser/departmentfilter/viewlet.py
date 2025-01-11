@@ -52,6 +52,8 @@ class DepartmentFilteringViewlet(ViewletBase):
         linked to the current user
         """
         contact = self.get_current_contact()
+        if not contact:
+            return []
 
         # departments allowed for the current user
         allowed = get_allowed_departments(contact)
