@@ -10,18 +10,6 @@ STORAGE_KEY = "departmentfilter.storage"
 NO_DEPARTMENT = "--NODEPARTMENT--"
 
 
-def is_lab_manager(contact):
-    """Returns whether the current contact is a manager or lab manager
-    """
-    manager_roles = ["LabManager", "Manager"]
-    user = contact.getUser()
-    roles = user.getRoles() if user else []
-    for role in roles:
-        if role in manager_roles:
-            return True
-    return False
-
-
 def get_allowed_departments(contact):
     """Returns the UIDs of the departments associated with this contact.
 
