@@ -5,6 +5,7 @@
 
   <!-- Package includes -->
   <include package=".controlpanel"/>
+  <include package=".departmentfilter"/>
   <include package=".sample"/>
   <include package=".sampletype"/>
   <include package=".viewlets"/>
