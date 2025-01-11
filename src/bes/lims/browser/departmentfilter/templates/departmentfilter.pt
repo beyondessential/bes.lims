@@ -1,0 +1,35 @@
+<div tal:condition="python: view.is_visible()"
+     i18n:domain="bes.lims">
+
+  <form class="form-inline"
+        id="departmentfilter"
+        name="departmentfilter"
+        method="POST">
+
+    <span i18n:translate="" class="mr-3 font-weight-bold">
+      Department:
+    </span>
+
+    <div tal:repeat="department python:view.get_departments()"
+         class="form-check form-check-inline input-group-input">
+
+      <tal:checkbox
+        define="id    string:department-${repeat/department/number};
+                clazz department/css;">
+        <input class="form-check-input" type="checkbox"
+               tal:attributes="id      python:id;
+                               value   department/uid;
+                               checked python:department['selected'];"
+               name="departments:list">
+        <label tal:attributes="for   python:id;
+                               class python:'form-check-label %s' % clazz;"
+               tal:content="department/title"></label>
+      </tal:checkbox>
+    </div>
+
+    <button type="submit" i18n:translate=""
+            class="btn btn-sm btn-outline-primary ml-2">Apply</button>
+
+  </form>
+
+</div>

@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup department filtering functionality"
+      description="Setup department filtering functionality"
+      source="1006"
+      destination="1007"
+      handler=".v01_00_000.setup_department_filtering"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup WHONET report action"
       description="Setup WHONET report action"
       source="1005"

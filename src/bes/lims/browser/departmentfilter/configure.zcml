@@ -1,0 +1,20 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Department filtering viewlet -->
+  <browser:viewlet
+      for="bika.lims.interfaces.IAnalysisRequestsFolder"
+      name="bes.lims.viewlet.departmentfilter"
+      class=".viewlet.DepartmentFilteringViewlet"
+      manager="plone.app.layout.viewlets.interfaces.IBelowContentTitle"
+      permission="zope2.View"
+      layer="bes.lims.interfaces.IBESLimsLayer" />
+
+  <!-- Samples listing -->
+  <subscriber
+      for="bika.lims.browser.analysisrequest.AnalysisRequestsView
+           *"
+      provides="senaite.app.listing.interfaces.IListingViewAdapter"
+      factory=".listing.DepartmentFilterListingAdapter" />
+
+</configure>

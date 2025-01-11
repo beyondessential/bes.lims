@@ -3,6 +3,7 @@
 from bes.lims import logger
 from bes.lims import PRODUCT_NAME as product
 from bes.lims.setuphandlers import setup_behaviors
+from bes.lims.setuphandlers import setup_catalogs
 from bes.lims.setuphandlers import setup_groups
 from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
@@ -190,3 +191,16 @@ def setup_whonet_export_action(tool):
     setup = portal.portal_setup
     setup.runImportStepFromProfile(profile, "actions")
     logger.info("Setup WHONET export [DONE]")
+
+
+def setup_department_filtering(tool):
+    """Setup the indexes to enable the department filtering functionality
+    """
+    logger.info("Setup department filtering ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Setup Catalogs
+    setup_catalogs(portal)
+
+    logger.info("Setup department filtering [DONE]")

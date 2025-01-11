@@ -12,6 +12,7 @@ from plone import api as ploneapi
 from senaite.core import permissions as core_permissions
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
+from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.setuphandlers import setup_other_catalogs
 from senaite.core.workflow import ANALYSIS_WORKFLOW
@@ -24,6 +25,7 @@ CATALOGS = (
 INDEXES = [
     # Tuples of (catalog, index_name, index_attribute, index_type)
     (ANALYSIS_CATALOG, "department_uid", "", "FieldIndex"),
+    (SAMPLE_CATALOG, "department_uid", "", "KeywordIndex"),
 ]
 
 COLUMNS = [

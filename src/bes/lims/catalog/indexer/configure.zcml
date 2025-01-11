@@ -3,4 +3,7 @@
   <!-- BaseAnalysis Indexer -->
   <adapter name="department_uid" factory=".baseanalysis.department_uid"/>
 
+  <!-- Sample Indexer -->
+  <adapter name="department_uid" factory=".sample.department_uid"/>
+
 </configure>
