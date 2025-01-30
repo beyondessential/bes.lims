@@ -132,10 +132,10 @@ def setup_handler(context):
     portal = context.getSite()
 
     # Setup roles
-    setup_roles(portal)
+    #setup_roles(portal)
 
     # Setup groups
-    setup_groups(portal)
+    #setup_groups(portal)
 
     # Setup Catalogs
     setup_catalogs(portal)
