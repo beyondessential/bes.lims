@@ -222,3 +222,34 @@ def setup_department_filtering(tool):
     setup_catalogs(portal)
 
     logger.info("Setup department filtering [DONE]")
+
+
+def setup_roles_and_groups(tool):
+    """Setup bes roles and groups that went missing in newly created instances
+    """
+    logger.info("Setup missing roles and groups ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Re-import rolemap
+    setup.runImportStepFromProfile(profile, "rolemap")
+
+    # Setup roles
+    setup_roles(portal)
+
+    # Create groups
+    setup_groups(portal)
+
+    # Update Analyses rolemap
+    wf = wapi.get_workflow(ANALYSIS_WORKFLOW)
+    states = ["assigned", "unassigned", "to_be_verified"]
+    query = {"portal_type": "Analysis", "review_state": states}
+    brains = api.search(query, ANALYSIS_CATALOG)
+    for brain in brains:
+        analysis = get_object(brain)
+        if not analysis:
+            continue
+        wf.updateRoleMappingsFor(analysis)
+        analysis._p_deactivate()
+
+    logger.info("Setup missing roles and groups [DONE]")

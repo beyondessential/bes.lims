@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup product-specific roles and groups"
+      description="Setup product-specific roles and groups"
+      source="1007"
+      destination="1008"
+      handler=".v01_00_000.setup_roles_and_groups"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup department filtering functionality"
       description="Setup department filtering functionality"
       source="1006"

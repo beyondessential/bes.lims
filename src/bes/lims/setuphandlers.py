@@ -20,6 +20,7 @@
 
 from bes.lims import logger
 from bes.lims import permissions
+from bes.lims import PRODUCT_NAME
 from bika.lims import api
 from bika.lims.api import security as sapi
 from plone import api as ploneapi
@@ -144,12 +145,19 @@ def setup_handler(context):
     logger.info("BES setup handler [BEGIN]")
 
     portal = context.getSite()
+    setup = portal.portal_setup  # noqa
+
+    # Run required import steps
+    profile = "profile-{0}:default".format(PRODUCT_NAME)
+    setup.runImportStepFromProfile(profile, "actions")
+    setup.runImportStepFromProfile(profile, "rolemap")
+    setup.runImportStepFromProfile(profile, "skins")
 
     # Setup roles
-    #setup_roles(portal)
+    setup_roles(portal)
 
     # Setup groups
-    #setup_groups(portal)
+    setup_groups(portal)
 
     # Setup Catalogs
     setup_catalogs(portal)
