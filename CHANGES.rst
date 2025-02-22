@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #26 Fix Scientist and Rejector roles/groups missing in new instances
 - #23 Add a department filter bar in samples listing
 - #13 Setup whonet report
 - #9 Added Rejector role and Rejectors group
