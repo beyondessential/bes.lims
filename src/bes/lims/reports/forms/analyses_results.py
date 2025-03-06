@@ -27,7 +27,6 @@ from bes.lims.reports.forms import CSVReport
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from senaite.core.api import dtime
-from senaite.core.api.dtime import get_relative_delta
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.patient.api import get_age_ymd
 from senaite.patient.config import SEXES
