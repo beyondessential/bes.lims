@@ -27,7 +27,9 @@ from bes.lims.reports.forms import CSVReport
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from senaite.core.api import dtime
+from senaite.core.api.dtime import get_relative_delta
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.patient.api import get_age_ymd
 from senaite.patient.config import SEXES
 
 
@@ -55,6 +57,7 @@ class AnalysesResults(CSVReport):
             _("Patient Other Names"),
             _("Patient Hospital #"),
             _("Patient Date of Birth"),
+            _("Patient Age"),
             _("Patient Gender"),
             _("Test Date Collected"),
             _("Test Date Tested"),
@@ -71,8 +74,11 @@ class AnalysesResults(CSVReport):
         for analysis in analyses:
             sample = analysis.getRequest()
             fullname = sample.getField("PatientFullName").get(sample) or {}
-            dob = self.parse_date_to_output(sample.getDateOfBirth()[0])
-            sampled = self.parse_date_to_output(sample.getDateSampled())
+            sampled = sample.getDateSampled()
+            dob = sample.getDateOfBirth()[0]
+            age = self.get_age(dob, sampled)
+            dob = self.parse_date_to_output(dob)
+            sampled = self.parse_date_to_output(sampled)
             result_captured = self.parse_date_to_output(
                 analysis.getResultCaptureDate()
             )
@@ -95,6 +101,7 @@ class AnalysesResults(CSVReport):
                     fullname.get("middlename", ""),
                     sample.getMedicalRecordNumberValue() or "",
                     dob,
+                    age,
                     dict(SEXES).get(sample.getSex(), ""),
                     sampled,
                     result_captured,
@@ -109,6 +116,16 @@ class AnalysesResults(CSVReport):
             )
 
         return rows
+
+    def get_age(self, dob, sampled):
+        """Returns the age truncated to the highest period
+        """
+        ymd = get_age_ymd(dob, sampled)
+        if not ymd:
+            return None
+        # truncate to highest period
+        matches = re.match(r"^(\d+[ymd])", ymd)
+        return matches.groups()[0]
 
     def replace_html_breaklines(self, text, replacement="; "):
         regex = r'<br\s*\/?>|<BR\s*\/?>'
