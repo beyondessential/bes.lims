@@ -27,6 +27,13 @@
       </tal:checkbox>
     </div>
 
+    <!-- All departments option -->
+    <button type="submit" 
+              name="all_departments"
+              value="all_departments"
+              class="btn btn-sm btn-outline-primary ml-2"
+              i18n:translate="">All</button>
+
     <button type="submit" i18n:translate=""
             class="btn btn-sm btn-outline-primary ml-2">Apply</button>
 
