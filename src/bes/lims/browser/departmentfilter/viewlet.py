@@ -94,12 +94,24 @@ class DepartmentFilteringViewlet(ViewletBase):
         return True if departments else False
 
     def render(self):
-        # Handle manual selection of departments
-        departments = self.request.form.get("departments", None)
-        if departments is None:
+        # Check if form was submitted
+        form_submitted = (
+            "departments" in self.request.form
+            or "all_departments" in self.request.form
+        )
+        if not form_submitted:
             return self.index()
 
         contact = self.get_current_contact()
+
+        all_departments = self.request.form.get("all_departments", None)
+        if all_departments:
+            # Get all available departments
+            departments = get_allowed_departments(contact)
+        else:
+            # Otherwise use the selected departments
+            departments = self.request.form.get("departments", [])
+
         set_selected_departments(contact, departments)
 
         return self.index()

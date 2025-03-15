@@ -4,7 +4,8 @@ Changelog
 1.0.0
 -----
 
-- #27 Display patient age in "Analyses results" stat report
+- #30 Add an "All" button to the department filter bar
+- #29 Display patient age in "Analyses results" stat report
 - #26 Fix Scientist and Rejector roles/groups missing in new instances
 - #23 Add a department filter bar in samples listing
 - #13 Setup whonet report
