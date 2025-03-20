@@ -19,6 +19,7 @@
   <include file="vocabularies.zcml"/>
 
   <!-- Package includes -->
+  <include package=".adapters"/>
   <include package=".behaviors"/>
   <include package=".browser"/>
   <include package=".catalog"/>

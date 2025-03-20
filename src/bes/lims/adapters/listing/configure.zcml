@@ -1,0 +1,11 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="bes.lims">
+
+  <subscriber
+    for="senaite.core.browser.samples.view.SamplesView
+         *"
+    provides="senaite.app.listing.interfaces.IListingViewAdapter"
+    factory=".samples.SamplesListingAdapter" />
+
+</configure>
