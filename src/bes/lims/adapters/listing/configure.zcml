@@ -3,8 +3,8 @@
     i18n_domain="bes.lims">
 
   <subscriber
-    for="bika.lims.browser.analysisrequest.AnalysisRequestsView
-         bika.lims.interfaces.IAnalysisRequestsFolder"
+    for="senaite.core.browser.samples.view.SamplesView
+         *"
     provides="senaite.app.listing.interfaces.IListingViewAdapter"
     factory=".samples.SamplesListingAdapter" />
 
