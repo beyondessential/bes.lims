@@ -1,0 +1,10 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
+
+  <monkey:patch
+      class="senaite.core.vocabularies.stickers.StickerTemplatesVocabulary"
+      original="__call__"
+      replacement=".stickers.call" />
+
+</configure>

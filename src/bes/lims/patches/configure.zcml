@@ -2,5 +2,6 @@
 
   <!-- Package includes -->
   <include package=".beka"/>
+  <include package=".vocabularies"/>
 
 </configure>
