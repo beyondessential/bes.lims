@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Reset default sticker templates from setup"
+      description="Reset default sticker templates from setup"
+      source="1008"
+      destination="1009"
+      handler=".v01_00_000.reset_setup_sticker_templates"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup product-specific roles and groups"
       description="Setup product-specific roles and groups"
       source="1007"

@@ -35,6 +35,8 @@ from senaite.core.upgrade import upgradestep
 from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.workflow import ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
+from zope import component
+from zope.schema.interfaces import IVocabularyFactory
 
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
@@ -253,3 +255,36 @@ def setup_roles_and_groups(tool):
         analysis._p_deactivate()
 
     logger.info("Setup missing roles and groups [DONE]")
+
+
+def reset_setup_sticker_templates(tool):
+    """Restore the default sticker templates from setup
+    """
+    setup = api.get_setup()
+
+    # default to the first sticker from vocabulary
+    vocab_id = "senaite.core.vocabularies.stickers"
+    vocab_factory = component.getUtility(IVocabularyFactory, name=vocab_id)
+    vocab = list(vocab_factory(setup))
+    default = vocab[0].value
+
+    fields = [
+        "AutoStickerTemplate",
+        "SmallStickerTemplate",
+        "LargeStickerTemplate"
+    ]
+
+    def is_from_senaite(template_id):
+        """Returns whether this template is from senaite namespace
+        """
+        if ":" not in template_id:
+            return True
+        return template_id.startswith("senaite.")
+
+    for field_name in fields:
+        field = setup.getField(field_name)
+        template = field.get(setup)
+        if not is_from_senaite(template):
+            continue
+
+        field.set(setup, default)
