@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #32 Do not display stickers from senaite namespace
 - #31 Flat listing for default, due, received, to be verified and verified samples
 - #30 Add an "All" button to the department filter bar
 - #29 Display patient age in "Analyses results" stat report

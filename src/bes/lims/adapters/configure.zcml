@@ -3,4 +3,10 @@
   <!-- Package includes -->
   <include package=".listing" />
 
+  <!-- IGetStickerTemplates adapter to only return the stickers from bes -->
+  <adapter
+      for="*"
+      provides="senaite.core.interfaces.IGetStickerTemplates"
+      factory=".stickers.StickerTemplates" />
+
 </configure>
