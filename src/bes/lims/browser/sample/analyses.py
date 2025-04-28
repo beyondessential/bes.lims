@@ -81,13 +81,20 @@ class SampleAnalysesListingAdapter(object):
         self.move_column("Analyst", before="DueDate")
         self.move_column("state_title", after="Analyst")
 
+        # Get the listing's review state ids
+        states = map(lambda st: st["id"], self.listing.review_states)
+
         # Add review_states
         for status in ADD_STATUSES:
+            # be sure this state exists in listing
             after = status.get("after", None)
-            before = status.get("before", None)
-            if not status.get("columns"):
-                status.update({"columns": self.listing.columns.keys()})
-            add_review_state(self.listing, status, after=after, before=before)
+            after = after if after in states else None
+
+            # assign the existing columns to the new status
+            status.update({"columns": self.listing.columns.keys()})
+
+            # add the review status
+            add_review_state(self.listing, status, after=after)
 
         # Rename the column "Specification" to "Normal values"
         for key, value in self.listing.columns.items():
