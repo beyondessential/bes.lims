@@ -556,10 +556,16 @@ class DefaultReportView(SingleReportView):
         return info
 
     def get_results_interpretations(self, model):
-        """Returns the result interpretations
+        """Returns the result interpretations, from partitions included
         """
-        # do a hard copy to prevent persistent changes
-        interpretations = copy.deepcopy(model.getResultsInterpretationDepts())
+        interpretations = []
+
+        # get from the partitions as well
+        samples = [model] + model.getDescendants(all_descendants=True)
+        for sample in samples:
+            # do a hard copy to prevent persistent changes
+            by_dept = sample.getResultsInterpretationDepts()
+            interpretations.extend(copy.deepcopy(by_dept))
 
         # group by user
         groups = collections.OrderedDict()
