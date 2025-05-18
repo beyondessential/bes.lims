@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #48 Display result interpretations from partitions
 - #47 Setup the Microbiology department for AST-like services and analyses
 - #32 Do not display stickers from senaite namespace
 - #31 Flat listing for default, due, received, to be verified and verified samples
