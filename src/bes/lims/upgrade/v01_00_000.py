@@ -23,6 +23,7 @@ from bes.lims import PRODUCT_NAME as product
 from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_catalogs
 from bes.lims.setuphandlers import setup_groups
+from bes.lims.setuphandlers import setup_microbiology_department
 from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
 from bika.lims import api
@@ -37,6 +38,7 @@ from senaite.core.workflow import ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
 from zope.schema.interfaces import IVocabularyFactory
+
 
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
@@ -288,3 +290,15 @@ def reset_setup_sticker_templates(tool):
             continue
 
         field.set(setup, default)
+
+
+def setup_ast_department(tool):
+    """Setup the 'Microbiology' department for AST services and tests
+    """
+    logger.info("Setup department for AST services and analyses ...")
+    portal = tool.aq_inner.aq_parent
+
+    # setup microbiology department and assign the AST-like analyses to it
+    setup_microbiology_department(portal)
+
+    logger.info("Setup department for AST services and analyses [DONE]")

@@ -24,10 +24,12 @@ from bes.lims import PRODUCT_NAME
 from bika.lims import api
 from bika.lims.api import security as sapi
 from plone import api as ploneapi
+from senaite.ast.config import AST_POINT_OF_CAPTURE
 from senaite.core import permissions as core_permissions
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.setuphandlers import setup_other_catalogs
 from senaite.core.workflow import ANALYSIS_WORKFLOW
@@ -168,6 +170,9 @@ def setup_handler(context):
     # Setup workflows
     setup_workflows(portal)
 
+    # Setup microbiology department and assign ast-analyses
+    setup_microbiology_department(portal)
+
     logger.info("BES setup handler [DONE]")
 
 
@@ -245,3 +250,75 @@ def setup_groups(portal):
                 title, group_id, ", ".join(roles)))
 
     logger.info("Setup groups [DONE]")
+
+
+def get_safe_object(brain_object_uid):
+    """Returns the object from the given uid/brain/object. Returns None if no
+    object exists or the brain is stale
+    """
+    obj = None
+    try:
+        obj = api.get_object(brain_object_uid, default=None)
+        if not obj:
+            logger.warn("Object not found: %r" % brain_object_uid)
+    except AttributeError as e:
+        logger.info("Cannot get object: %r (%s)" % (brain_object_uid, str(e)))
+    return obj
+
+
+def deactivate(obj):
+    """Deactivates an object to save memory
+    """
+    if not obj:
+        return
+    obj._p_deactivate()
+
+
+def setup_microbiology_department(portal):
+    """Setup microbiology department and assign the AST-like analyses to it
+    """
+    logger.info("Setup microbiology department ...")
+
+    setup = portal.setup
+    sc = api.get_tool(SETUP_CATALOG)
+    deps = sc(portal_type="Department", title="Microbiology")
+    if deps:
+        department = api.get_object(deps[0])
+    else:
+        # create the department
+        department = api.create(setup.departments, "Department",
+                                title="Microbiology")
+
+    # assign the Microbiology department to all AST-like services
+    brains = sc(portal_type="AnalysisService",
+                point_of_capture=AST_POINT_OF_CAPTURE)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating analyses {0}/{1}".format(num, total))
+
+        service = get_safe_object(brain)
+        if not service:
+            continue
+
+        service.setDepartment(department)
+        service.reindexObject()
+        deactivate(service)
+
+    # assign the Microbiology department to all AST-like analyses
+    ac = api.get_tool(ANALYSIS_CATALOG)
+    brains = ac(portal_type="Analysis", getPointOfCapture=AST_POINT_OF_CAPTURE)
+    total = len(brains)
+    idxs = ["department_id", "department_title", "department_uid"]
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating analyses {0}/{1}".format(num, total))
+
+        analysis = get_safe_object(brain)
+        if not analysis:
+            continue
+
+        analysis.setDepartment(department)
+        analysis.reindexObject(idxs=idxs)
+        deactivate(analysis)
+
+    logger.info("Setup microbiology department [DONE]")
