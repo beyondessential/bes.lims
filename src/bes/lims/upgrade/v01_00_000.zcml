@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup the microbiology department for AST services and analyses"
+      description="Setup a department for AST services and tests"
+      source="1009"
+      destination="1010"
+      handler=".v01_00_000.setup_ast_department"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Reset default sticker templates from setup"
       description="Reset default sticker templates from setup"
       source="1008"
