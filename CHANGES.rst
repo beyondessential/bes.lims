@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #49 Grant edit remarks permission for analyses in to_be_verified status
 - #48 Display result interpretations from partitions
 - #47 Setup the Microbiology department for AST-like services and analyses
 - #32 Do not display stickers from senaite namespace

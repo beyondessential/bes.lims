@@ -33,6 +33,8 @@ from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.setuphandlers import setup_other_catalogs
 from senaite.core.workflow import ANALYSIS_WORKFLOW
+from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
+from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 
 CATALOGS = (
@@ -84,6 +86,30 @@ GROUPS = [
 
 # Workflow updates
 WORKFLOWS_TO_UPDATE = {
+    DUPLICATE_ANALYSIS_WORKFLOW: {
+        "states": {
+            "to_be_verified": {
+                "permissions": {
+                    # allow LabManager, Manager and Scientist to edit remarks
+                    core_permissions.FieldEditAnalysisRemarks: [
+                        "Scientist", "LabManager", "Manager"
+                    ],
+                }
+            },
+        },
+    },
+    REFERENCE_ANALYSIS_WORKFLOW: {
+        "states": {
+            "to_be_verified": {
+                "permissions": {
+                    # allow LabManager, Manager and Scientist to edit remarks
+                    core_permissions.FieldEditAnalysisRemarks: [
+                        "Scientist", "LabManager", "Manager"
+                    ],
+                }
+            },
+        },
+    },
     ANALYSIS_WORKFLOW: {
         "states": {
             "assigned": {
@@ -129,7 +155,11 @@ WORKFLOWS_TO_UPDATE = {
             "to_be_verified": {
                 "permissions": {
                     # allow Scientist role to add analyses in to_be_verified
-                    core_permissions.AddAnalysis: ["Scientist", ]
+                    core_permissions.AddAnalysis: ["Scientist", ],
+                    # allow LabManager, Manager and Scientist to edit remarks
+                    core_permissions.FieldEditAnalysisRemarks: [
+                        "Scientist", "LabManager", "Manager"
+                    ],
                 }
             }
         }
