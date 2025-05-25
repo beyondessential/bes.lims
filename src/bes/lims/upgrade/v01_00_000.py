@@ -32,9 +32,12 @@ from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.migration.migrator import get_attribute_storage
+from senaite.core.permissions import FieldEditAnalysisRemarks
 from senaite.core.upgrade import upgradestep
 from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.workflow import ANALYSIS_WORKFLOW
+from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
+from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
 from zope.schema.interfaces import IVocabularyFactory
@@ -302,3 +305,43 @@ def setup_ast_department(tool):
     setup_microbiology_department(portal)
 
     logger.info("Setup department for AST services and analyses [DONE]")
+
+
+def setup_edit_remarks(tool):
+    """Grants the `Edit Analysis Remarks` permission for the `to_be_verified`
+    state in both the analyses and reference analyses workflows. This
+    permission is assigned to the LabManager and Manager roles, enabling users
+    with these roles to edit remarks for analyses in this state.
+    Additionally, the function updates role mappings for all analyses and
+    reference analyses currently in the `to_be_verified` state, ensuring that
+    users with the LabManager or Manager role can edit the remarks before the
+    analysis is verified.
+    """
+    logger.info("Setup permission for analysis remarks edition ...")
+    wfs = [
+        ANALYSIS_WORKFLOW,
+        REFERENCE_ANALYSIS_WORKFLOW,
+        DUPLICATE_ANALYSIS_WORKFLOW
+    ]
+    for wf in wfs:
+        state = wapi.get_state(wf, "to_be_verified")
+        roles = ["Scientist", "LabManager", "Manager"]
+        wapi.update_permission(state, FieldEditAnalysisRemarks, roles)
+
+    # Update role mappings
+    query = {"review_state": "to_be_verified"}
+    brains = api.search(query, ANALYSIS_CATALOG)
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating role mappings {0}/{1}".format(num, total))
+
+        analysis = get_object(brain)
+        if not analysis:
+            continue
+
+        wf = wapi.get_workflow(analysis)
+        wf.updateRoleMappingsFor(analysis)
+        analysis._p_deactivate()  # noqa
+
+    logger.info("Setup permission for analysis remarks edition [DONE]")
