@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #54 Allow to choose "out of stock" in analyses received by month stats report
 - #49 Grant edit remarks permission for analyses in to_be_verified status
 - #48 Display result interpretations from partitions
 - #47 Setup the Microbiology department for AST-like services and analyses
