@@ -43,8 +43,12 @@ class AnalysesResults(CSVReport):
 
         # search by requested department
         department_uid = self.request.form.get("department")
-        brains = get_analyses(date_from, date_to, review_state=statuses,
-                              department_uid=department_uid)
+        query = {"review_state": statuses}
+        if api.is_uid(department_uid):
+            query["department_uid"] = department_uid
+
+        # do the search
+        brains = get_analyses(date_from, date_to, **query)
         objs = map(api.get_object, brains)
         analyses = [analysis for analysis in objs if is_reportable(analysis)]
 

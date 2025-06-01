@@ -42,9 +42,12 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
         year = int(self.request.form.get("year"))
         # search by requested department
         department_uid = self.request.form.get("department")
-        brains = get_analyses_by_year(year, review_state=statuses,
-                                      department_uid=department_uid,
-                                      getPointOfCapture=poc)
+        query = {"review_state": statuses, "getPointOfCapture": poc}
+        if api.is_uid(department_uid):
+            query["department_uid"] = department_uid
+
+        # do the search
+        brains = get_analyses_by_year(year, **query)
 
         # add the first two rows (header)
         department = api.get_object_by_uid(department_uid, default=None)
