@@ -1,0 +1,18 @@
+<tal:control i18n:domain="bes.lims"
+  define="default python:['to_be_verified', 'verified', 'published']">
+
+  <!-- Analysis statuses -->
+  <label for="analysis_states" class="field mr-2" i18n:translate="">
+    Analysis states
+    </label>
+  <select name="analysis_states"
+          class="form-control form-control-sm mr-2" multiple>
+    <tal:options repeat="state_info python:view.get_analysis_states()">
+      <option tal:attributes="value python:state_info[0];
+                              selected python:'selected' if state_info[0] in default else None"
+              tal:content="python: state_info[1]">
+      </option>
+    </tal:options>
+  </select>
+
+</tal:control>

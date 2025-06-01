@@ -3,6 +3,7 @@
   <!-- Department -->
   <label for="year" class="field mr-2" i18n:translate="">Department</label>
   <select name="department" class="form-control form-control-sm mr-2">
+    <option value='__all__' i18n:translate="">All departments</option>
     <option value="" i18n:translate="">Without department assigned</option>
     <tal:options repeat="department python:view.get_departments()">
       <option tal:attributes="value department/uid"

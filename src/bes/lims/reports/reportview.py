@@ -29,11 +29,14 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile as PT
 from senaite.app.supermodel import SuperModel
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
+from senaite.core.workflow import ANALYSIS_WORKFLOW
+from senaite.core.api import workflow as wapi
 
 YEAR_CONTROL = "controls/year.pt"
 DATE_CONTROL = "controls/date.pt"
 TARGET_PATIENT_CONTROL = "controls/target_patient.pt"
 DEPARTMENT_CONTROL = "controls/department.pt"
+ANALYSIS_STATES_CONTROL = "controls/analysis_states.pt"
 
 
 class StatisticReportsView(BrowserView):
@@ -73,6 +76,11 @@ class StatisticReportsView(BrowserView):
         """
         return PT(DEPARTMENT_CONTROL)(self)
 
+    def analysis_states_control(self):
+        """Returns the control for the selection of analysis states
+        """
+        return PT(ANALYSIS_STATES_CONTROL)(self)
+
     @view.memoize
     def get_years(self):
         """Returns the list of years since the first sample was created
@@ -103,6 +111,17 @@ class StatisticReportsView(BrowserView):
         }
         brains = api.search(query, SETUP_CATALOG)
         return [SuperModel(brain) for brain in brains]
+
+    @view.memoize
+    def get_analysis_states(self):
+        """Returns the list of analysis statuses that are suitable for
+        reporting, as tuples of (state_id, state_title): verified,
+        to_be_verified, published and out_of_stock
+        """
+        supported = ["to_be_verified", "verified", "published", "out_of_stock"]
+        wf = wapi.get_workflow(ANALYSIS_WORKFLOW)
+        return [(state, wf.getTitleForStateOnType(state, "Analysis"))
+                for state in supported]
 
     def get_target_patients(self):
         """Returns the list target patient
