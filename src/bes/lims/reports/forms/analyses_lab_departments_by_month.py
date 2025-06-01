@@ -34,8 +34,8 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
     """
 
     def process_form(self):
-        # verified and published samples that were received within a given year
-        statuses = ["to_be_verified", "verified", "published"]
+        # analysis states
+        statuses = self.request.form.get("analysis_states")
         # skip AST-like analyses
         poc = ["lab", "field"]
         # search by requested year

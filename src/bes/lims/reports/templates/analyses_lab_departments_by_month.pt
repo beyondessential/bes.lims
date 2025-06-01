@@ -9,8 +9,7 @@
 
     <p i18n:translate="">
       Number of analyses for a given department from samples received within a
-      year, grouped by month. Only analyses in any of the following statuses
-      are considered: 'To be verified', 'Verified' or 'Published'
+      year, grouped by month.
     </p>
 
     <div class="form-group form-inline">
@@ -20,6 +19,9 @@
 
       <!-- Department control -->
       <tal:department replace="structure python:view.department_control()"/>
+
+      <!-- Analysis states -->
+      <tal:states replace="structure python:view.analysis_states_control()"/>
 
     </div>
 
