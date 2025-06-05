@@ -23,11 +23,9 @@ import copy
 import json
 from collections import OrderedDict
 
-from bes.lims import messageFactory as _
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.api import mail
-from bika.lims.utils import get_link
 from bika.lims.workflow import getTransitionActor
 from bika.lims.workflow import getTransitionDate
 from plone.memoize import view
