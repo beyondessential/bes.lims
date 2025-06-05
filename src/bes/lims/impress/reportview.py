@@ -23,11 +23,9 @@ import copy
 import json
 from collections import OrderedDict
 
-from bes.lims import messageFactory as _
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.api import mail
-from bika.lims.utils import get_link
 from bika.lims.workflow import getTransitionActor
 from bika.lims.workflow import getTransitionDate
 from plone.memoize import view
@@ -42,8 +40,6 @@ from senaite.patient import api as patient_api
 from senaite.patient.config import SEXES
 from senaite.patient.i18n import translate as patient_translate
 from weasyprint.compat import base64_encode
-
-BOOL_TEXTS = {True: _("Yes"), False: _("No")}
 
 
 class DefaultReportView(SingleReportView):
@@ -314,20 +310,15 @@ class DefaultReportView(SingleReportView):
             return model.get_formatted_specs(analysis)
         return specs.get("rangecomment")
 
-    def get_analysis_conditions(self, analysis):
-        """Returns the analysis conditions of the given analysis
-        """
-        # analysis (pre)conditions
-        analysis = api.get_object(analysis)
-        conditions = analysis.getConditions()
-        return filter(None, map(self.format_condition, conditions))
-
     def get_analysis_footnotes(self, analysis):
         items = []
         analysis = api.get_object(analysis)
 
         # analysis (pre)conditions
         conditions = self.get_analysis_conditions(analysis)
+        # only interested on the title and formatted value of the condition
+        conditions = ["%s: %s" % (con.get("title"), con.get("formatted_value"))
+                      for con in conditions]
         if conditions:
             items.append({"type": "conditions", "data": conditions})
 
@@ -337,40 +328,6 @@ class DefaultReportView(SingleReportView):
             items.append({"type": "remarks", "data": remarks})
 
         return items
-
-    def is_true(self, val):
-        """Returns whether val evaluates to True
-        """
-        val = str(val).strip().lower()
-        return val in ["y", "yes", "1", "true", "on"]
-
-    def format_condition(self, condition):
-        """Returns an string representation of the analysis condition value
-        """
-        title = condition.get("title")
-        value = condition.get("value", "")
-        if not any([title, value]):
-            return None
-
-        condition_type = condition.get("type")
-        if condition_type == "checkbox":
-            value = BOOL_TEXTS.get(self.is_true(value))
-
-        elif condition_type == "file":
-            attachment = api.get_object_by_uid(value, None)
-            if not attachment:
-                return None
-            value = self.get_attachment_link(attachment)
-
-        return ": ".join([title, str(value)])
-
-    def get_attachment_link(self, attachment):
-        """Returns a well-formed link for the attachment passed in
-        """
-        filename = attachment.getFilename()
-        att_url = api.get_url(attachment)
-        url = "{}/at_download/AttachmentFile".format(att_url)
-        return get_link(url, filename, tabindex="-1")
 
     def get_result_variables_titles(self, analyses, report_only=True):
         """Returns the titles of the results variables for the given analyses
