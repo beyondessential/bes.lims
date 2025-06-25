@@ -26,6 +26,7 @@
   <include package=".extender"/>
   <include package=".impress"/>
   <include package=".patches"/>
+  <include package=".reflex"/>
   <include package=".reports"/>
   <include package=".subscribers"/>
   <include package=".upgrade"/>

@@ -18,14 +18,33 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+from DateTime import DateTime
+from bes.lims.reflex import get_reflex_testing_adapter
 from bes.lims.utils import get_previous_status
 from bika.lims import api
 from bika.lims.interfaces import ISubmitted
 from bika.lims.interfaces import IVerified
 from bika.lims.workflow import doActionFor
-from DateTime import DateTime
 from senaite.core.workflow import ANALYSIS_WORKFLOW
 from zope.interface import alsoProvides
+
+
+def after_submit(analysis):
+    """Event fired when an analysis result gets submitted
+    """
+    # Handle reflex testing if necessary
+    adapter = get_reflex_testing_adapter(analysis, "submit")
+    if adapter:
+        adapter()
+
+
+def after_verify(analysis):
+    """Event fired when an analysis result gets submitted
+    """
+    # Handle reflex testing if necessary
+    adapter = get_reflex_testing_adapter(analysis, "verify")
+    if adapter:
+        adapter()
 
 
 def after_set_out_of_stock(analysis):

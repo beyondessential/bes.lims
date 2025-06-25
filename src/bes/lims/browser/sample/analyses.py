@@ -21,6 +21,7 @@
 import collections
 
 from bes.lims import messageFactory as _
+from bes.lims.reflex import get_reflex_testing_adapter
 from bika.lims import api
 from senaite.app.listing.interfaces import IListingView
 from senaite.app.listing.interfaces import IListingViewAdapter
@@ -55,10 +56,51 @@ class SampleAnalysesListingAdapter(object):
     def __init__(self, listing, context):
         self.listing = listing
         self.context = context
+        self.reload_actions = {}
 
     def folder_item(self, obj, item, index):
+        # render results range or range comment
         self.render_results_range(obj, item)
+        # force full view reload if required
+        self.render_reload(obj, item)
         return item
+
+    def render_reload(self, obj, item):
+        """Assign the item's reload attribute with the actions for the given
+        object that required a full-view reload after transition
+        """
+        # get the actions of this obj that require a full-view reload
+        actions = self.get_reload_actions(obj)
+        if not actions:
+            return
+
+        # maybe reload actions were already set for this obj
+        reload_actions = item.get("reload", [])
+        reload_actions.extend(actions)
+        item["reload"] = list(set(reload_actions))
+
+    def get_reload_actions(self, analysis):
+        """Returns a list with the actions for the given analysis that require
+        a full-view reload after being triggered
+        """
+        analysis = self.listing.get_object(analysis)
+
+        # find out if we already know the actions for this keyword
+        keyword = analysis.getKeyword()
+        actions = self.reload_actions.get(keyword, None)
+        if actions is not None:
+            return actions
+
+        # loop over reflex-suitable actions
+        actions = []
+        for action in ["submit", "verify"]:
+            ad = get_reflex_testing_adapter(analysis, action)
+            if ad:
+                actions.append(action)
+
+        # keep a mapping of keyword-to-action
+        self.reload_actions[keyword] = actions
+        return self.reload_actions.get(keyword)
 
     def render_results_range(self, obj, item):
         """Sets the results range to the item passed in
