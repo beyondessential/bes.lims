@@ -1,0 +1,33 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- ServiceRequest -->
+  <adapter name="tamanu.resource.ServiceRequest"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".servicerequest.ServiceRequest"/>
+
+  <!-- Patient -->
+  <adapter name="tamanu.resource.Patient"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".patient.PatientResource"/>
+
+  <!-- Specimen -->
+  <adapter name="tamanu.resource.Specimen"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".specimen.SpecimenResource"/>
+
+  <!-- Encounter -->
+  <adapter name="tamanu.resource.Encounter"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".encounter.Encounter"/>
+
+  <!-- Organization -->
+  <adapter name="tamanu.resource.Organization"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".organization.Organization"/>
+
+  <!-- Practitioner -->
+  <adapter name="tamanu.resource.Practitioner"
+           for="bes.lims.tamanu.session.TamanuSession"
+           factory=".practitioner.Practitioner"/>
+
+</configure>

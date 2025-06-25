@@ -1,0 +1,16 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Package includes -->
+  <include package=".viewlets"/>
+
+  <!-- View for metadata -->
+  <browser:page
+      for="*"
+      name="tamanu_metadata"
+      class=".meta.MetaView"
+      permission="senaite.core.permissions.ManageBika"
+      layer="bes.lims.interfaces.IBESLimsLayer" />
+
+</configure>

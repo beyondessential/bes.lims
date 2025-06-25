@@ -1,0 +1,20 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
+
+  <!-- Package includes -->
+  <include package=".bika"/>
+
+  <monkey:patch
+      class="plone.dexterity.content.DexterityContent"
+      original="tamanu_uid"
+      ignoreOriginal="True"
+      replacement=".dexterity.tamanu_uid" />
+
+  <monkey:patch
+      class="Products.Archetypes.BaseObject.BaseObject"
+      original="tamanu_uid"
+      ignoreOriginal="True"
+      replacement=".archetypes.tamanu_uid" />
+
+</configure>

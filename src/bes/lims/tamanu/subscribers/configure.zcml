@@ -1,0 +1,27 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- ARReport created -->
+  <subscriber
+      for="bika.lims.interfaces.IARReport
+           Products.Archetypes.interfaces.IObjectInitializedEvent"
+      handler=".arreport.on_object_created" />
+
+  <!-- Patient created -->
+  <subscriber
+    for="senaite.patient.interfaces.IPatient
+         zope.lifecycleevent.interfaces.IObjectAddedEvent"
+    handler=".patient.on_patient_added"/>
+
+  <!-- Patient modified -->
+  <subscriber
+    for="senaite.patient.interfaces.IPatient
+         zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+    handler=".patient.on_patient_modified"/>
+
+  <!-- Sample after event -->
+  <subscriber
+    for="bika.lims.interfaces.IAnalysisRequest
+         Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+    handler=".sample.on_after_transition"/>
+
+</configure>

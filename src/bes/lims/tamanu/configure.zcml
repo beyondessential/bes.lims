@@ -1,0 +1,9 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Package includes -->
+  <include package=".browser" />
+  <include package=".patches" />
+  <include package=".resources" />
+  <include package=".subscribers" />
+
+</configure>

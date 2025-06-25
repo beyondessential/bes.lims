@@ -3,6 +3,15 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup catalogs for integration with Tamanu"
+      description="Setup new catalogs and/or modify existing ones for the
+        integration with Tamanu to work properly"
+      source="1011"
+      destination="1012"
+      handler=".v01_00_000.setup_tamanu_catalogs"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup the microbiology department for AST services and analyses"
       description="Setup a department for AST services and tests"
       source="1010"

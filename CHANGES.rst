@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #60 Port Tamanu integration scripts and logic from palau.lims
 - #57 Hide analysis conditions not flagged with "Show in report"
 - #54 Allow to choose "out of stock" in analyses received by month stats report
 - #49 Grant edit remarks permission for analyses in to_be_verified status
