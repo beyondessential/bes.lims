@@ -1,0 +1,8 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+    <!--
+    Note the patches in `__init__`
+    https://pypi.org/project/collective.monkeypatcher/#patching-module-level-functions
+    -->
+
+</configure>

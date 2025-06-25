@@ -1,0 +1,14 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+  <!-- Imported object info viewlet -->
+  <browser:viewlet
+    for="Products.CMFCore.interfaces.IContentish"
+    name="bes.lims.tamanu.tamanu_object_viewlet"
+    class=".tamanuobject.TamanuObjectViewlet"
+    manager="plone.app.layout.viewlets.interfaces.IAboveContent"
+    template="templates/tamanu_object.pt"
+    permission="senaite.core.permissions.ManageBika"
+    layer="bes.lims.interfaces.IBESLimsLayer" />
+
+</configure>

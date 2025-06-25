@@ -1,0 +1,29 @@
+<div tal:omit-tag=""
+     tal:condition="python: view.is_visible()"
+     i18n:domain="bes.lims">
+
+  <div class="visualClear"></div>
+
+  <div id="portal-alert">
+    <div class="portlet-alert-item alert alert-info">
+      <p class="title mb-0">
+        <strong i18n:translate="">Resource from Tamanu</strong>:
+        <a tal:attributes="href python: view.get_tamanu_metadata_url()"
+           i18n:translate="">show original metadata (JSON)</a>&nbsp;
+      </p>
+    </div>
+    <div class="portal-alert-item alert alert-warning"
+         tal:define="diffs python: view.get_differences()"
+         tal:condition="diffs">
+      <p class="title mb-0">
+        <strong i18n:translate="">
+          There are inconsistencies with Tamanu's record
+        </strong>
+      </p>
+      <p class="description mb-0" tal:repeat="diff diffs">
+        <span tal:content="python: diff[0]"/>:
+        <span tal:content="python: diff[1]"/>
+      </p>
+    </div>
+  </div>
+</div>

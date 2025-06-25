@@ -29,6 +29,7 @@
   <include package=".reflex"/>
   <include package=".reports"/>
   <include package=".subscribers"/>
+  <include package=".tamanu"/>
   <include package=".upgrade"/>
   <include package=".workflow"/>
 
