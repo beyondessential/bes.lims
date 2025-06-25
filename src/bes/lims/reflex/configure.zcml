@@ -1,0 +1,10 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Culture interpretation -->
+  <adapter
+    name="bes.lims.reflex.cinter.submit"
+    factory=".cinter.CultureInterpretationSubmitAdapter"
+    for="bika.lims.interfaces.analysis.IRequestAnalysis" />
+
+</configure>
