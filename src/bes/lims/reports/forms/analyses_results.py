@@ -26,6 +26,9 @@ from bes.lims.reports import get_analyses
 from bes.lims.reports.forms import CSVReport
 from bes.lims.utils import is_reportable
 from bika.lims import api
+from bika.lims.utils import format_supsub
+from bika.lims.utils import to_utf8
+from senaite.ast import utils
 from senaite.core.api import dtime
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.patient.api import get_age_ymd
@@ -55,37 +58,33 @@ class AnalysesResults(CSVReport):
         # Add the first row (header)
         rows = [[
             _("Sample ID"),
-            _("Patient Name"),
-            _("Patient Surname"),
-            _("Patient Other Names"),
-            _("Patient Hospital #"),
-            _("Patient Date of Birth"),
+            _("Sample Type"),
             _("Patient Age"),
             _("Patient Gender"),
-            _("Test Date Collected"),
-            _("Test Date Tested"),
-            _("Test Category"),
+            _("Test Date and Time Collected"),
+            _("Test Date and Time Tested"),
+            _("Test Date and Time Verified"),
             _("Test Department"),
-            _("Test ID"),
+            _("Test Panels"),
             _("Test Type"),
             _("Test Result"),
+            _("Test Unit"),
             _("Site"),
-            _("Requesting Physician"),
         ]]
 
         # Add the info per analysis in a row
         for analysis in analyses:
             sample = analysis.getRequest()
-            fullname = sample.getField("PatientFullName").get(sample) or {}
             sampled = sample.getDateSampled()
             dob = sample.getDateOfBirth()[0]
             age = self.get_age(dob, sampled)
-            dob = self.parse_date_to_output(dob)
             sampled = self.parse_date_to_output(sampled)
             result_captured = self.parse_date_to_output(
                 analysis.getResultCaptureDate()
             )
-
+            result_verified = self.parse_date_to_output(
+                analysis.getDateVerified()
+            )
             # Only show results that appear on the final reports
             result = ""
             if analysis.getDatePublished():
@@ -93,28 +92,25 @@ class AnalysesResults(CSVReport):
                 result = self.replace_html_breaklines(result)
 
             department = analysis.getDepartmentTitle() or ""
-            category = analysis.getCategoryTitle() or ""
+            panels = self.get_panels(analysis) or ""
+            unit = format_supsub(to_utf8(analysis.Unit))
 
             # add the info for each analysis in a row
             rows.append(
                 [
                     analysis.getRequestID(),
-                    fullname.get("firstname", ""),
-                    fullname.get("lastname", ""),
-                    fullname.get("middlename", ""),
-                    sample.getMedicalRecordNumberValue() or "",
-                    dob,
+                    sample.getSampleTypeTitle() or "",
                     age,
                     dict(SEXES).get(sample.getSex(), ""),
                     sampled,
                     result_captured,
-                    category,
+                    result_verified,
                     department,
-                    analysis.getKeyword(),
+                    ", ".join(panels),
                     analysis.Title(),
                     result,
+                    unit,
                     sample.getClientTitle() or "",
-                    sample.getContactFullName() or "",
                 ]
             )
 
@@ -163,4 +159,15 @@ class AnalysesResults(CSVReport):
         return datetime(year, 1, 1)
 
     def parse_date_to_output(self, date):
-        return dtime.to_localized_time(date, long_format=False) or ""
+        return dtime.to_localized_time(date, long_format=True) or ""
+
+    def get_panels(self, analysis):
+        names = utils.get_microorganisms_from_result(analysis)
+        # Get the microorganisms
+        objects = api.get_setup().microorganisms.objectValues()
+        microorganisms = filter(lambda m: api.get_title(m) in names, objects)
+        if not microorganisms:
+            return ""
+
+        panels = utils.get_panels_for(microorganisms)
+        return map(api.get_title, panels)
