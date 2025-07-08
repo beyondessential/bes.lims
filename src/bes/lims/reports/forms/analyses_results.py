@@ -28,7 +28,6 @@ from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
 from bika.lims.utils import to_utf8
-from senaite.ast import utils
 from senaite.core.api import dtime
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.patient.api import get_age_ymd
@@ -92,7 +91,7 @@ class AnalysesResults(CSVReport):
                 result = self.replace_html_breaklines(result)
 
             department = analysis.getDepartmentTitle() or ""
-            panels = self.get_panels(analysis) or ""
+            profiles = self.get_analysis_profiles(sample)
             unit = format_supsub(to_utf8(analysis.Unit))
 
             # add the info for each analysis in a row
@@ -106,7 +105,7 @@ class AnalysesResults(CSVReport):
                     result_captured,
                     result_verified,
                     department,
-                    ", ".join(panels),
+                    ", ".join(profiles),
                     analysis.Title(),
                     result,
                     unit,
@@ -161,13 +160,6 @@ class AnalysesResults(CSVReport):
     def parse_date_to_output(self, date):
         return dtime.to_localized_time(date, long_format=True) or ""
 
-    def get_panels(self, analysis):
-        names = utils.get_microorganisms_from_result(analysis)
-        # Get the microorganisms
-        objects = api.get_setup().microorganisms.objectValues()
-        microorganisms = filter(lambda m: api.get_title(m) in names, objects)
-        if not microorganisms:
-            return ""
-
-        panels = utils.get_panels_for(microorganisms)
-        return map(api.get_title, panels)
+    def get_analysis_profiles(self, sample):
+        profiles = sample.getProfiles()
+        return map(api.get_title, profiles)
