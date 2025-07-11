@@ -9,4 +9,12 @@
       provides="senaite.core.interfaces.IGetStickerTemplates"
       factory=".stickers.StickerTemplates" />
 
+
+  <!-- PDF Report Storage Adapter -->
+  <adapter
+      for="zope.interface.Interface
+           bes.lims.interfaces.IBESLimsLayer"
+      factory=".impress.PdfReportStorageAdapter"
+      permission="zope2.View"/>
+
 </configure>
