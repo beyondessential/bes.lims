@@ -57,6 +57,8 @@ setup(
         # senaite.core does no longer provides schemaextender
         # https://github.com/senaite/senaite.core/pull/1931
         "archetypes.schemaextender",
+        # Version 2.0 does no longer support python 2.7
+        "PyPDF2==1.28.5",
         # Python 2.7: python-slugify < 5.0.0
         # Python 3.6+: python-slugify >= 5.0.0
         "python-slugify < 5.0.0",
