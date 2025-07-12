@@ -4,7 +4,7 @@ Changelog
 1.0.0
 -----
 
-- #65 Add methods to retrieve and merge PDF attachments into published report
+- #65 Merge PDF attachments into results report on publish
 - #61 Enhance analysis results statistic report
 - #60 Port Tamanu integration scripts and logic from palau.lims
 - #57 Hide analysis conditions not flagged with "Show in report"
