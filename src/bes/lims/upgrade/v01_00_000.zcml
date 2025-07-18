@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Add `republish` transition to `invalidate` state"
+      description="Add `republish` transition to `invalidate` state"
+      source="1012"
+      destination="1013"
+      handler=".v01_00_000.add_republish_transition_to_invalidate_state"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup catalogs for integration with Tamanu"
       description="Setup new catalogs and/or modify existing ones for the
         integration with Tamanu to work properly"
