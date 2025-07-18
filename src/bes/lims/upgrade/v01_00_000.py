@@ -355,3 +355,30 @@ def setup_tamanu_catalogs(tool):
     portal = tool.aq_inner.aq_parent
     setup_catalogs(portal)
     logger.info("Setup Tamanu integration [DONE]")
+
+
+def add_republish_transition_to_invalidate_state(tool):
+    """Adds the `republish` transition to the
+    `invalidated` state in the sample workflow
+    """
+    logger.info("Add `republish` transition to `invalidate` state ...")
+    portal = tool.aq_inner.aq_parent
+
+    # Update workflows
+    setup_workflows(portal)
+
+    # Update role mappings for existing samples in invalid status
+    query = {
+        "portal_type": "AnalysisRequest",
+        "review_state": "invalid"
+    }
+    wf = wapi.get_workflow(SAMPLE_WORKFLOW)
+    brains = api.search(query, SAMPLE_CATALOG)
+    for brain in brains:
+        sample = get_object(brain)
+        if not sample:
+            continue
+        wf.updateRoleMappingsFor(sample)
+        sample._p_deactivate()
+
+    logger.info("Add `republish` transition to `invalidate` state [DONE]")
