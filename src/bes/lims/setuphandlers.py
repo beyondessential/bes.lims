@@ -161,7 +161,15 @@ WORKFLOWS_TO_UPDATE = {
                         "Scientist", "LabManager", "Manager"
                     ],
                 }
-            }
+            },
+            "invalid": {
+                "transitions": ["republish"],
+                "permissions": {
+                    core_permissions.TransitionPublishResults: (
+                        "LabManager", "Manager"
+                    ),
+                }
+            },
         }
     }
 }
