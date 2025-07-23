@@ -25,10 +25,26 @@ class Encounter(TamanuResource):
     """Object that represents an Encounter resource from Tamanu
     """
 
-    def getLocation(self):
-        """Returns the Location resource assigned to this Encounter, if any
+    def getLocations(self, physical_type=None):
+        """Returns the Location resources assigned to this Encounter, if any
         """
-        return self.get("subject")
+        locations = self.get("location")
+        if not physical_type:
+            return locations
+
+        matches = []
+        for location in locations:
+            record = location.get("physicalType")
+            codings = record.get("coding")
+
+            # find matches against code
+            codes = [coding.get("code") for coding in codings]
+            codes.extend([coding.get("display") for coding in codings])
+            codes = set(filter(None, codes))
+            if physical_type in codes:
+                matches.append(location)
+
+        return matches
 
     def getServiceProvider(self):
         """Returns the ServiceProvider resource assigned to this Encounter
