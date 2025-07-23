@@ -113,6 +113,9 @@ USERNAME = "tamanu"
 # https://browser.ihtsdotools.org/?perspective=full&conceptId1=108252007
 SNOMED_REQUEST_CATEGORY = "108252007"
 
+# Code of the location from Encounter to assign as the Ward of the Sample
+WARD_CODE = "wa"
+
 SKIP_STATUSES = (
     # Service Request statuses to skip
     "revoked", "draft", "entered-in-error", "completed"
@@ -298,6 +301,42 @@ def get_sample_point(service_request):
     container = api.get_senaite_setup().samplepoints
     return api.create(container, "SamplePoint", **info)
 
+def get_ward(service_request):
+    """Returns a Ward object counterpart for the given resource
+    """
+    # TODO Remove after Ward content types are migrated to bes.lims
+    if "Ward" not in api.get_portal_types():
+        return None
+
+    encounter = service_request.getEncounter()
+    if not encounter:
+        return None
+
+    # get the locations from encounter that represent a Ward
+    locations = encounter.getLocations(physical_type=WARD_CODE)
+    if not locations:
+        return None
+
+    # TODO We pick the last location from the list of Wards here
+    resource = locations[-1].get("location") or {}
+    name = resource.get("display")
+    if not name:
+        return None
+
+    # search by name/title
+    query = {
+        "portal_type": "Ward",
+        "title":  name,
+        "sort_on": "created",
+        "sort_order": "descending",
+    }
+    brains = api.search(query, SETUP_CATALOG)
+    if not brains:
+        # create a ward
+        container = api.get_setup().wards
+        return api.create(container, "Ward", title=name)
+
+    return api.get_object(brains[0])
 
 def get_services(service_request):
     """Returns the service objects counterpart for the given resource
@@ -624,6 +663,9 @@ def sync_service_request(sr):
         "lastname": patient.getLastname(),
     }
 
+    # get or create the ward via Encounter locations
+    ward = get_ward(sr)
+
     # get profiles
     profiles = get_profiles(sr)
     profiles = map(api.get_uid, profiles)
@@ -650,7 +692,7 @@ def sync_service_request(sr):
         "Sampler": collector,
         #"Remarks": remarks,
         "Specification": spec,
-        #"Ward": api.get_uid(ward),
+        "Ward": ward,
         "ClinicalInformation": clinical_info,
         #"DateOfAdmission": doa,
         #"CurrentAntibiotics": antibiotics,

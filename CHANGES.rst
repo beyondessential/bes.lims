@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #67 Import ward location from Tamanu's ServiceRequest
 - #66 Add watermark for invalid reports
 - #65 Merge PDF attachments into results report on publish
 - #61 Enhance analysis results statistic report
