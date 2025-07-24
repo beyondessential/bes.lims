@@ -6,5 +6,6 @@
   <!-- File includes -->
   <include file="client.zcml"/>
   <include file="setup.zcml"/>
+  <include file="analysisrequest.zcml"/>
 
 </configure>
