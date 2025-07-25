@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- 69 Exclude out-of-stock analyses from provisional status check
 - #67 Import ward location from Tamanu's ServiceRequest
 - #66 Add watermark for invalid reports
 - #65 Merge PDF attachments into results report on publish
