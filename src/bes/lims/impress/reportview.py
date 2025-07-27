@@ -633,10 +633,14 @@ class DefaultReportView(SingleReportView):
         """Returns true if there are analyses not yet verified
         """
         def in_progress(analysis):
-            return (
-                not analysis.getDateVerified()
-                and not self.is_out_of_stock(analysis)
-            )
+            if analysis.getDateVerified():
+                return False
+            if self.is_out_of_stock(analysis):
+                # do not display results as provisional for analyses that are
+                # in the out-of-stock analysis
+                # https://github.com/beyondessential/bes.lims/pull/69
+                return False
+            return True
 
         # Exclude invalid analyses
         analyses = self.get_analyses(sample)
