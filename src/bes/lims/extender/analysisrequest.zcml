@@ -1,0 +1,24 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
+
+  <!-- Schema extender for AnalysisRequest (Sample) -->
+  <adapter
+      name="bes.lims.analysisrequest.schemaextender"
+      provides="archetypes.schemaextender.interfaces.ISchemaExtender"
+      factory=".analysisrequest.AnalysisRequestSchemaExtender"/>
+
+  <!-- Getters/Setters -->
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="getCollector"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.getCollector" />
+
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="setCollector"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.setCollector" />
+
+</configure>
