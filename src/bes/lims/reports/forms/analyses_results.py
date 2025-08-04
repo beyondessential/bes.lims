@@ -90,7 +90,10 @@ class AnalysesResults(CSVReport):
                 result = analysis.getFormattedResult(html=False) or result
                 result = self.replace_html_breaklines(result)
 
-            department = analysis.getDepartmentTitle() or ""
+            # get the department title
+            department = analysis.getDepartment()
+            department = api.get_title(department) if department else ""
+
             profiles = self.get_analysis_profiles(sample)
             unit = format_supsub(to_utf8(analysis.Unit))
 
