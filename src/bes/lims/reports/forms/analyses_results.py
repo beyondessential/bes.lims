@@ -19,17 +19,21 @@
 # Some rights reserved, see README and LICENSE.
 
 import re
+from collections import OrderedDict
 from datetime import datetime
 
 from bes.lims import messageFactory as _
+from bes.lims.exceptions import TooManyRecordsError
 from bes.lims.reports import get_analyses
 from bes.lims.reports.forms import CSVReport
+from bes.lims.setuphandlers import deactivate
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
 from bika.lims.utils import to_utf8
 from senaite.core.api import dtime
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.core.i18n import translate
 from senaite.patient.api import get_age_ymd
 from senaite.patient.config import SEXES
 
@@ -37,6 +41,55 @@ from senaite.patient.config import SEXES
 class AnalysesResults(CSVReport):
     """Analyses by result, category and department
     """
+
+    def __init__(self, context, request):
+        super(AnalysesResults, self).__init__(context, request)
+
+        # max analyses search
+        self.max_records = 100000
+
+        # initialize the columns
+        self.columns = OrderedDict((
+            ("sample_id", {
+                "title": _("Sample ID"),
+            }),
+            ("sample_type", {
+                "title": _("Sample Type"),
+            }),
+            ("age", {
+                "title": _("Patient Age"),
+            }),
+            ("gender", {
+                "title": _("Patient Gender"),
+            }),
+            ("collected", {
+                "title": _("Test Date and Time Collected"),
+            }),
+            ("captured", {
+                "title": _("Test Date and Time Tested"),
+            }),
+            ("verified", {
+                "title": _("Test Date and Time Verified"),
+            }),
+            ("department", {
+                "title": _("Test Department"),
+            }),
+            ("panels", {
+                "title": _("Test Panels"),
+            }),
+            ("test_type", {
+                "title": _("Test Type"),
+            }),
+            ("result", {
+                "title": _("Test Result"),
+            }),
+            ("unit", {
+                "title": _("Test Unit"),
+            }),
+            ("site", {
+                "title": _("Site"),
+            }),
+        ))
 
     def process_form(self):
         statuses = ["published"]
@@ -51,72 +104,88 @@ class AnalysesResults(CSVReport):
 
         # do the search
         brains = get_analyses(date_from, date_to, **query)
-        objs = map(api.get_object, brains)
-        analyses = [analysis for analysis in objs if is_reportable(analysis)]
 
-        # Add the first row (header)
-        rows = [[
-            _("Sample ID"),
-            _("Sample Type"),
-            _("Patient Age"),
-            _("Patient Gender"),
-            _("Test Date and Time Collected"),
-            _("Test Date and Time Tested"),
-            _("Test Date and Time Verified"),
-            _("Test Department"),
-            _("Test Panels"),
-            _("Test Type"),
-            _("Test Result"),
-            _("Test Unit"),
-            _("Site"),
-        ]]
+        # Generate one row per analysis
+        rows = []
+        for brain in brains:
+            row = self.get_row(brain)
+            if not row:
+                continue
 
-        # Add the info per analysis in a row
-        for analysis in analyses:
-            sample = analysis.getRequest()
-            sampled = sample.getDateSampled()
-            dob = sample.getDateOfBirth()[0]
-            age = self.get_age(dob, sampled)
-            sampled = self.parse_date_to_output(sampled)
-            result_captured = self.parse_date_to_output(
-                analysis.getResultCaptureDate()
-            )
-            result_verified = self.parse_date_to_output(
-                analysis.getDateVerified()
-            )
-            # Only show results that appear on the final reports
-            result = ""
-            if analysis.getDatePublished():
-                result = analysis.getFormattedResult(html=False) or result
-                result = self.replace_html_breaklines(result)
+            rows.append(row)
+            if len(rows) > self.max_records:
+                raise TooManyRecordsError(
+                    "Too many records (> %s). Please, refine your search" %
+                    self.max_records
+                )
 
-            # get the department title
-            department = analysis.getDepartment()
-            department = api.get_title(department) if department else ""
+        # Insert the header row at first position
+        rows.insert(0, self.get_header_row())
 
-            profiles = self.get_analysis_profiles(sample)
-            unit = format_supsub(to_utf8(analysis.Unit))
+        return list(filter(None, rows))
 
-            # add the info for each analysis in a row
-            rows.append(
-                [
-                    analysis.getRequestID(),
-                    sample.getSampleTypeTitle() or "",
-                    age,
-                    dict(SEXES).get(sample.getSex(), ""),
-                    sampled,
-                    result_captured,
-                    result_verified,
-                    department,
-                    ", ".join(profiles),
-                    analysis.Title(),
-                    result,
-                    unit,
-                    sample.getClientTitle() or "",
-                ]
-            )
+    def get_header_row(self):
+        """Returns a plain list with the column names
+        """
+        return [self.columns[key].get("title") for key in self.columns.keys()]
 
-        return rows
+    def get_row(self, analysis):
+        """Return a plain list with the column values for the given analysis
+        """
+        analysis = api.get_object(analysis)
+        if not is_reportable(analysis):
+            analysis._p_deactivate()
+            return None
+
+        info = self.get_row_info(analysis)
+        analysis._p_deactivate()
+        return [info.get(key, "") for key in self.columns.keys()]
+
+    def get_row_info(self, analysis):
+        sample = analysis.getRequest()
+        sampled = sample.getDateSampled()
+        dob = sample.getDateOfBirth()[0]
+        age = self.get_age(dob, sampled)
+        sampled = self.parse_date_to_output(sampled)
+        result_captured = self.parse_date_to_output(
+            analysis.getResultCaptureDate()
+        )
+        result_verified = self.parse_date_to_output(
+            analysis.getDateVerified()
+        )
+        # Only show results that appear on the final reports
+        result = ""
+        if analysis.getDatePublished():
+            result = analysis.getFormattedResult(html=False) or result
+            result = self.replace_html_breaklines(result)
+
+        # get the department title
+        department = analysis.getDepartment()
+        department = api.get_title(department) if department else ""
+
+        profiles = self.get_analysis_profiles(sample)
+        unit = format_supsub(to_utf8(analysis.Unit))
+
+        # get the patient's gender/sex
+        gender = dict(SEXES).get(sample.getSex())
+        gender = translate(gender) if gender else ""
+
+        # add the info for each analysis in a row
+        return {
+            "sample_id": analysis.getRequestID(),
+            "sample_type": sample.getSampleTypeTitle() or "",
+            "age": age,
+            "gender": gender,
+            "collected": sampled,
+            "captured": result_captured,
+            "verified": result_verified,
+            "department": department,
+            "panels": ", ".join(profiles),
+            "test_type": analysis.Title(),
+            "result": result,
+            "unit": unit,
+            "site": sample.getClientTitle() or ""
+        }
 
     def get_age(self, dob, sampled):
         """Returns the age truncated to the highest period

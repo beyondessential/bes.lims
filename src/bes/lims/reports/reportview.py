@@ -22,6 +22,7 @@
 from datetime import datetime
 
 from bes.lims.config import TARGET_PATIENTS
+from bes.lims.exceptions import TooManyRecordsError
 from bika.lims import api
 from plone.memoize import view
 from Products.Five.browser import BrowserView
@@ -52,7 +53,11 @@ class StatisticReportsView(BrowserView):
 
         if submit and report_id:
             report_form = api.get_view(report_id)
-            return report_form()
+            try:
+                return report_form()
+            except TooManyRecordsError as e:
+                err_msg = str(e)
+                self.context.plone_utils.addPortalMessage(err_msg, "error")
 
         return self.template()
 

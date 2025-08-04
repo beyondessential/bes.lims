@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #72 Make statistic report of analyses results more reusable
 - #71 Fix 'getDepartmentTitle' AttributeError on statistics report creation
 - #69 Exclude out-of-stock analyses from provisional status check
 - #68 Add Collector field in AnalysisRequest
