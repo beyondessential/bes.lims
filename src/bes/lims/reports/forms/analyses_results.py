@@ -23,8 +23,10 @@ from collections import OrderedDict
 from datetime import datetime
 
 from bes.lims import messageFactory as _
+from bes.lims.exceptions import TooManyRecordsError
 from bes.lims.reports import get_analyses
 from bes.lims.reports.forms import CSVReport
+from bes.lims.setuphandlers import deactivate
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
@@ -42,6 +44,9 @@ class AnalysesResults(CSVReport):
 
     def __init__(self, context, request):
         super(AnalysesResults, self).__init__(context, request)
+
+        # max analyses search
+        self.max_records = 50000
 
         # initialize the columns
         self.columns = OrderedDict((
@@ -99,11 +104,20 @@ class AnalysesResults(CSVReport):
 
         # do the search
         brains = get_analyses(date_from, date_to, **query)
-        objs = map(api.get_object, brains)
-        analyses = [analysis for analysis in objs if is_reportable(analysis)]
 
         # Generate one row per analysis
-        rows = [self.get_row(analysis) for analysis in analyses]
+        rows = []
+        for brain in brains:
+            row = self.get_row(brain)
+            if not row:
+                continue
+
+            rows.append(row)
+            if len(rows) > self.max_records:
+                raise TooManyRecordsError(
+                    "Too many records (> %s). Please, refine your search" %
+                    self.max_records
+                )
 
         # Insert the header row at first position
         rows.insert(0, self.get_header_row())
@@ -118,7 +132,13 @@ class AnalysesResults(CSVReport):
     def get_row(self, analysis):
         """Return a plain list with the column values for the given analysis
         """
+        analysis = api.get_object(analysis)
+        if not is_reportable(analysis):
+            analysis._p_deactivate()
+            return None
+
         info = self.get_row_info(analysis)
+        analysis._p_deactivate()
         return [info.get(key, "") for key in self.columns.keys()]
 
     def get_row_info(self, analysis):
