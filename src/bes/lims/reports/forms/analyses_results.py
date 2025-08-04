@@ -46,7 +46,7 @@ class AnalysesResults(CSVReport):
         super(AnalysesResults, self).__init__(context, request)
 
         # max analyses search
-        self.max_records = 50000
+        self.max_records = 100000
 
         # initialize the columns
         self.columns = OrderedDict((
