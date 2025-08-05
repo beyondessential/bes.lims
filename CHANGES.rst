@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #73 Disable title-based matching when importing analyses from Tamanu
 - #72 Make statistic report of analyses results more reusable
 - #71 Fix 'getDepartmentTitle' AttributeError on statistics report creation
 - #69 Exclude out-of-stock analyses from provisional status check

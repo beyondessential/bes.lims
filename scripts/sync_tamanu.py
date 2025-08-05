@@ -344,12 +344,10 @@ def get_services(service_request):
     services = []
 
     # get all services and group them by title
-    by_title = {}
     by_keyword = {}
     sc = api.get_tool(SETUP_CATALOG)
     for brain in sc(portal_type="AnalysisService"):
         obj = api.get_object(brain)
-        by_title[api.get_title(obj)] = obj
         by_keyword[obj.getKeyword()] = obj
 
     # get the codes requested in the ServiceRequest
@@ -357,13 +355,7 @@ def get_services(service_request):
     for coding in tapi.get_codings(details, SENAITE_TESTS_CODING_SYSTEM):
         # get the analysis by keyword
         code = coding.get("code")
-        service = by_keyword.get(code)
-        if not service:
-            # fallback to title
-            # TODO Fallback searches by analysis to CommercialName instead?
-            display = coding.get("display")
-            service = by_title.get(display)
-
+        service = by_keyword.pop(code, None)
         if service:
             services.append(service)
 
