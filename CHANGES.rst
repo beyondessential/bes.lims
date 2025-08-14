@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #75 Add date range search function in samples listing
 - #73 Disable title-based matching when importing analyses from Tamanu
 - #72 Make statistic report of analyses results more reusable
 - #71 Fix 'getDepartmentTitle' AttributeError on statistics report creation
