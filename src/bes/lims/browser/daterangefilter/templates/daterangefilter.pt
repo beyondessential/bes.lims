@@ -1,0 +1,60 @@
+<div i18n:domain="bes.lims">
+
+  <form class="form-inline"
+        id="daterangefilter"
+        name="daterangefilter"
+        method="POST">
+
+    <span i18n:translate="" class="mr-3 font-weight-bold">
+      Date Range:
+    </span>
+
+    <!-- Date type selector -->
+    <label for="date_type" class="field mr-2"
+           i18n:translate="">Filter date by</label>
+    <select id="date_type"
+            name="date_type"
+            class="field mr-2"
+            tal:define="date_types python: view.get_date_types();
+                        selected_date_type python: view.get_date_type()">
+        <option tal:repeat="date_type date_types"
+                tal:attributes="value date_type;
+                                selected python:'selected' if date_type == selected_date_type else None"
+                tal:content="python: date_types.getValue(date_type)"/>
+    </select>
+
+
+    <!-- Date from -->
+    <label for="date_from" class="field mr-2"
+           i18n:translate="">From</label>
+    <input type="date"
+           class="form-control form-control-sm mr-1"
+           id="date_from"
+           name="date_from"
+           tal:attributes="value python: view.get_date_from()"/>
+    <input type="time"
+           class="form-control form-control-sm mr-2"
+           id="time_from"
+           name="time_from"
+           tal:attributes="value python: view.get_time_from()"/>
+
+    <!-- Date to -->
+    <label for="date_to" class="field mr-2"
+           i18n:translate="">To</label>
+    <input type="date"
+           class="form-control form-control-sm mr-1"
+           id="date_to"
+           name="date_to"
+           tal:attributes="value python: view.get_date_to()"/>
+    <input type="time"
+           class="form-control form-control-sm mr-2"
+           id="time_to"
+           name="time_to"
+           tal:attributes="value python: view.get_time_to()"/>
+
+    <button type="submit" i18n:translate=""
+            class="btn btn-sm btn-outline-primary ml-2">Apply</button>
+
+  </form>
+
+</div>

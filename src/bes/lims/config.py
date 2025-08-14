@@ -49,3 +49,13 @@ TARGET_PATIENTS = DisplayList((
     ("a", _("Adult patient")),
     ("p", _("Paediatric patient")),
 ))
+
+DATE_TYPES = DisplayList((
+    ("created", _("Date Registered")),
+    ("getSamplingDate", _("Expected Sampling Date")),
+    ("getDateSampled", _("Date Sampled")),
+    ("getDateReceived", _("Date Received")),
+    ("getDueDate", _("Due Date")),
+    ("getDateVerified", _("Date Verified")),
+    ("getDatePublished", _("Date Published")),
+))
