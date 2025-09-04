@@ -18,14 +18,18 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims import logger
+import copy
+
 from bes.lims import PRODUCT_NAME as product
+from bes.lims import logger
 from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_catalogs
 from bes.lims.setuphandlers import setup_groups
 from bes.lims.setuphandlers import setup_microbiology_department
 from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
+from bes.lims.tamanu import api as tapi
+from bes.lims.tamanu.interfaces import ITamanuContent
 from bika.lims import api
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
@@ -41,7 +45,6 @@ from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
 from zope.schema.interfaces import IVocabularyFactory
-
 
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
@@ -382,3 +385,36 @@ def add_republish_transition_to_invalidate_state(tool):
         sample._p_deactivate()
 
     logger.info("Add `republish` transition to `invalidate` state [DONE]")
+
+
+def reset_tamanu_ids(tool):
+    """Walks through samples that were imported from Tamanu and updates the
+    value of the field 'TamanuID' with the ID of the counterpart ServiceRequest
+    """
+    logger.info("Reset Tamanu IDs ...")
+    query = {
+        "portal_type": "AnalysisRequest",
+        "object_provides": ITamanuContent.__identifier__
+    }
+    brains = api.search(query, SAMPLE_CATALOG)
+    for brain in brains:
+        sample = get_object(brain)
+        if not sample:
+            continue
+
+        if not tapi.is_tamanu_content(sample):
+            logger.warn("[SKIP] Not an ITamanuContent: %r" % sample)
+            continue
+
+        # extract the original Tamanu ID from the storage
+        session = tapi.get_tamanu_session_for(sample, login=False)
+        storage = tapi.get_tamanu_storage(sample)
+        item = copy.deepcopy(storage.get("data", {}))
+        sr = session.to_resource(item)
+        tid = sr.getLabTestID()
+
+        # set the tamanu ID
+        sample.setTamanuID(tid)
+        sample._p_deactivate()
+
+    logger.info("Reset Tamanu IDs ...")

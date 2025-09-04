@@ -96,16 +96,17 @@ def get_tamanu_modified(obj):
     return dtime.to_dt(modified)
 
 
-def get_tamanu_session(host, email, password):
+def get_tamanu_session(host, email, password, login=True):
     """Returns a TamanuSession for the given host
     """
     from bes.lims.tamanu.session import TamanuSession
     session = TamanuSession(host)
-    session.login(email, password)
+    if login:
+        session.login(email, password)
     return session
 
 
-def get_tamanu_session_for(obj):
+def get_tamanu_session_for(obj, login=True):
     """Returns a Tamanu Session for the given object
     """
     # TODO Use a singleton utility to get tamanu session
@@ -121,7 +122,7 @@ def get_tamanu_session_for(obj):
         email, password = storage.get("auth")
 
         # create the session
-        return get_tamanu_session(host, email, password)
+        return get_tamanu_session(host, email, password, login=login)
 
     return None
 
