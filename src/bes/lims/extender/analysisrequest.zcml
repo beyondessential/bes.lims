@@ -21,4 +21,16 @@
       ignoreOriginal="True"
       replacement=".analysisrequest.setCollector" />
 
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="getTamanuID"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.getTamanuID" />
+
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="setTamanuID"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.setTamanuID" />
+
 </configure>

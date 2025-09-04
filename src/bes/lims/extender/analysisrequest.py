@@ -98,3 +98,16 @@ def setCollector(self, value):
     self.getField("Collector").set(self, value)
     # Keep sampler field in-sync
     self.getField("Sampler").set(self, value)
+
+
+def getTamanuID(self):
+    """Returns the Tamanu ID of the sample/specimen, if any
+    """
+    return self.getField("TamanuID").get(self)
+
+
+def setTamanuID(self, value):
+    """Sets the Tamanu ID of the sample/specimen
+    """
+    self.getField("TamanuID").set(self, value)
+
