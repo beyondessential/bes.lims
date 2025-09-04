@@ -18,14 +18,15 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+from Products.Archetypes.Widget import StringWidget
+from Products.CMFCore.permissions import View
 from archetypes.schemaextender.interfaces import IBrowserLayerAwareExtender
 from archetypes.schemaextender.interfaces import ISchemaExtender
 from bes.lims import messageFactory as _
 from bes.lims.extender.field import ExtStringField
 from bes.lims.interfaces import IBESLimsLayer
 from bika.lims.interfaces import IAnalysisRequest
-from Products.Archetypes.Widget import StringWidget
-from Products.CMFCore.permissions import View
+from senaite.core.permissions import FieldEditClientSampleID
 from senaite.core.permissions import FieldEditSampler
 from zope.component import adapter
 from zope.interface import implementer
@@ -49,7 +50,25 @@ NEW_FIELDS = [
             }
         )
     ),
-
+    ExtStringField(
+        "TamanuID",
+        default="",
+        mode="rw",
+        read_permission=View,
+        write_permission=FieldEditClientSampleID,
+        widget=StringWidget(
+            label=_("Tamanu ID"),
+            description=_(
+                "The identifier of the corresponding ServiceRequest in Tamanu"
+            ),
+            # Display Tamanu ID in readonly mode only
+            visible={
+                "add": "invisible",
+                "edit": "disabled",
+                "secondary": "disabled",
+            }
+        )
+    )
 ]
 
 
