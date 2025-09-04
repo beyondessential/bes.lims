@@ -3,6 +3,7 @@
   <!-- Package includes -->
   <include package=".adapters" />
   <include package=".browser" />
+  <include package=".catalog" />
   <include package=".patches" />
   <include package=".resources" />
   <include package=".subscribers" />

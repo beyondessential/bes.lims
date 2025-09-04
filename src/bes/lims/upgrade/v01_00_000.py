@@ -406,15 +406,26 @@ def reset_tamanu_ids(tool):
             logger.warn("[SKIP] Not an ITamanuContent: %r" % sample)
             continue
 
-        # extract the original Tamanu ID from the storage
-        session = tapi.get_tamanu_session_for(sample, login=False)
+        # get the tamanu-related storage
         storage = tapi.get_tamanu_storage(sample)
         item = copy.deepcopy(storage.get("data", {}))
+        if not item:
+            logger.warn("[SKIP] No tamanu data found for %r" % sample)
+            continue
+
+        # extract the original Tamanu ID from the storage
+        session = tapi.get_tamanu_session_for(sample, login=False)
         sr = session.to_resource(item)
         tid = sr.getLabTestID()
+        if not tid:
+            logger.warn("[SKIP] No LabTestID found for %r" % sample)
+            continue
 
         # set the tamanu ID
         sample.setTamanuID(tid)
+
+        # reindex to update existing listing_searchable_text index
+        sample.reindexObject()
         sample._p_deactivate()
 
     logger.info("Reset Tamanu IDs ...")
