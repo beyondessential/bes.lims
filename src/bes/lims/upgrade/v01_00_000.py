@@ -19,6 +19,7 @@
 # Some rights reserved, see README and LICENSE.
 
 import copy
+import transaction
 
 from bes.lims import PRODUCT_NAME as product
 from bes.lims import logger
@@ -35,6 +36,7 @@ from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
+from senaite.core.decorators import retriable
 from senaite.core.migration.migrator import get_attribute_storage
 from senaite.core.permissions import FieldEditAnalysisRemarks
 from senaite.core.upgrade import upgradestep
@@ -44,6 +46,7 @@ from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
+from zope.interface import alsoProvides
 from zope.schema.interfaces import IVocabularyFactory
 
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
@@ -387,30 +390,24 @@ def add_republish_transition_to_invalidate_state(tool):
     logger.info("Add `republish` transition to `invalidate` state [DONE]")
 
 
-def reset_tamanu_ids(tool):
-    """Walks through samples that were imported from Tamanu and updates the
-    value of the field 'TamanuID' with the ID of the counterpart ServiceRequest
-    """
-    logger.info("Reset Tamanu IDs ...")
-    query = {
-        "portal_type": "AnalysisRequest",
-        "object_provides": ITamanuContent.__identifier__
-    }
-    brains = api.search(query, SAMPLE_CATALOG)
-    for brain in brains:
-        sample = get_object(brain)
+@retriable(sync=True)
+def reset_tamanu_ids_for(uids):
+    cat = api.get_tool(SAMPLE_CATALOG)
+    indexes = ["object_provides", "listing_searchable_text"]
+    for uid in uids:
+        sample = api.get_object_by_uid(uid, default=None)
         if not sample:
             continue
 
         if not tapi.is_tamanu_content(sample):
-            logger.warn("[SKIP] Not an ITamanuContent: %r" % sample)
-            continue
+            # BBB (for earlier records from palau.lims)
+            alsoProvides(ITamanuContent)
 
         # get the tamanu-related storage
         storage = tapi.get_tamanu_storage(sample)
         item = copy.deepcopy(storage.get("data", {}))
         if not item:
-            logger.warn("[SKIP] No tamanu data found for %r" % sample)
+            logger.warn("[SKIP] No Tamanu data found for %r" % sample)
             continue
 
         # extract the original Tamanu ID from the storage
@@ -421,11 +418,51 @@ def reset_tamanu_ids(tool):
             logger.warn("[SKIP] No LabTestID found for %r" % sample)
             continue
 
+        if sample.getTamanuID() == tid:
+            continue
+
         # set the tamanu ID
         sample.setTamanuID(tid)
 
-        # reindex to update existing listing_searchable_text index
-        sample.reindexObject()
+        # reindex proper indexes
+        cat.reindexObject(sample, idxs=indexes, update_metadata=0)
+
+        # flush from memory
         sample._p_deactivate()
+
+    transaction.commit()
+
+
+def to_chunks(values, size):
+    """Generator function to yield chunks
+    """
+    for idx in range(0, len(values), size):
+        yield values[idx:idx + size]
+
+
+def reset_tamanu_ids(tool):
+    """Walks through samples that were imported from Tamanu and updates the
+    value of the field 'TamanuID' with the ID of the counterpart ServiceRequest
+    """
+    logger.info("Reset Tamanu IDs ...")
+
+    # search affected samples
+    query = {
+        "portal_type": "AnalysisRequest",
+        "object_provides": [
+            ITamanuContent.__identifier__,
+            # BBB
+            "palau.lims.tamanu.interfaces.ITamanuContent",
+        ]
+    }
+    brains = api.search(query, SAMPLE_CATALOG)
+    uids = [api.get_uid(brain) for brain in brains]
+
+    # process them in chunks
+    size = 100
+    for num, chunk in enumerate(to_chunks(uids, size)):
+        reset_tamanu_ids_for(chunk)
+        processed = (num * size) + len(chunk)
+        logger.info("Processed objects: %s/%s" % (processed, len(uids)))
 
     logger.info("Reset Tamanu IDs ...")
