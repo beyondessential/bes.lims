@@ -20,16 +20,15 @@
 
 
 import argparse
-from collections import OrderedDict
 import logging
 import os
 import re
+from collections import OrderedDict
 from datetime import timedelta
 
 from bes.lims import logger
 from bes.lims import messageFactory as _
 from bes.lims.scripts import setup_script_environment
-from bes.lims.setuphandlers import deactivate
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
@@ -43,9 +42,15 @@ from six import StringIO
 
 
 __doc__ = """
-Export SENAITE analysis requests by date range.
-This script exports analysis requests within a specified date range
-to a CSV file.
+Export published analyses verified within a date range
+
+This script generates a CSV file containing information about published
+analyses and their associated samples/specimens, based on the analysis
+verification date. Only published analyses that were verified within the
+specified date range are included.
+
+If no date range is provided, the system defaults to the previous week
+(Monday through Sunday).
 """
 
 parser = argparse.ArgumentParser(description=__doc__,
