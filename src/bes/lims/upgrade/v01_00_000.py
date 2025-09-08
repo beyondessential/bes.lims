@@ -49,6 +49,7 @@ from zope import component
 from zope.interface import alsoProvides
 from zope.schema.interfaces import IVocabularyFactory
 
+
 version = "1.0.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
 
@@ -466,3 +467,16 @@ def reset_tamanu_ids(tool):
         logger.info("Processed objects: %s/%s" % (processed, len(uids)))
 
     logger.info("Reset Tamanu IDs ...")
+
+
+def setup_tupaia_export_script(tool):
+    """Setup script for exporting data to Tupaia
+    """
+    logger.info("Setup script for exporting data to Tupaia ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Setup Catalogs
+    setup_catalogs(portal)
+
+    logger.info("Setup script for exporting data to Tupaia [DONE]")

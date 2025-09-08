@@ -20,6 +20,7 @@
 
 from bika.lims.interfaces import IBaseAnalysis
 from plone.indexer import indexer
+from senaite.core.api import dtime
 from senaite.core.interfaces import IAnalysisCatalog
 
 
@@ -28,3 +29,11 @@ def department_uid(instance):
     """Returns the department uid assigned to this instance or empty
     """
     return instance.getRawDepartment() or ""
+
+
+@indexer(IBaseAnalysis, IAnalysisCatalog)
+def date_verified(instance):
+    """Returns the date (as DateTime) when the instance was verified or None
+    """
+    dt = instance.getDateVerified()
+    return dtime.to_DT(dt)

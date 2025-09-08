@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #76 Add script to export SENAITE analysis requests by date range
 - #83 Add Tamanu ID Field
 - #75 Add date range search function in samples listing
 - #73 Disable title-based matching when importing analyses from Tamanu
