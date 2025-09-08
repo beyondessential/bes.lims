@@ -24,6 +24,7 @@ from collections import OrderedDict
 import logging
 import os
 import re
+from datetime import timedelta
 
 from bes.lims import logger
 from bes.lims import messageFactory as _
@@ -52,14 +53,14 @@ parser = argparse.ArgumentParser(description=__doc__,
 # Define the command line arguments
 parser.add_argument(
     "-df", "--date_from",
-    required=True,
-    help='Start date for verified analyses (YYYY-MM-DD format)'
+    help='Start date for verified analyses (YYYY-MM-DD format). Default: '
+         'first day of previous week'
 )
 
 parser.add_argument(
     "-dt", "--date_to",
-    required=True,
-    help='End date for verified analyses (YYYY-MM-DD format)'
+    help='End date for verified analyses (YYYY-MM-DD format). Default: '
+         'last day of previous week'
 )
 
 parser.add_argument(
@@ -131,18 +132,31 @@ COLUMNS = OrderedDict((
 ))
 
 
-def parse_dates(date_from, date_to):
+def get_dates_range(date_from, date_to):
     """Parse and validate date range
     """
-    try:
-        from_date_dt = dtime.to_DT(date_from).earliestTime()
-        to_date_dt = dtime.to_DT(date_to).latestTime()
-        return from_date_dt, to_date_dt
-    except Exception as e:
-        logger.error(
-            "Invalid date format. Use YYYY-MM-DD. Error: {}".format(e)
-        )
-        raise
+    if date_from and not dtime.is_date(date_from):
+        raise ValueError("Invalid date format. Use YYYY-MM-DD")
+
+    if date_to and not dtime.is_date(date_to):
+        raise ValueError("Invalid date format. Use YYYY-MM-DD")
+
+    now = dtime.now()
+    if not date_from:
+        # defaults to first day of the previous week
+        date_from = now - timedelta(days=now.weekday() + 7)
+
+    if not date_to:
+        # defaults to last day of the previous week
+        date_to = now - timedelta(days=now.weekday() + 1)
+
+    # to earliest and latest
+    date_from = dtime.to_DT(date_from).earliestTime()
+    date_to = dtime.to_DT(date_to).latestTime()
+    if date_from >= date_to:
+        raise ValueError("To date must be after from date")
+
+    return date_from, date_to
 
 
 def get_published_analyses():
@@ -281,14 +295,12 @@ def process_export(date_from, date_to):
     """Export data to CSV file
     """
     # Get analyses data
-    from_date_dt, to_date_dt = parse_dates(date_from, date_to)
-
     brains = get_published_analyses()
 
     # Generate one row per analysis
     rows = []
     for brain in brains:
-        row = get_row(brain, from_date_dt, to_date_dt)
+        row = get_row(brain, date_from, date_to)
         if row:
             rows.append(row)
 
@@ -352,18 +364,22 @@ def main(app):
         )
         return
 
+    # get the date range
+    dt_from, dt_to = get_dates_range(args.date_from, args.date_to)
     logger.info(
-        "Exporting analyses from {} to {} ...".format(
-            args.date_from, args.date_to
+        "Exporting analyses from %s to %s ..." % (
+            dtime.date_to_string(dt_from),
+            dtime.date_to_string(dt_to)
         )
     )
 
-    rows = process_export(args.date_from, args.date_to)
-    to_csv(rows, args.date_from, args.date_to, args.destination)
+    rows = process_export(dt_from, dt_to)
+    to_csv(rows, dt_from, dt_to, args.destination)
 
     logger.info(
-        "Exporting analyses from {} to {} [DONE]".format(
-            args.date_from, args.date_to
+        "Exporting analyses from %s to %s [DONE]" % (
+            dtime.date_to_string(dt_from),
+            dtime.date_to_string(dt_to)
         )
     )
 
