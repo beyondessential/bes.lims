@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Reset Tamanu ID field"
+      description="Resets the value of Tamanu ID field"
+      source="1013"
+      destination="1014"
+      handler=".v01_00_000.reset_tamanu_ids"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Add `republish` transition to `invalidate` state"
       description="Add `republish` transition to `invalidate` state"
       source="1012"
