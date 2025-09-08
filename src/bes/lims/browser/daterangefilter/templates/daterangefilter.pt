@@ -5,9 +5,30 @@
         name="daterangefilter"
         method="POST">
 
-    <span i18n:translate="" class="mr-3 font-weight-bold">
-      Date Range:
-    </span>
+    <div class="d-flex align-items-center mr-3">
+      <span i18n:translate="" class="font-weight-bold mr-2">
+        Date Range:
+      </span>
+      
+      <!-- Bootstrap Switch Toggle -->
+      <div class="form-check form-switch">
+        <input class="form-check-input" 
+               type="checkbox" 
+               role="switch" 
+               id="dateFilterToggle"
+               name="filter_enabled"
+               value="1"
+               onchange="this.form.submit()"
+               tal:attributes="checked python: 'checked' if view.is_filter_enabled() else None">
+        <label class="form-check-label sr-only" for="dateFilterToggle">
+          Toggle Date Filter
+        </label>
+      </div>
+    </div>
+
+    <!-- Date filter controls - conditionally displayed -->
+    <div tal:condition="python: view.is_filter_enabled()" 
+         class="d-flex align-items-center flex-wrap">
 
     <!-- Date type selector -->
     <label for="date_type" class="field mr-2"
@@ -22,7 +43,6 @@
                                 selected python:'selected' if date_type == selected_date_type else None"
                 tal:content="python: date_types.getValue(date_type)"/>
     </select>
-
 
     <!-- Date from -->
     <label for="date_from" class="field mr-2"
@@ -54,6 +74,8 @@
 
     <button type="submit" i18n:translate=""
             class="btn btn-sm btn-outline-primary ml-2">Apply</button>
+
+    </div> <!-- End conditional date filter controls -->
 
   </form>
 

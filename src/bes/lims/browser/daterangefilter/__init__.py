@@ -18,7 +18,6 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from datetime import datetime
 from zope.globalrequest import getRequest
 
 # Session storage key
@@ -38,10 +37,8 @@ def get_selected_date_range():
             return session_data
 
     # Default to current month and created date type
-    now = datetime.now()
-    first_day = datetime(now.year, now.month, 1)
-    datetime_from = first_day.strftime("%Y-%m-%d 00:00")
-    datetime_to = now.strftime("%Y-%m-%d 23:59")
+    datetime_from = ""
+    datetime_to = ""
 
     return {
         "datetime_from": datetime_from,

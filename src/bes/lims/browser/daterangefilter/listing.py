@@ -61,7 +61,7 @@ class DateRangeFilterListingAdapter(object):
         datetime_from = date_range.get("datetime_from")
         datetime_to = date_range.get("datetime_to")
         date_type = date_range.get("date_type")
-        if not datetime_from or not datetime_to:
+        if not datetime_from and not datetime_to:
             return {}
 
         date_from_dt = dtime.to_DT(datetime_from)
