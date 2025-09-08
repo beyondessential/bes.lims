@@ -29,6 +29,7 @@ from datetime import timedelta
 from bes.lims import logger
 from bes.lims import messageFactory as _
 from bes.lims.scripts import setup_script_environment
+from bes.lims.setuphandlers import deactivate
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
@@ -159,20 +160,6 @@ def get_dates_range(date_from, date_to):
     return date_from, date_to
 
 
-def get_published_analyses():
-    """Get analyses based on published date range
-    """
-    # Search for published analyses
-    query = {
-        "portal_type": "Analysis",
-        "review_state": ["published"],
-        "sort_on": "getDateReceived",
-        "sort_order": "ascending",
-    }
-
-    return api.search(query, ANALYSIS_CATALOG)
-
-
 def get_age(dob, sampled):
     """Returns the age truncated to the highest period
     """
@@ -201,28 +188,6 @@ def get_header_row():
     """Returns a plain list with the column names
     """
     return [COLUMNS[key].get("title") for key in COLUMNS.keys()]
-
-
-def get_row(analysis, date_from, date_to):
-    """Extract row data for an analysis
-    """
-    analysis = api.get_object(analysis)
-    if not is_reportable(analysis):
-        analysis._p_deactivate()
-        return None
-
-    sample = analysis.getRequest()
-
-    if (
-        sample.getDateVerified()
-        and not (date_from <= sample.getDateVerified() <= date_to)
-    ):
-        analysis._p_deactivate()
-        return None
-
-    info = get_row_info(analysis, sample)
-    analysis._p_deactivate()
-    return [info.get(key, "") for key in COLUMNS.keys()]
 
 
 def get_row_info(analysis, sample):
@@ -291,23 +256,58 @@ def get_row_info(analysis, sample):
     }
 
 
-def process_export(date_from, date_to):
+def do_export(date_from, date_to, output_file):
     """Export data to CSV file
     """
-    # Get analyses data
-    brains = get_published_analyses()
+    # Get published analyses that were verified within the given date range
+    query = {
+        "portal_type": "Analysis",
+        "review_state": ["published"],
+        "date_verified": {
+            "query": [date_from, date_to],
+            "range": "min:max",
+        },
+        "sort_on": "getDateReceived",
+        "sort_order": "ascending",
+    }
+
+    logger.info(
+        "Exporting analyses from %s to %s ..." % (
+            dtime.date_to_string(date_from),
+            dtime.date_to_string(date_to)
+        )
+    )
 
     # Generate one row per analysis
     rows = []
-    for brain in brains:
-        row = get_row(brain, date_from, date_to)
-        if row:
-            rows.append(row)
+    for brain in api.search(query, ANALYSIS_CATALOG):
+        analysis = api.get_object(brain)
+        if not is_reportable(analysis):
+            analysis._p_deactivate()
+            continue
+
+        # build the analysis row
+        sample = analysis.getRequest()
+        info = get_row_info(analysis, sample)
+        row = [info.get(key, "") for key in COLUMNS.keys()]
+        rows.append(row)
+
+        # flush the sample and analysis from memory
+        analysis._p_deactivate()  # noqa
+        sample._p_deactivate()  # noqa
 
     # Insert the header row at first position
     rows.insert(0, get_header_row())
 
-    return list(filter(None, rows))
+    # generate the csv
+    to_csv(rows, output_file)
+
+    logger.info(
+        "Exporting analyses from %s to %s [DONE]" % (
+            dtime.date_to_string(date_from),
+            dtime.date_to_string(date_to)
+        )
+    )
 
 
 def quote(value):
@@ -320,24 +320,15 @@ def quote(value):
     return "\"{}\"".format(value)
 
 
-def to_csv(rows, date_from, date_to, destination):
+def to_csv(rows, output_file):
     """Returns a CSV-like string with quotes values
     """
-    filename = "{}-{}-{}.csv".format(
-        "analysis_requests",
-        date_from.replace("-", ""),
-        date_to.replace("-", "")
-    )
-    if destination:
-        filename = os.path.join(destination, filename)
-
     output = StringIO()
-
     for row in rows:
         output.write(",".join(map(quote, row)) + "\n")
 
     output = api.safe_unicode(output.getvalue()).encode("utf-8")
-    with open(filename, 'w') as f:
+    with open(output_file, 'w') as f:
         f.write(output)
 
 
@@ -349,7 +340,6 @@ def main(app):
         print("")
         parser.print_help()
         parser.exit()
-        return
 
     # Setup environment
     setup_script_environment(app, stream_out=True)
@@ -357,31 +347,27 @@ def main(app):
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    # Check if destination directory exists
-    if args.destination and not os.path.exists(args.destination):
-        logger.error(
-            "Destination directory does not exist: {}", args.destination
-        )
-        return
+    # destination path
+    destination = args.destination or os.getcwd()
+    if not os.path.exists(destination):
+        print("Destination directory does not exist: {}", args.destination)
+        exit(-1)
 
-    # get the date range
-    dt_from, dt_to = get_dates_range(args.date_from, args.date_to)
-    logger.info(
-        "Exporting analyses from %s to %s ..." % (
-            dtime.date_to_string(dt_from),
-            dtime.date_to_string(dt_to)
-        )
-    )
+    # compute the date range (default: previous week)
+    try:
+        dt_from, dt_to = get_dates_range(args.date_from, args.date_to)
+    except ValueError as e:
+        print(str(e))
+        exit(-1)
 
-    rows = process_export(dt_from, dt_to)
-    to_csv(rows, dt_from, dt_to, args.destination)
+    # output file
+    ansi_from = dtime.to_ansi(dt_from, show_time=False)
+    ansi_to = dtime.to_ansi(dt_to, show_time=False)
+    filename = "analyses-%s-%s.csv" % (ansi_from, ansi_to)
+    out_file = os.path.join(destination, filename)
 
-    logger.info(
-        "Exporting analyses from %s to %s [DONE]" % (
-            dtime.date_to_string(dt_from),
-            dtime.date_to_string(dt_to)
-        )
-    )
+    # export the data
+    do_export(dt_from, dt_to, out_file)
 
 
 if __name__ == "__main__":

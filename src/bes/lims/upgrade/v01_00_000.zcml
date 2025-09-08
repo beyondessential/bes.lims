@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup script for exporting data to Tupaia"
+      description="Enables the analyses data export for Tupaia"
+      source="1014"
+      destination="1015"
+      handler=".v01_00_000.setup_tupaia_export_script"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Reset Tamanu ID field"
       description="Resets the value of Tamanu ID field"
       source="1013"
