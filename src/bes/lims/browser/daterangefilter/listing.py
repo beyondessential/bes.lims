@@ -18,7 +18,7 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims.browser.daterangefilter import get_selected_date_range
+from bes.lims.browser.daterangefilter import get_selected_date_range_config
 from senaite.core.api import dtime
 from senaite.app.listing.interfaces import IListingView
 from senaite.app.listing.interfaces import IListingViewAdapter
@@ -57,7 +57,12 @@ class DateRangeFilterListingAdapter(object):
         """
 
         # get the date range selected for current contact
-        date_range = get_selected_date_range()
+        date_range = get_selected_date_range_config()
+
+        # Check if filter is enabled
+        if not date_range.get("filter_enabled", False):
+            return {}
+
         datetime_from = date_range.get("datetime_from")
         datetime_to = date_range.get("datetime_to")
         date_type = date_range.get("date_type")
