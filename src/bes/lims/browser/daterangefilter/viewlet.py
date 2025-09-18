@@ -18,10 +18,11 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims.browser.daterangefilter import get_selected_date_range
-from bes.lims.browser.daterangefilter import set_selected_date_range
-from bes.lims.config import DATE_TYPES
 from datetime import datetime
+from datetime import timedelta
+from bes.lims.browser.daterangefilter import get_selected_date_range_config
+from bes.lims.browser.daterangefilter import set_selected_date_range_config
+from bes.lims.config import DATE_TYPES
 from plone.app.layout.viewlets import ViewletBase
 from plone.memoize import view
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -33,34 +34,34 @@ class DateRangeFilteringViewlet(ViewletBase):
     index = ViewPageTemplateFile("templates/daterangefilter.pt")
 
     @view.memoize
-    def get_date_range(self):
+    def get_date_range_config(self):
         """Returns the selected date range
         """
-        return get_selected_date_range()
+        return get_selected_date_range_config()
 
     def get_date_from(self):
         """Extract date part from datetime_from"""
-        datetime_from = self.get_date_range().get("datetime_from", "")
+        datetime_from = self.get_date_range_config().get("datetime_from", "")
         return datetime_from.split(" ")[0] if datetime_from else ""
 
     def get_time_from(self):
         """Extract time part from datetime_from"""
-        datetime_from = self.get_date_range().get("datetime_from", "")
-        return datetime_from.split(" ")[1] if " " in datetime_from else "00:00"
+        datetime_from = self.get_date_range_config().get("datetime_from", "")
+        return datetime_from.split(" ")[1] if " " in datetime_from else ""
 
     def get_date_to(self):
         """Extract date part from datetime_to"""
-        datetime_to = self.get_date_range().get("datetime_to", "")
+        datetime_to = self.get_date_range_config().get("datetime_to", "")
         return datetime_to.split(" ")[0] if datetime_to else ""
 
     def get_date_type(self):
         """Returns the selected date type"""
-        return self.get_date_range().get("date_type", "created")
+        return self.get_date_range_config().get("date_type", "created")
 
     def get_time_to(self):
         """Extract time part from datetime_to"""
-        datetime_to = self.get_date_range().get("datetime_to", "")
-        return datetime_to.split(" ")[1] if " " in datetime_to else "23:59"
+        datetime_to = self.get_date_range_config().get("datetime_to", "")
+        return datetime_to.split(" ")[1] if " " in datetime_to else ""
 
     @view.memoize
     def get_date_types(self):
@@ -68,37 +69,47 @@ class DateRangeFilteringViewlet(ViewletBase):
         """
         return DATE_TYPES
 
+    def is_filter_enabled(self):
+        """Check if the filter is currently enabled"""
+        # If form is submitted, check if checkbox is present
+        if self.request.form:
+            return "filter_enabled" in self.request.form
+
+        # For initial load, check session storage
+        date_range_config = self.get_date_range_config()
+        return date_range_config.get("filter_enabled", False)
+
     def render(self):
-        # Check if the form was submitted
-        form_submitted = (
-            "date_from" in self.request.form
-            or "date_to" in self.request.form
-            or "time_from" in self.request.form
-            or "time_to" in self.request.form
-            or "date_type" in self.request.form
-        )
-        if not form_submitted:
+        # Always process form if any form data is present
+        if not self.request.form:
             return self.index()
 
-        # Get the submitted date range, time range and type
-        date_from = self.request.form.get("date_from")
-        date_to = self.request.form.get("date_to")
-        time_from = self.request.form.get("time_from")
-        time_to = self.request.form.get("time_to")
-        date_type = self.request.form.get("date_type")
+        # Check if filter is enabled (checkbox checked)
+        filter_enabled = self.request.form.get("filter_enabled", False)
+        # Filter is enabled, process the form data
+        date_from = self.request.form.get("date_from", "")
+        date_to = self.request.form.get("date_to", "")
+        time_from = self.request.form.get("time_from", "")
+        time_to = self.request.form.get("time_to", "")
+        date_type = self.request.form.get("date_type", "created")
 
-        # Validate and set default dates if empty
-        if not date_from or not date_to:
+        if filter_enabled:
             now = datetime.now()
-            first_day = datetime(now.year, now.month, 1)
-            date_from = date_from or first_day.strftime("%Y-%m-%d")
-            date_to = date_to or now.strftime("%Y-%m-%d")
+            delta = now - timedelta(days=30)
+            if not date_from:
+                date_from = delta.strftime("%Y-%m-%d")
+                time_from = "00:00"
+            if not date_to:
+                date_to = now.strftime("%Y-%m-%d")
+                time_to = "23:59"
 
         # Combine date and time into datetime strings
-        datetime_from = "{} {}".format(date_from, time_from)
-        datetime_to = "{} {}".format(date_to, time_to)
+        datetime_from = "{} {}".format(date_from, time_from).strip()
+        datetime_to = "{} {}".format(date_to, time_to).strip()
 
-        # Save the selected date range
-        set_selected_date_range(datetime_from, datetime_to, date_type)
+        # Save the selected date range config
+        set_selected_date_range_config(
+            datetime_from, datetime_to, date_type, filter_enabled
+        )
 
         return self.index()
