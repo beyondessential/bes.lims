@@ -4,7 +4,9 @@ Changelog
 1.0.0
 -----
 
-- #84 Add date range filter toggle and refactor date handling logic 
+- #84 Add date range filter toggle and refactor date handling logic
+- #76 Add script to export SENAITE analysis requests by date range
+- #83 Add Tamanu ID Field
 - #75 Add date range search function in samples listing
 - #73 Disable title-based matching when importing analyses from Tamanu
 - #72 Make statistic report of analyses results more reusable

@@ -1,0 +1,6 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Additional tokens for listing_searchable_text -->
+  <adapter factory=".sample.ListingSearchableTextProvider" />
+
+</configure>

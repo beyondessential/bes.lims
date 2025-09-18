@@ -18,19 +18,25 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims import logger
+import copy
+import transaction
+
 from bes.lims import PRODUCT_NAME as product
+from bes.lims import logger
 from bes.lims.setuphandlers import setup_behaviors
 from bes.lims.setuphandlers import setup_catalogs
 from bes.lims.setuphandlers import setup_groups
 from bes.lims.setuphandlers import setup_microbiology_department
 from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
+from bes.lims.tamanu import api as tapi
+from bes.lims.tamanu.interfaces import ITamanuContent
 from bika.lims import api
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
+from senaite.core.decorators import retriable
 from senaite.core.migration.migrator import get_attribute_storage
 from senaite.core.permissions import FieldEditAnalysisRemarks
 from senaite.core.upgrade import upgradestep
@@ -40,6 +46,7 @@ from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
+from zope.interface import alsoProvides
 from zope.schema.interfaces import IVocabularyFactory
 
 
@@ -382,3 +389,94 @@ def add_republish_transition_to_invalidate_state(tool):
         sample._p_deactivate()
 
     logger.info("Add `republish` transition to `invalidate` state [DONE]")
+
+
+@retriable(sync=True)
+def reset_tamanu_ids_for(uids):
+    cat = api.get_tool(SAMPLE_CATALOG)
+    indexes = ["object_provides", "listing_searchable_text"]
+    for uid in uids:
+        sample = api.get_object_by_uid(uid, default=None)
+        if not sample:
+            continue
+
+        if not tapi.is_tamanu_content(sample):
+            # BBB (for earlier records from palau.lims)
+            alsoProvides(ITamanuContent)
+
+        # get the tamanu-related storage
+        storage = tapi.get_tamanu_storage(sample)
+        item = copy.deepcopy(storage.get("data", {}))
+        if not item:
+            logger.warn("[SKIP] No Tamanu data found for %r" % sample)
+            continue
+
+        # extract the original Tamanu ID from the storage
+        session = tapi.get_tamanu_session_for(sample, login=False)
+        sr = session.to_resource(item)
+        tid = sr.getLabTestID()
+        if not tid:
+            logger.warn("[SKIP] No LabTestID found for %r" % sample)
+            continue
+
+        if sample.getTamanuID() == tid:
+            continue
+
+        # set the tamanu ID
+        sample.setTamanuID(tid)
+
+        # reindex proper indexes
+        cat.reindexObject(sample, idxs=indexes, update_metadata=0)
+
+        # flush from memory
+        sample._p_deactivate()
+
+    transaction.commit()
+
+
+def to_chunks(values, size):
+    """Generator function to yield chunks
+    """
+    for idx in range(0, len(values), size):
+        yield values[idx:idx + size]
+
+
+def reset_tamanu_ids(tool):
+    """Walks through samples that were imported from Tamanu and updates the
+    value of the field 'TamanuID' with the ID of the counterpart ServiceRequest
+    """
+    logger.info("Reset Tamanu IDs ...")
+
+    # search affected samples
+    query = {
+        "portal_type": "AnalysisRequest",
+        "object_provides": [
+            ITamanuContent.__identifier__,
+            # BBB
+            "palau.lims.tamanu.interfaces.ITamanuContent",
+        ]
+    }
+    brains = api.search(query, SAMPLE_CATALOG)
+    uids = [api.get_uid(brain) for brain in brains]
+
+    # process them in chunks
+    size = 100
+    for num, chunk in enumerate(to_chunks(uids, size)):
+        reset_tamanu_ids_for(chunk)
+        processed = (num * size) + len(chunk)
+        logger.info("Processed objects: %s/%s" % (processed, len(uids)))
+
+    logger.info("Reset Tamanu IDs ...")
+
+
+def setup_tupaia_export_script(tool):
+    """Setup script for exporting data to Tupaia
+    """
+    logger.info("Setup script for exporting data to Tupaia ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Setup Catalogs
+    setup_catalogs(portal)
+
+    logger.info("Setup script for exporting data to Tupaia [DONE]")

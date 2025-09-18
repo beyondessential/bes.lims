@@ -679,7 +679,7 @@ def sync_service_request(sr):
         "DateOfBirth": patient_dob,
         "Sex": patient_sex,
         "Priority": priority,
-        "ClientSampleID": tid,
+        "TamanuID": tid,
         "Collector": collector,
         "Sampler": collector,
         #"Remarks": remarks,

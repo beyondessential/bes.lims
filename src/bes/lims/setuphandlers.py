@@ -44,6 +44,7 @@ CATALOGS = (
 INDEXES = [
     # Tuples of (catalog, index_name, index_attribute, index_type)
     (ANALYSIS_CATALOG, "department_uid", "", "FieldIndex"),
+    (ANALYSIS_CATALOG, "date_verified", "", "DateIndex"),
     (SAMPLE_CATALOG, "department_uid", "", "KeywordIndex"),
 ]
 
