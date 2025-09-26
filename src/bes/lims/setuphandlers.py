@@ -124,6 +124,14 @@ WORKFLOWS_TO_UPDATE = {
                 "transitions": ["rollback"],
                 "permissions_copy_from": "rejected",
             },
+            "to_be_verified": {
+                "permissions": {
+                    # allow LabManager, Manager and Scientist to edit remarks
+                    core_permissions.FieldEditAnalysisRemarks: [
+                        "Scientist", "LabManager", "Manager"
+                    ],
+                }
+            },
         },
         "transitions": {
             "set_out_of_stock": {
