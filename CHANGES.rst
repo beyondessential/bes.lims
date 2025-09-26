@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #86 Enable editing of analysis remarks when status is 'to_be_verified'
 - #84 Add date range filter toggle and refactor date handling logic
 - #76 Add script to export SENAITE analysis requests by date range
 - #83 Add Tamanu ID Field

@@ -3,10 +3,11 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
-      title="Enable editing of analysis remarks when status is 'to_be_verified'"
+      title="Enable editing of analysis remarks when status is to_be_verified"
       description="
-        Permits users assigned to the roles LabManager, Manager, or Scientist to modify remarks associated with analyses
-        that are in the 'To be verified' status.
+        Permits users assigned to the roles LabManager, Manager, or Scientist
+        to modify remarks associated with analyses that are in the 'To be
+        verified' status.
       "
       source="1015"
       destination="1016"

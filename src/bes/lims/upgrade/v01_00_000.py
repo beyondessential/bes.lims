@@ -484,7 +484,7 @@ def setup_tupaia_export_script(tool):
 
 
 def enable_analysis_remarks_edition(tool):
-    logger.info("Enable editing of analysis remarks when status is 'to_be_verified' ...")
+    logger.info("Enable editing of analysis remarks in to_be_verified ...")
     portal = tool.aq_inner.aq_parent
     setup = portal.portal_setup
 
@@ -506,4 +506,4 @@ def enable_analysis_remarks_edition(tool):
         wf.updateRoleMappingsFor(analysis)
         analysis._p_deactivate()
 
-    logger.info("Enable editing of analysis remarks when status is 'to_be_verified' [DONE]")
+    logger.info("Enable editing of analysis remarks in to_be_verified [DONE]")
