@@ -29,6 +29,7 @@ from bes.lims.setuphandlers import setup_groups
 from bes.lims.setuphandlers import setup_microbiology_department
 from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
+from bes.lims.setuphandlers import WORKFLOWS_TO_UPDATE
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu.interfaces import ITamanuContent
 from bika.lims import api
@@ -480,3 +481,29 @@ def setup_tupaia_export_script(tool):
     setup_catalogs(portal)
 
     logger.info("Setup script for exporting data to Tupaia [DONE]")
+
+
+def enable_analysis_remarks_edition(tool):
+    logger.info("Enable editing of analysis remarks when status is 'to_be_verified' ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+
+    # Update analysis workflow
+    settings = WORKFLOWS_TO_UPDATE.get(ANALYSIS_WORKFLOW)
+    wapi.update_workflow(ANALYSIS_WORKFLOW, **settings)
+
+    # Update role mappings for existing analyses in to_be_verified status
+    query = {
+        "portal_type": "Analysis",
+        "review_state": "to_be_verified"
+    }
+    wf = wapi.get_workflow(ANALYSIS_WORKFLOW)
+    brains = api.search(query, ANALYSIS_CATALOG)
+    for brain in brains:
+        analysis = get_object(brain)
+        if not analysis:
+            continue
+        wf.updateRoleMappingsFor(analysis)
+        analysis._p_deactivate()
+
+    logger.info("Enable editing of analysis remarks when status is 'to_be_verified' [DONE]")

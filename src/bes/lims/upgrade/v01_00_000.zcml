@@ -3,6 +3,17 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Enable editing of analysis remarks when status is 'to_be_verified'"
+      description="
+        Permits users assigned to the roles LabManager, Manager, or Scientist to modify remarks associated with analyses
+        that are in the 'To be verified' status.
+      "
+      source="1015"
+      destination="1016"
+      handler=".v01_00_000.enable_analysis_remarks_edition"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup script for exporting data to Tupaia"
       description="Enables the analyses data export for Tupaia"
       source="1014"
