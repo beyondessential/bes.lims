@@ -33,6 +33,7 @@ from bes.lims.setuphandlers import WORKFLOWS_TO_UPDATE
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu.interfaces import ITamanuContent
 from bika.lims import api
+from Products.ZCatalog.ProgressHandler import ZLogHandler
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
@@ -507,3 +508,13 @@ def enable_analysis_remarks_edition(tool):
         analysis._p_deactivate()
 
     logger.info("Enable editing of analysis remarks in to_be_verified [DONE]")
+
+
+def fix_cannot_search_by_mrn(tool):
+    logger.info("Fix cannot search by MRN ...")
+
+    idx = ("listing_searchable_text", )
+    cat = api.get_tool(SAMPLE_CATALOG)
+    cat.reindexIndex(idx, api.get_request(), ZLogHandler(1000))
+
+    logger.info("Fix cannot search by MRN [DONE]")

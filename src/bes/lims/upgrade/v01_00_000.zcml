@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Fix cannot search by MRN or patient name in samples listing"
+      description="Reindex listing_searchable_text from sample catalog"
+      source="1016"
+      destination="1017"
+      handler=".v01_00_000.fix_cannot_search_by_mrn"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Enable editing of analysis remarks when status is to_be_verified"
       description="
         Permits users assigned to the roles LabManager, Manager, or Scientist
