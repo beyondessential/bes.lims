@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #77 Remove 'verified' status mapping when notify Tamanu in DiagnosticReport
 - #88 Fix cannot search samples by MRN or patient name
 - #86 Enable editing of analysis remarks when status is 'to_be_verified'
 - #84 Add date range filter toggle and refactor date handling logic
