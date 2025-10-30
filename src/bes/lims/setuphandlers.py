@@ -44,6 +44,7 @@ CATALOGS = (
 INDEXES = [
     # Tuples of (catalog, index_name, index_attribute, index_type)
     (ANALYSIS_CATALOG, "department_uid", "", "FieldIndex"),
+    (ANALYSIS_CATALOG, "date_verified", "", "DateIndex"),
     (SAMPLE_CATALOG, "department_uid", "", "KeywordIndex"),
 ]
 
@@ -122,6 +123,14 @@ WORKFLOWS_TO_UPDATE = {
                 "title": "Out of Stock",
                 "transitions": ["rollback"],
                 "permissions_copy_from": "rejected",
+            },
+            "to_be_verified": {
+                "permissions": {
+                    # allow LabManager, Manager and Scientist to edit remarks
+                    core_permissions.FieldEditAnalysisRemarks: [
+                        "Scientist", "LabManager", "Manager"
+                    ],
+                }
             },
         },
         "transitions": {

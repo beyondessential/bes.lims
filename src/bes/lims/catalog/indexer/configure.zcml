@@ -2,6 +2,7 @@
 
   <!-- BaseAnalysis Indexer -->
   <adapter name="department_uid" factory=".baseanalysis.department_uid"/>
+  <adapter name="date_verified" factory=".baseanalysis.date_verified"/>
 
   <!-- Sample Indexer -->
   <adapter name="department_uid" factory=".sample.department_uid"/>

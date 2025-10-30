@@ -5,6 +5,11 @@ Changelog
 -----
 
 - #77 Remove 'verified' status mapping when notify Tamanu in DiagnosticReport
+- #88 Fix cannot search samples by MRN or patient name
+- #86 Enable editing of analysis remarks when status is 'to_be_verified'
+- #84 Add date range filter toggle and refactor date handling logic
+- #76 Add script to export SENAITE analysis requests by date range
+- #83 Add Tamanu ID Field
 - #75 Add date range search function in samples listing
 - #73 Disable title-based matching when importing analyses from Tamanu
 - #72 Make statistic report of analyses results more reusable
