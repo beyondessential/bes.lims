@@ -89,6 +89,9 @@ class AnalysesResults(CSVReport):
             ("site", {
                 "title": _("Site"),
             }),
+            ("ward", {
+                "title": _("Ward"),
+            })
         ))
 
     def process_form(self):
@@ -170,6 +173,10 @@ class AnalysesResults(CSVReport):
         gender = dict(SEXES).get(sample.getSex())
         gender = translate(gender) if gender else ""
 
+        # get the ward
+        ward = sample.getWard()
+        ward = api.get_title(ward) if ward else ""
+
         # add the info for each analysis in a row
         return {
             "sample_id": analysis.getRequestID(),
@@ -184,7 +191,8 @@ class AnalysesResults(CSVReport):
             "test_type": analysis.Title(),
             "result": result,
             "unit": unit,
-            "site": sample.getClientTitle() or ""
+            "site": sample.getClientTitle() or "",
+            "ward": ward,
         }
 
     def get_age(self, dob, sampled):
