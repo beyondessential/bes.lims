@@ -174,7 +174,7 @@ class AnalysesResults(CSVReport):
         gender = translate(gender) if gender else ""
 
         # get the ward
-        ward = sample.getWard()
+        ward = self.get_ward(sample)
         ward = api.get_title(ward) if ward else ""
 
         # add the info for each analysis in a row
@@ -225,6 +225,13 @@ class AnalysesResults(CSVReport):
         date_to = dtime.to_DT(date_to).latestTime()
 
         return date_from, date_to
+
+    def get_ward(self, sample):
+        # TODO Remove after Wards are ported to bes.lims
+        accessor = getattr(sample, "getWard", None)
+        if callable(accessor):
+            return accessor()
+        return None
 
     def get_first_sample_date(self):
         query = {

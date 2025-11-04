@@ -310,14 +310,18 @@ class WHONETExportView(BrowserView):
     def get_age_ymd(self, dob, date_sampled):
         return patient_api.get_age_ymd(dob, date_sampled) or ""
 
+    def get_ward(self, sample):
+        # TODO Remove after Wards are ported to bes.lims
+        accessor = getattr(sample, "getWard", None)
+        if callable(accessor):
+            return accessor()
+        return None
+
     def get_sample_info(self, sample):
         """Returns a dictionary that represents the sample object passed-in
         """
         mrn = sample.getMedicalRecordNumberValue()
         dob = sample.getDateOfBirth()[0]
-        ward = sample.getWard()
-        if ward:
-            ward = api.get_title(ward)
 
         client = sample.getClient()
         sample_type = sample.getRawSampleType()
@@ -332,6 +336,9 @@ class WHONETExportView(BrowserView):
         patient_field = sample.getField("PatientFullName")
         firstname = patient_field.get_firstname(sample)
         lastname = patient_field.get_lastname(sample)
+
+        ward = self.get_ward(sample)
+        ward = api.get_title(ward) if ward else ""
 
         return {
             "client": api.get_title(client),
