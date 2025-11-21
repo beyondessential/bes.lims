@@ -89,6 +89,9 @@ class AnalysesResults(CSVReport):
             ("site", {
                 "title": _("Site"),
             }),
+            ("ward", {
+                "title": _("Ward"),
+            })
         ))
 
     def process_form(self):
@@ -170,6 +173,10 @@ class AnalysesResults(CSVReport):
         gender = dict(SEXES).get(sample.getSex())
         gender = translate(gender) if gender else ""
 
+        # get the ward
+        ward = self.get_ward(sample)
+        ward = api.get_title(ward) if ward else ""
+
         # add the info for each analysis in a row
         return {
             "sample_id": analysis.getRequestID(),
@@ -184,7 +191,8 @@ class AnalysesResults(CSVReport):
             "test_type": analysis.Title(),
             "result": result,
             "unit": unit,
-            "site": sample.getClientTitle() or ""
+            "site": sample.getClientTitle() or "",
+            "ward": ward,
         }
 
     def get_age(self, dob, sampled):
@@ -217,6 +225,13 @@ class AnalysesResults(CSVReport):
         date_to = dtime.to_DT(date_to).latestTime()
 
         return date_from, date_to
+
+    def get_ward(self, sample):
+        # TODO Remove after Wards are ported to bes.lims
+        accessor = getattr(sample, "getWard", None)
+        if callable(accessor):
+            return accessor()
+        return None
 
     def get_first_sample_date(self):
         query = {

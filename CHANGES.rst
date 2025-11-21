@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #90 Add ward to Analyses results stats report
 - #77 Remove 'verified' status mapping when notify Tamanu in DiagnosticReport
 - #88 Fix cannot search samples by MRN or patient name
 - #86 Enable editing of analysis remarks when status is 'to_be_verified'
