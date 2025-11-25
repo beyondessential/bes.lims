@@ -22,6 +22,7 @@ from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu.config import LOINC_CODING_SYSTEM
 from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
+from bes.lims.tamanu.config import SEND_OBSERVATIONS
 from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import tmpID
@@ -140,7 +141,8 @@ def send_diagnostic_report(sample, report, status=None):
     payload["code"] = {"coding": coding}
 
     # add the observations
-    #payload["results"] = get_observations(sample)
+    if SEND_OBSERVATIONS:
+        payload["results"] = get_observations(sample)
 
     # attach the pdf encoded in base64
     if report:

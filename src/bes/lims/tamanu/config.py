@@ -50,3 +50,5 @@ SAMPLE_FINAL_STATUSES = (
     "published",
     "invalid",
 )
+
+SEND_OBSERVATIONS = False
