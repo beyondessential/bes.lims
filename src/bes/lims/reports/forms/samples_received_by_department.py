@@ -43,6 +43,7 @@ class SamplesReceivedByDepartment(CSVReport):
         rows = [[_("Department")] + sample_types]
 
         # group the samples by (Ward) department
+        # TODO Add getWardDepartment metadata in catalog to prevent obj wake-up
         samples_by_dept = group_by(brains, "getWardDepartment")
 
         for dept, samples_in_dept in samples_by_dept.items():
