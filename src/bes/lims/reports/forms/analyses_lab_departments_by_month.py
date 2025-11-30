@@ -59,7 +59,7 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
         totals_by_month = OrderedDict.fromkeys(range(1, 14), 0)
 
         # group the analyses brains by title
-        analyses_by_name = group_by(brains, self.get_fullname)
+        analyses_by_name = group_by(brains, self.get_analysis_fullname)
 
         # get titles and sort them
         names = sorted(analyses_by_name.keys())
@@ -91,7 +91,7 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
 
         return rows
 
-    def get_fullname(self, analysis):
+    def get_analysis_fullname(self, analysis):
         """Returns a string that in the format "<name> (keyword)"
         """
         name = api.get_title(analysis)
