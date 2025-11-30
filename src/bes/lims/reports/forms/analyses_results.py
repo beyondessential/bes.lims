@@ -188,7 +188,7 @@ class AnalysesResults(CSVReport):
             "verified": result_verified,
             "department": department,
             "panels": ", ".join(profiles),
-            "test_type": analysis.Title(),
+            "test_type": self.get_analysis_fullname(analysis),
             "result": result,
             "unit": unit,
             "site": sample.getClientTitle() or "",
@@ -250,3 +250,13 @@ class AnalysesResults(CSVReport):
     def get_analysis_profiles(self, sample):
         profiles = sample.getProfiles()
         return map(api.get_title, profiles)
+
+    def get_analysis_fullname(self, analysis):
+        """Returns a string that in the format "<name> (keyword)"
+        """
+        name = api.get_title(analysis)
+        if api.is_brain(analysis):
+            keyword = analysis.getKeyword
+        else:
+            keyword = analysis.getKeyword()
+        return "%s (%s)" % (name, keyword)

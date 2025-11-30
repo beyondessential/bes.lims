@@ -58,10 +58,15 @@ def group_by(objs, func):
     """
     groups = {}
     for obj in objs:
-        if not hasattr(obj, func) and api.is_brain(obj):
-            obj = api.get_object(obj)
+        value = None
+        if callable(func):
+            value = func(obj)
+        elif hasattr(obj, func):
+            value = getattr(obj, func, None)
+        elif api.is_brain(obj):
+            brain_obj = api.get_object(obj)
+            value = getattr(brain_obj, func, None)
 
-        value = getattr(obj, func, None)
         if callable(value):
             value = value()
 

@@ -59,15 +59,15 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
         totals_by_month = OrderedDict.fromkeys(range(1, 14), 0)
 
         # group the analyses brains by title
-        analyses_by_title = group_by(brains, "Title")
+        analyses_by_name = group_by(brains, self.get_analysis_fullname)
 
         # get titles and sort them
-        titles = sorted(analyses_by_title.keys())
+        names = sorted(analyses_by_name.keys())
 
-        for title in titles:
+        for name in names:
 
             # get the analyses for the test with the given title
-            analyses = analyses_by_title[title]
+            analyses = analyses_by_name[name]
 
             # group and count the analyses by reception date
             counts = count_by(analyses, "getDateReceived")
@@ -84,9 +84,19 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
                 totals_by_month[month] += counts.get(month, 0)
 
             # build the totals by analysis name row
-            rows.append([title] + analysis_counts + [total])
+            rows.append([name] + analysis_counts + [total])
 
         # build the totals by month row
         rows.append([_("Total")] + totals_by_month.values())
 
         return rows
+
+    def get_analysis_fullname(self, analysis):
+        """Returns a string that in the format "<name> (keyword)"
+        """
+        name = api.get_title(analysis)
+        if api.is_brain(analysis):
+            keyword = analysis.getKeyword
+        else:
+            keyword = analysis.getKeyword()
+        return "%s (%s)" % (name, keyword)
