@@ -22,6 +22,8 @@ TAMANU_USER = "tamanu"
 
 TAMANU_STORAGE = "senaite.tamanu.storage"
 
+TAMANU_TASKS_QUEUE = "senaite.tamanu.queue.storage"
+
 TAMANU_SEXES = (
     ("male", "m"),
     ("female", "f"),
@@ -51,4 +53,24 @@ SAMPLE_FINAL_STATUSES = (
     "invalid",
 )
 
+# Whether observations have to be included in DiagnosticReport
 SEND_OBSERVATIONS = False
+
+SAMPLE_STATUSES = (
+    # mapping between sample status and tamanu statuses
+    ("sample_received", "partial"),
+    ("to_be_verified", "preliminary"),
+    ("published", "final"),
+    ("invalid", "entered-in-error"),
+    # Tamanu is notified back with the rejection report (Attachment) instead of
+    # the results report (ARReport) on rejection.
+    # See patches.bika.utils.analysisrequest.do_rejection
+    # ("rejected", "cancelled"),
+)
+
+ANALYSIS_STATUSES = (
+    # mapping between analyses status and tamanu statuses
+    ("to_be_verified", "partial"),
+    ("verified", "preliminary"),
+    ("published", "final"),
+)

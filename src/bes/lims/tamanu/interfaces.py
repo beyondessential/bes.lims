@@ -34,3 +34,16 @@ class ITamanuContent(Interface):
     """Marker interface for objects that keep a reference to a counterpart
     content at Tamanu
     """
+
+
+class ITamanuTask(Interface):
+    """Interface to process Tamanu-specific tasks
+    """
+
+    def __init__(self, record):
+        """Record containing the job required information
+        """
+
+    def process(self):
+        """Processes the job or raises an Exception if unable to succeed
+        """

@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Adapter to handle DiagnosticReport notifications -->
+  <adapter
+    name="senaite.tamanu.task.notify_diagnostic_report"
+    provides="bes.lims.tamanu.interfaces.ITamanuTask"
+    factory=".diagnosticreport.NotifyAdapter"
+    for="bika.lims.interfaces.IAnalysisRequest" />
+
+</configure>

@@ -7,5 +7,6 @@
   <include package=".patches" />
   <include package=".resources" />
   <include package=".subscribers" />
+  <include package=".tasks" />
 
 </configure>
