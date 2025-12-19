@@ -36,12 +36,12 @@ def get():
         return None
 
     # get the name of the task and the context uid
-    idx = task.indexOf("-")
+    idx = task.index("-")
     uid = task[:idx]
-    name = task[idx:]
+    name = task[idx+1:]
 
     # validate the task id
-    if not all([name,api.is_uid(uid)]):
+    if not all([name, api.is_uid(uid)]):
         logger.error("Not a valid task: %s" % task)
         return None
 
@@ -63,7 +63,7 @@ def put(name, context):
     task_id = "%s-%s" % (uid, name)
     tasks = _get_tasks()
     # do not append unless new
-    if name not in tasks:
+    if task_id not in tasks:
         tasks.insert(0, task_id)
         return True
     return False
