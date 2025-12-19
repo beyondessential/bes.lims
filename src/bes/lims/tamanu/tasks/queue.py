@@ -65,3 +65,5 @@ def put(name, context):
     # do not append unless new
     if name not in tasks:
         tasks.insert(0, task_id)
+        return True
+    return False

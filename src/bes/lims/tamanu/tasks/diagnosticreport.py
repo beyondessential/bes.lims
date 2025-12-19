@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.utils import tmpID
@@ -16,6 +17,7 @@ from bes.lims.tamanu.config import SAMPLE_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
 from bes.lims.tamanu.config import SEND_OBSERVATIONS
 from bes.lims.tamanu.interfaces import ITamanuTask
+from bes.lims.tamanu.tasks import queue
 from bes.lims.utils import is_reportable
 
 
@@ -40,7 +42,7 @@ class NotifyAdapter(object):
         # get the last report of the sample, if any
         report = self.get_last_report(self.context)
         # send the diagnostic report
-        self.send_diagnostic_report(self.context, report)
+        return self.send_diagnostic_report(self.context, report)
 
     def send_diagnostic_report(self, sample, report, status=None):
         if not status:
@@ -65,7 +67,7 @@ class NotifyAdapter(object):
         # invalidation event
         invalidated = sample.getInvalidated()
         if invalidated:
-            self.send_diagnostic_report(invalidated, report, status=status)
+            return self.send_diagnostic_report(invalidated, report, status=status)
 
         # get the tamanu session
         session = tapi.get_tamanu_session_for(sample)
@@ -192,3 +194,22 @@ class NotifyAdapter(object):
             observations.append(observation)
 
         return observations
+
+
+def can_notify(sample):
+    """Returns whether we can notify Tamanu about this sample
+    """
+    if tapi.is_tamanu_content(sample):
+        return True
+    invalidated = sample.getInvalidated()
+    if invalidated:
+        return tapi.is_tamanu_content(invalidated)
+    return False
+
+
+def notify(sample):
+    """Dispatches a diagnostic report for the given sample to Tamanu
+    """
+    if can_notify(sample):
+        return queue.put(NOTIFY_DIAGNOSTIC_REPORT, sample)
+    return False

@@ -18,8 +18,9 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
-from bes.lims.tamanu.tasks import queue as tq
+
+from bes.lims.tamanu.tasks import diagnosticreport
+
 
 def on_after_transition(sample, event):  # noqa camelcase
     """Actions to be done when a transition for a sample takes place
@@ -27,5 +28,5 @@ def on_after_transition(sample, event):  # noqa camelcase
     if not event.transition:
         return
 
-    # notify tamanu back about this sample
-    tq.put(NOTIFY_DIAGNOSTIC_REPORT, sample)
+    # notify Tamanu with the DiagnosticReport if necessary
+    diagnosticreport.notify(sample)

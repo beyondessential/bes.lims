@@ -18,8 +18,7 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
-from bes.lims.tamanu.tasks import queue as tq
+from bes.lims.tamanu.tasks import diagnosticreport
 
 
 def on_object_created(instance, event):
@@ -29,4 +28,5 @@ def on_object_created(instance, event):
     """
     samples = instance.getContainedAnalysisRequests()
     for sample in samples:
-        tq.put(NOTIFY_DIAGNOSTIC_REPORT, sample)
+        # notify Tamanu with the DiagnosticReport if necessary
+        diagnosticreport.notify(sample)
