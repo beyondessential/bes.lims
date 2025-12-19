@@ -92,7 +92,7 @@ class TamanuSession(object):
 
         # Send the POST request
         logger.info("[POST] {}".format(url))
-        logger.info("[POST PAYLOAD] {}".format(repr(payload)))
+        logger.debug("[POST PAYLOAD] {}".format(repr(payload)))
         resp = requests.post(url, data=json.dumps(payload), **kwargs)
         code = resp.status_code
         if code not in [200, 201]:

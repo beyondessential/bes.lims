@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 import argparse
+import logging
 import os
 import sys
 
@@ -27,6 +29,10 @@ parser.add_argument(
     "-su", "--senaite_user",
     help="SENAITE user",
     default="tamanu"
+)
+parser.add_argument(
+    "-v", "--verbose", action="store_true",
+    help="Verbose logging"
 )
 
 
@@ -62,6 +68,10 @@ def main(app):
         parser.print_help()
         return parser.exit()
 
+    # verbose logging
+    log_mode = logging.DEBUG if args.verbose else logging.INFO
+    logger.setLevel(log_mode)
+
     # Setup environment
     setup_script_environment(app, username=username, logger=logger)
 
@@ -86,6 +96,7 @@ def main(app):
 
     transaction.commit()
     logger.info("Executing Tamanu-specific tasks [DONE]")
+    logger.info("-" * 79)
 
 
 if __name__ == "__main__":

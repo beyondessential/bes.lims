@@ -53,8 +53,6 @@ def setup_script_environment(app, stream_out=False, username="admin",
     zope_conf = get_zope_conf()
     configure(zope_conf)
 
-    # Verbose logging
-    logger.setLevel(logging.DEBUG)
     if stream_out:
         logger.addHandler(logging.StreamHandler())
 

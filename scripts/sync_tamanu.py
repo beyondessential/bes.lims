@@ -21,6 +21,7 @@
 import argparse
 import errno
 import json
+import logging
 import os
 import re
 import sys
@@ -90,6 +91,11 @@ parser.add_argument(
 parser.add_argument(
     "-cs", "--cache_since",
     help="Default days to keep cached content since their last update date",
+)
+
+parser.add_argument(
+    "-v", "--verbose", action="store_true",
+    help="Verbose logging"
 )
 
 parser.add_argument(
@@ -869,6 +875,10 @@ def main(app):
     sync_func = resources.get(args.resource)
     if not sync_func:
         error("Resource type is missing or not valid")
+
+    # verbose logging
+    log_mode = logging.DEBUG if args.verbose else logging.INFO
+    logger.setLevel(log_mode)
 
     # Setup environment
     username = args.senaite_user or USERNAME
