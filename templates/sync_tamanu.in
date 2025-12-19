@@ -18,4 +18,4 @@ $FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -
 $FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Run Tamanu specific tasks
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 5 |& tee -a $ZEO_DIR/event.log
+$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log
