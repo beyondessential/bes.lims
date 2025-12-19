@@ -139,7 +139,6 @@ class NotifyAdapter(object):
             }]
 
         # notify back to Tamanu
-        return None
         return session.post("DiagnosticReport", payload)
 
     def get_observations(self, sample):
