@@ -19,10 +19,6 @@ parser = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawTextHelpFormatter)
 
 parser.add_argument(
-    "-d", "--dry", action="store_true",
-    help="Run in dry mode"
-)
-parser.add_argument(
     "-m", "--max_tasks",
     help="Maximum tasks to be processed",
     default="10"
