@@ -241,7 +241,7 @@ def get_row_info(analysis, sample):
 
     return {
         "sample_id": analysis.getRequestID(),
-        "tamanu_id": sample.getClientSampleID() or "",
+        "tamanu_id": sample.getTamanuID() or "",
         "sample_type": sample.getSampleTypeTitle() or "",
         "age": age,
         "gender": gender,
