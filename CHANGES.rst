@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #98 Capture Tamanu ID in Tupaia export file
 - #95 Decouple Tamanu DiagnosticReport notifications from publication workflow
 - #92 Add the keyword next to the analysis name in stats report
 - #90 Add ward to Analyses results stats report
