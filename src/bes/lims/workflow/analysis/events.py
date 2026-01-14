@@ -50,6 +50,17 @@ def after_verify(analysis):
 def after_set_out_of_stock(analysis):
     """Event fired when an analysis is transitioned to out-of-stock
     """
+    # Set the result to NA for out-of-stock analyses
+    analysis.setResultOptions([])
+    analysis.setUnitChoices([])
+    analysis.setDetectionLimitOperand("")
+    analysis.setAllowManualUncertainty(False)
+    analysis.setResultType("string")
+    analysis.setResult("NA")
+
+    # Set the result capture date
+    analysis.setResultCaptureDate(DateTime())
+
     # Mark the analysis with ISubmitted so samples with only one analysis in
     # out-of-stock can also be pre-published
     alsoProvides(analysis, ISubmitted)
