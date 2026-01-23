@@ -42,12 +42,13 @@ from six import StringIO
 
 
 __doc__ = """
-Export published analyses verified within a date range
+Export published and out_of_stock analyses within a date range
 
 This script generates a CSV file containing information about published
-analyses and their associated samples/specimens, based on the analysis
-verification date. Only published analyses that were verified within the
-specified date range are included.
+analyses and out_of_stock analyses, along with their associated
+samples/specimens. Published analyses are filtered by verification date,
+while out_of_stock analyses are filtered by result capture date (since
+they don't have verified or published dates).
 
 If no date range is provided, the system defaults to the previous week
 (Monday through Sunday).
@@ -265,7 +266,7 @@ def do_export(date_from, date_to, output_file):
     """Export data to CSV file
     """
     # Get published analyses that were verified within the given date range
-    query = {
+    query_published = {
         "portal_type": "Analysis",
         "review_state": ["published"],
         "date_verified": {
@@ -276,8 +277,20 @@ def do_export(date_from, date_to, output_file):
         "sort_order": "ascending",
     }
 
+    # Query for out_of_stock analyses using result capture date
+    query_out_of_stock = {
+        "portal_type": "Analysis",
+        "review_state": ["out_of_stock"],
+        "getResultCaptureDate": {
+            "query": [date_from, date_to],
+            "range": "min:max",
+        },
+        "sort_on": "getDateReceived",
+        "sort_order": "ascending",
+    }
+
     logger.info(
-        "Exporting analyses from %s to %s ..." % (
+        "Exporting published and out_of_stock analyses from %s to %s ..." % (
             dtime.date_to_string(date_from),
             dtime.date_to_string(date_to)
         )
@@ -285,7 +298,26 @@ def do_export(date_from, date_to, output_file):
 
     # Generate one row per analysis
     rows = []
-    for brain in api.search(query, ANALYSIS_CATALOG):
+
+    # Process published analyses
+    for brain in api.search(query_published, ANALYSIS_CATALOG):
+        analysis = api.get_object(brain)
+        if not is_reportable(analysis):
+            analysis._p_deactivate()
+            continue
+
+        # build the analysis row
+        sample = analysis.getRequest()
+        info = get_row_info(analysis, sample)
+        row = [info.get(key, "") for key in COLUMNS.keys()]
+        rows.append(row)
+
+        # flush the sample and analysis from memory
+        analysis._p_deactivate()  # noqa
+        sample._p_deactivate()  # noqa
+
+    # Process out_of_stock analyses
+    for brain in api.search(query_out_of_stock, ANALYSIS_CATALOG):
         analysis = api.get_object(brain)
         if not is_reportable(analysis):
             analysis._p_deactivate()
@@ -308,7 +340,8 @@ def do_export(date_from, date_to, output_file):
     to_csv(rows, output_file)
 
     logger.info(
-        "Exporting analyses from %s to %s [DONE]" % (
+        "Exporting published and out_of_stock analyses from %s to %s "
+        "[DONE]" % (
             dtime.date_to_string(date_from),
             dtime.date_to_string(date_to)
         )

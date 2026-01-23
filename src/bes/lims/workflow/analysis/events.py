@@ -50,6 +50,11 @@ def after_verify(analysis):
 def after_set_out_of_stock(analysis):
     """Event fired when an analysis is transitioned to out-of-stock
     """
+    # Set the result capture date
+    # XXX This is necessary to allow the export of out_of_stock analyses by
+    #     date range. See https://github.com/beyondessential/bes.lims/issues/97
+    analysis.setResultCaptureDate(DateTime())
+
     # Mark the analysis with ISubmitted so samples with only one analysis in
     # out-of-stock can also be pre-published
     alsoProvides(analysis, ISubmitted)

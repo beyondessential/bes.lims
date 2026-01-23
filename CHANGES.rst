@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #99 Include out-of-stock analyses for export file
 - #103 Enable date range filtering using cookies instead of session storage
 - #98 Capture Tamanu ID in Tupaia export file
 - #95 Decouple Tamanu DiagnosticReport notifications from publication workflow
