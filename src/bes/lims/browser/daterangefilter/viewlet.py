@@ -75,7 +75,7 @@ class DateRangeFilteringViewlet(ViewletBase):
         if self.request.form:
             return "filter_enabled" in self.request.form
 
-        # For initial load, check session storage
+        # For initial load, check cookie storage
         date_range_config = self.get_date_range_config()
         return date_range_config.get("filter_enabled", False)
 
