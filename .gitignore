@@ -82,3 +82,6 @@ ansible/roles
 ansible/senaite.ansible-playbook/roles
 ansible/vault-password-file
 ansible/vault.txt
+
+CLAUDE.md
+CLAUDE.local.md

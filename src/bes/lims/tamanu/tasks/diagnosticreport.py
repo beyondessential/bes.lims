@@ -211,5 +211,5 @@ def notify(sample):
     """Dispatches a diagnostic report for the given sample to Tamanu
     """
     if can_notify(sample):
-        return queue.put(NOTIFY_DIAGNOSTIC_REPORT, sample)
+        return queue.put(NOTIFY_DIAGNOSTIC_REPORT, sample, delay=300)
     return False

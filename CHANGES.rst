@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #105 Add configurable delay for DiagnosticReport notifications to Tamanu
 - #99 Include out-of-stock analyses for export file
 - #103 Enable date range filtering using cookies instead of session storage
 - #98 Capture Tamanu ID in Tupaia export file
