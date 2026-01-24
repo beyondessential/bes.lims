@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import time
+
+from bes.lims.tamanu import logger
+from bes.lims.tamanu.config import TAMANU_TASKS_QUEUE
+from bes.lims.tamanu.interfaces import ITamanuTask
 from bika.lims import api
 from bika.lims.decorators import synchronized
 from persistent.list import PersistentList
 from zope.annotation.interfaces import IAnnotations
 from zope.component import queryAdapter
-
-from bes.lims.tamanu import logger
-from bes.lims.tamanu.config import TAMANU_TASKS_QUEUE
-from bes.lims.tamanu.interfaces import ITamanuTask
 
 
 def _get_tasks():
@@ -26,12 +27,21 @@ def _get_tasks():
 def get():
     """Pops the next task to be processed
     """
+    # get the tasks
     tasks = _get_tasks()
-    if not tasks:
-        return None
 
-    # pop the oldest element (last from the list)
-    task = tasks.pop()
+    # current time in seconds since the epoch
+    now = int(time.time())
+
+    # first elements added have priority (FIFO)
+    task = None
+    for idx in range(len(tasks)):
+        # check if the task has to be delayed
+        if tasks[idx][1] <= now:
+            task = tasks.pop(idx)[0]
+            break
+
+    # no task found
     if not task:
         return None
 
@@ -56,14 +66,27 @@ def get():
 
 
 @synchronized(max_connections=1)
-def put(name, context):
+def put(name, context, delay=120):
     """Appends a task for the given name and context to the queue
+    :param name: The name of the task
+    :param context: Context the task is bound to
+    :param delay: Minimum delay in seconds before the task is executed
+    :returns: True if the task was added
+    :rtype: bool
     """
     uid = api.get_uid(context)
     task_id = "%s-%s" % (uid, name)
     tasks = _get_tasks()
+
     # do not append unless new
-    if task_id not in tasks:
-        tasks.insert(0, task_id)
-        return True
-    return False
+    ids = [task[0] for task in tasks]
+    if task_id in ids:
+        return False
+
+    # current time in seconds since the epoch + delay
+    when = int(time.time()) + delay
+
+    # add the task
+    logger.info("Task %s [scheduled on %s]" % (task_id, when))
+    tasks.append((task_id, when))
+    return True
