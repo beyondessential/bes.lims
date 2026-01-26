@@ -50,24 +50,20 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
         brains = get_analyses_by_year(year, **query)
 
         # add the first two rows (header)
-        department = api.get_object_by_uid(department_uid, default=None)
-        department_name = api.get_title(department) if department else ""
         months = [MONTHS[num] for num in range(1, 13)]
-        rows = [[department_name] + months + [_("Total")]]
+        rows = [[_("Analysis"), _("Department")] + months + [_("Total")]]
 
         # keep a dict to store the totals per month
         totals_by_month = OrderedDict.fromkeys(range(1, 14), 0)
 
-        # group the analyses brains by title
-        analyses_by_name = group_by(brains, self.get_analysis_fullname)
+        # group the analyses brains by title and department
+        analyses_by_name_dept = group_by(
+            brains, self.get_analysis_name_and_dept
+        )
 
-        # get titles and sort them
-        names = sorted(analyses_by_name.keys())
-
-        for name in names:
-
-            # get the analyses for the test with the given title
-            analyses = analyses_by_name[name]
+        for name, dept_name in analyses_by_name_dept.keys():
+            # get the analyses for the test with the given title and department
+            analyses = analyses_by_name_dept[(name, dept_name)]
 
             # group and count the analyses by reception date
             counts = count_by(analyses, "getDateReceived")
@@ -83,11 +79,11 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
             for month in range(1, 13):
                 totals_by_month[month] += counts.get(month, 0)
 
-            # build the totals by analysis name row
-            rows.append([name] + analysis_counts + [total])
+            # build the totals by analysis name row with department
+            rows.append([name, dept_name] + analysis_counts + [total])
 
         # build the totals by month row
-        rows.append([_("Total")] + totals_by_month.values())
+        rows.append([_("Total"), ""] + totals_by_month.values())
 
         return rows
 
@@ -100,3 +96,21 @@ class AnalysesLabDepartmentsByMonth(CSVReport):
         else:
             keyword = analysis.getKeyword()
         return "%s (%s)" % (name, keyword)
+
+    def get_analysis_department(self, analysis):
+        """Returns the department of analysis
+        """
+        if api.is_brain(analysis):
+            analysis = api.get_object(analysis)
+
+        dept = analysis.getDepartment()
+        dept_name = api.get_title(dept) if dept else _("No Department")
+
+        return dept_name
+
+    def get_analysis_name_and_dept(self, analysis):
+        """Returns a tuple of (analysis_fullname, department_name)
+        """
+        fullname = self.get_analysis_fullname(analysis)
+        dept_name = self.get_analysis_department(analysis)
+        return (fullname, dept_name)
