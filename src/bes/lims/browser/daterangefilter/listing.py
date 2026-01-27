@@ -18,13 +18,33 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+from datetime import datetime
+
 from bes.lims.browser.daterangefilter import get_selected_date_range_config
+from plone import api as ploneapi
 from senaite.core.api import dtime
 from senaite.app.listing.interfaces import IListingView
 from senaite.app.listing.interfaces import IListingViewAdapter
 from zope.component import adapter
 from zope.interface import implementer
 from plone.memoize import view
+
+
+def get_timezone():
+    """Return the portal timezone, with safe fallbacks.
+    """
+    tz = ploneapi.portal.get_registry_record("plone.portal_timezone")
+    if not tz or not dtime.is_valid_timezone(tz):
+        tz = dtime.get_os_timezone()
+    return tz
+
+
+def parse_local_datetime(value, timezone):
+    if not value:
+        return None
+    dt = datetime.strptime(value, "%Y-%m-%d %H:%M")
+    dt = dtime.to_zone(dt, timezone)
+    return dtime.to_DT(dt)
 
 
 @adapter(IListingView)
@@ -69,8 +89,9 @@ class DateRangeFilterListingAdapter(object):
         if not datetime_from and not datetime_to:
             return {}
 
-        date_from_dt = dtime.to_DT(datetime_from)
-        date_to_dt = dtime.to_DT(datetime_to)
+        timezone = get_timezone()
+        date_from_dt = parse_local_datetime(datetime_from, timezone)
+        date_to_dt = parse_local_datetime(datetime_to, timezone)
 
         # build the query - filter by the selected date type
         query = {
