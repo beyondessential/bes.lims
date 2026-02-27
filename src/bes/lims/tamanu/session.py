@@ -80,6 +80,9 @@ class TamanuSession(object):
     def post(self, endpoint, payload, **kwargs):
         url = self.get_url(endpoint)
 
+        # raise on error?
+        raise_for_status = kwargs.pop("raise_for_status", False)
+
         # add the default headers
         headers = kwargs.pop("headers", {})
         headers.update(dict(HEADERS))
@@ -94,6 +97,8 @@ class TamanuSession(object):
         logger.info("[POST] {}".format(url))
         logger.debug("[POST PAYLOAD] {}".format(repr(payload)))
         resp = requests.post(url, data=json.dumps(payload), **kwargs)
+        if raise_for_status:
+            resp.raise_for_status()
         code = resp.status_code
         if code not in [200, 201]:
             logger.error("[ERROR {}]: {}".format(str(code), resp.content))
