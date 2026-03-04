@@ -20,9 +20,9 @@
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from bika.lims.utils import createPdf
-import transaction
 from bes.lims import logger
 from bika.lims import api
+from plone.namedfile.file import NamedBlobFile
 from senaite.impress.decorators import synchronized
 from senaite.impress.storage import PdfReportStorageAdapter as BaseAdapter
 from bika.lims.workflow import doActionFor as do_action_for
@@ -120,13 +120,16 @@ class PdfReportStorageAdapter(BaseAdapter):
 
     @synchronized(max_connections=1)
     def create_report(self, parent, pdf, html, uids, metadata):
-        """Create a new report object
+        """Create a new report object with embedded attachments and watermark
+        if required
 
         NOTE: We limit the creation of reports to 1 to avoid conflict errors on
-              simultaneous publication.
+              simultaneous publication. The transaction is committed once for
+              all reports in the store() method using savepoints for rollback
+              capability.
 
         :param parent: parent object where to create the report inside
-        :returns: ARReport
+        :returns: ResultsReport
         """
 
         parent_id = api.get_id(parent)
@@ -147,21 +150,28 @@ class PdfReportStorageAdapter(BaseAdapter):
             watermark_pdf = self.create_watermark_pdf("INVALID")
             pdf = self.apply_watermark(pdf, watermark_pdf)
 
+        # Convert PDF binary data to NamedBlobFile
+        pdf_filename = "{}.pdf".format(parent_id)
+        pdf_blob = NamedBlobFile(
+            data=pdf,
+            filename=api.safe_unicode(pdf_filename),
+            contentType="application/pdf"
+        )
+
         # Create the report object
+        # Field setters are called automatically by api.create(), including
+        # UIDReferenceField.set() which creates backreferences via event
+        # handler
         report = api.create(
             parent,
-            "ARReport",
-            AnalysisRequest=api.get_uid(parent),
-            Pdf=pdf,
-            Html=html,
-            ContainedAnalysisRequests=uids,
-            Metadata=metadata)
+            "ResultsReport",
+            sample=api.get_uid(parent),
+            contained_samples=uids if uids else [],
+            pdf=pdf_blob,
+            metadata=metadata if metadata else {})
 
         # Transition the sample to published status
         do_action_for(parent, "publish")
-
-        # Commit the changes
-        transaction.commit()
 
         logger.info("Create Report for {} [DONE]".format(parent_id))
 

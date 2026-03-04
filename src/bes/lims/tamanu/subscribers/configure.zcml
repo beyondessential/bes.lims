@@ -1,11 +1,5 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
-  <!-- ARReport created -->
-  <subscriber
-      for="bika.lims.interfaces.IARReport
-           Products.Archetypes.interfaces.IObjectInitializedEvent"
-      handler=".arreport.on_object_created" />
-
   <!-- Patient created -->
   <subscriber
     for="senaite.patient.interfaces.IPatient
