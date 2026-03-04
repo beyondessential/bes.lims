@@ -101,7 +101,7 @@ def send_rejection_report(sample, report):
         # the status of the DiagnosticReport
         # registered | partial | preliminary | final | entered-in-error
         "status": "cancelled",
-        # the ServiceRequest(s) this ARReport is based on
+        # the ServiceRequest(s) this ResultsReport is based on
         # TODO What about a DiagnosticReport with more than one basedOn
         "basedOn": [{
             "type": "ServiceRequest",
