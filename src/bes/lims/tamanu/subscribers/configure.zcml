@@ -1,5 +1,11 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
+  <!-- ResultsReport created -->
+  <subscriber
+      for="senaite.core.interfaces.IResultsReport
+           senaite.core.events.lifecycle.IAfterAPICreatedObjectEvent"
+      handler=".resultsreport.on_object_created" />
+
   <!-- Patient created -->
   <subscriber
     for="senaite.patient.interfaces.IPatient
