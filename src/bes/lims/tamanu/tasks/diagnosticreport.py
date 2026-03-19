@@ -33,10 +33,10 @@ class NotifyAdapter(object):
     def get_last_report(self, sample):
         """Returns the last analysis report that was created for this sample
         """
-        reports_ids = sample.objectIds("ARReport")
-        if not reports_ids:
+        reports = sample.getReports()
+        if not reports:
             return None
-        return sample.get(reports_ids[-1])
+        return reports[-1]
 
     def process(self):
         # get the last report of the sample, if any
@@ -95,19 +95,19 @@ class NotifyAdapter(object):
         modified = dtime.to_iso_format(modified)
 
         # build the payload
-        # TODO Add an adapter to build payloads for a given object (e.g ARReport)
+        # TODO Add an adapter to build payloads for a given object
         tamanu_uid = tapi.get_tamanu_uid(sample)
         payload = {
-            # meta information about the DiagnosticReport (ARReport)
+            # meta information about the DiagnosticReport (ResultsReport)
             "resourceType": "DiagnosticReport",
             "id": report_uuid,
             "meta": {
                 "lastUpdated": modified,
             },
-            # the status of the DiagnosticReport (ARReport)
+            # the status of the DiagnosticReport (ResultsReport)
             # registered | partial | preliminary | final | entered-in-error
             "status": status,
-            # the ServiceRequest(s) this ARReport is based on
+            # the ServiceRequest(s) this ResultsReport is based on
             # TODO What about a DiagnosticReport with more than one basedOn
             "basedOn": [{
                 "type": "ServiceRequest",

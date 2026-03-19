@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
 - #116 Compatibility with core#2831 (Migrate ARReport to Dexterity)
 - #105 Add configurable delay for DiagnosticReport notifications to Tamanu
 - #99 Include out-of-stock analyses for export file
