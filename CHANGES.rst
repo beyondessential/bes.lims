@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #123 Allow to submit Zone size value with operators
 - #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
 - #116 Compatibility with core#2831 (Migrate ARReport to Dexterity)
 - #105 Add configurable delay for DiagnosticReport notifications to Tamanu
