@@ -33,6 +33,7 @@ from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.utils import format_supsub
 from bika.lims.utils import to_utf8
+from bika.lims.utils.analysis import format_interim
 from senaite.core.api import dtime
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.i18n import translate
@@ -127,6 +128,9 @@ COLUMNS = OrderedDict((
     ("panels", {
         "title": _("Test Panels"),
     }),
+    ("result_variables", {
+        "title": _("Result variables"),
+    }),
     ("result", {
         "title": _("Test Result (with units)"),
     }),
@@ -190,6 +194,30 @@ def get_analysis_profiles(sample):
     return [api.get_title(profile) for profile in profiles]
 
 
+def get_result_variables_text(analysis):
+    """Returns formatted result variables for the analysis
+    """
+    interims = analysis.getInterimFields() or []
+    results = []
+    for interim in interims:
+        # skip if not shown in report
+        if not interim.get("report", False):
+            continue
+
+        formatted = format_interim(interim, html=False)
+
+        title = formatted.get("title", "").strip()
+        value = formatted.get("formatted_value", "").strip()
+        unit = formatted.get("formatted_unit", "").strip()
+
+        # combine value and unit
+        detail = (value + " " + unit) if value and unit else value
+
+        results.append("{}: {}".format(title, detail))
+
+    return "\n".join(results)
+
+
 def get_header_row():
     """Returns a plain list with the column names
     """
@@ -217,7 +245,10 @@ def get_row_info(analysis, sample):
     )
 
     # Only show results that appear on the final reports
-    result = analysis.getResult() or ""
+    result = analysis.getFormattedResult() or ""
+
+    # For multiple results, replace <br/> by comma and space
+    result = result.replace("<br/>", ", ")
 
     # Get the department title
     department = analysis.getDepartment()
@@ -240,6 +271,9 @@ def get_row_info(analysis, sample):
     # Get analysis status
     status = api.get_review_status(analysis)
 
+    # Get formatted result variables
+    result_variables = get_result_variables_text(analysis)
+
     return {
         "sample_id": analysis.getRequestID(),
         "tamanu_id": sample.getTamanuID() or "",
@@ -256,6 +290,7 @@ def get_row_info(analysis, sample):
         "panels": ", ".join(profiles),
         "test_id": analysis.getId() or "",
         "test_type": analysis.Title(),
+        "result_variables": result_variables,
         "result": result + (" " + unit if unit else ""),
         "status": status,
         "site": sample.getClientTitle() or ""
