@@ -1,0 +1,11 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Guard handler for Analysis content type -->
+  <adapter
+      for="bika.lims.interfaces.IAnalysis"
+      provides="bika.lims.interfaces.IGuardAdapter"
+      factory=".analysis.AnalysisGuardAdapter"
+      name="senaite.ast.adapter.guard.analysis" />
+
+</configure>
