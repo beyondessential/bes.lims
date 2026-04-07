@@ -190,8 +190,10 @@ def get_client(service_request):
     }
     brains = api.search(query, CLIENT_CATALOG)
     if not brains:
-        container = api.get_portal().clients
-        return tapi.create_object(container, resource, "Client")
+        if api.get_registry_record("create_clients_on_sync", default=False):
+            container = api.get_portal().clients
+            return tapi.create_object(container, resource, "Client")
+        return None
 
     # link the resource to this Client object
     client = api.get_object(brains[0])
