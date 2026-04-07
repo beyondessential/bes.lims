@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #125 Fix Tamanu sync freezing due to missing HTTP timeouts
 - #124 Add result variables and improve result formatting to Tupaia export file
 - #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
 - #116 Compatibility with core#2831 (Migrate ARReport to Dexterity)
