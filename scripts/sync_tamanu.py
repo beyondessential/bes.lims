@@ -45,7 +45,7 @@ from bika.lims.api import security as sapi
 from bika.lims.utils.analysisrequest import \
     create_analysisrequest as create_sample
 from bika.lims.workflow import doActionFor
-from requests import ConnectionError
+from requests.exceptions import RequestException
 from senaite.core.api import dtime
 from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import CONTACT_CATALOG
@@ -902,7 +902,7 @@ def main(app):
     try:
         # Call the sync function
         sync_func(session, since)
-    except ConnectionError as e:
+    except RequestException as e:
         connection_error(str(e))
 
     if args.dry:

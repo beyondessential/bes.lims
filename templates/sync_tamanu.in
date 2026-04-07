@@ -11,11 +11,15 @@ SRC_DIR=${buildout:directory}/src/bes.lims/scripts
 ZEO_DIR=${buildout:var-dir}/${sync_tamanu:zeoclient}
 FLOCK="flock -n /tmp/sync_tamanu.lock"
 
+# Apply a `timeout 840` (14 min) as a safety net, so even if a process hangs
+# despite HTTP timeouts, it gets killed before the next 15-minute cron run
+TIMEOUT="timeout 840"
+
 # Synchronize service requests
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Synchronize patients
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Run Tamanu specific tasks
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log
+$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log
