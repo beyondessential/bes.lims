@@ -59,3 +59,15 @@ DATE_TYPES = DisplayList((
     ("getDateVerified", _("Date Verified")),
     ("getDatePublished", _("Date Published")),
 ))
+
+RESULT_TYPES = DisplayList((
+    ("", _("Numeric")),
+    ("string", _("String")),
+    ("datetime", _("Datetime")),
+    ("select", _("Selection list")),
+    ("multiselect", _("Multiple selection")),
+    ("multiselect_duplicates", _("Multiple selection (with duplicates)")),
+    ("multichoice", _("Multiple choices")),
+    ("multivalue", _("Multiple values")),
+    ("text", _("Text")),
+))

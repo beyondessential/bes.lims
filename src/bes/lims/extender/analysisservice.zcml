@@ -1,0 +1,8 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <adapter
+      name="bes.lims.analysisservice.interimfields.schemamodifier"
+      provides="archetypes.schemaextender.interfaces.ISchemaModifier"
+      factory=".analysisservice.AnalysisServiceInterimFieldsSchemaModifier"/>
+
+</configure>

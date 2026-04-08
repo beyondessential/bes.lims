@@ -19,7 +19,7 @@
 # Some rights reserved, see README and LICENSE.
 
 import collections
-
+import cgi
 from bes.lims import messageFactory as _
 from bes.lims.reflex import get_reflex_testing_adapter
 from bika.lims import api
@@ -61,9 +61,37 @@ class SampleAnalysesListingAdapter(object):
     def folder_item(self, obj, item, index):
         # render results range or range comment
         self.render_results_range(obj, item)
+        # keep interim multiline values in readonly display
+        self.render_interim_line_breaks(item)
         # force full view reload if required
         self.render_reload(obj, item)
         return item
+
+    def format_interim_text(self, value):
+        """Formats interim string/text values to keep line breaks
+        """
+        result = value if api.is_string(value) else str(value)
+        result = cgi.escape(result)
+        return result.replace("\n", "<br/>")
+
+    def render_interim_line_breaks(self, item):
+        """Converts interim new lines to <br/> in readonly render payload."""
+        interims = item.get("interimfields") or []
+        allow_edit = item.get("allow_edit", [])
+        for interim in interims:
+            keyword = interim.get("keyword", "")
+            if not keyword:
+                continue
+
+            result_type = interim.get("result_type")
+            if not interim.get("value"):
+                continue
+
+            if result_type in ["string", "text"]:
+                formatted = self.format_interim_text(interim.get("value"))
+                interim["formatted_value"] = formatted
+                if keyword not in allow_edit:
+                    interim["value"] = formatted
 
     def render_reload(self, obj, item):
         """Assign the item's reload attribute with the actions for the given

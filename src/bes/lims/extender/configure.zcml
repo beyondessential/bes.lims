@@ -7,5 +7,6 @@
   <include file="client.zcml"/>
   <include file="setup.zcml"/>
   <include file="analysisrequest.zcml"/>
+  <include file="analysisservice.zcml"/>
 
 </configure>
