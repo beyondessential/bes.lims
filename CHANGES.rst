@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #128 Add Text control type for interim result variables
 - #124 Add result variables and improve result formatting to Tupaia export file
 - #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
 - #116 Compatibility with core#2831 (Migrate ARReport to Dexterity)
