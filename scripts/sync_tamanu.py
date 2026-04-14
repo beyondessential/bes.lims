@@ -647,6 +647,9 @@ def sync_service_request(sr):
 
     # get or create the client via FHIR's encounter/serviceProvider
     client = get_client(sr)
+    if not client:
+        logger.info("Skip %s. No client for this facility" % hash)
+        return
 
     # get or create the contact via FHIR's requester
     contact = get_contact(sr)
