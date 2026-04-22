@@ -12,6 +12,43 @@ class ITamanuControlPanel(model.Schema):
     """Control panel settings for tamanu sync
     """
 
+    host = schema.URI(
+        title=_(
+            u"title_tamanu_settings_host",
+            default=u"Tamanu host"),
+        description=_(
+            u"description_tamanu_settings_host",
+            default=u"Base URL of the Tamanu instance this LIMS syncs with. "
+                    u"Used for all outbound requests targeting Tamanu "
+                    u"resources previously imported into SENAITE."
+        ),
+        required=False,
+    )
+
+    email = schema.TextLine(
+        title=_(
+            u"title_tamanu_settings_email",
+            default=u"Integration account email"),
+        description=_(
+            u"description_tamanu_settings_email",
+            default=u"Email of the Tamanu account used by SENAITE to "
+                    u"authenticate outbound requests."
+        ),
+        required=False,
+    )
+
+    password = schema.Password(
+        title=_(
+            u"title_tamanu_settings_password",
+            default=u"Integration account password"),
+        description=_(
+            u"description_tamanu_settings_password",
+            default=u"Password of the Tamanu account used by SENAITE to "
+                    u"authenticate outbound requests."
+        ),
+        required=False,
+    )
+
     create_clients_on_sync = schema.Bool(
         title=_(
             u"title_tamanu_settings_create_clients_on_sync",

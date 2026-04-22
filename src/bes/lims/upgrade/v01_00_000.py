@@ -527,3 +527,16 @@ def setup_tamanu_controlpanel(tool):
     setup.runImportStepFromProfile(profile, "plone.app.registry")
     setup.runImportStepFromProfile(profile, "controlpanel")
     logger.info("Setup Tamanu controlpanel [DONE]]")
+
+
+def setup_tamanu_host_credentials(tool):
+    """Registers the new host/email/password fields of the Tamanu control
+    panel. Outbound requests against previously imported Tamanu content now
+    consult the control panel instead of each object's annotation storage,
+    so admins must set these values after the upgrade.
+    """
+    logger.info("Setup Tamanu host and credentials ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "plone.app.registry")
+    logger.info("Setup Tamanu host and credentials [DONE]")

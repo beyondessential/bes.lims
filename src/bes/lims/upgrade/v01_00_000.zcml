@@ -3,6 +3,18 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Add Tamanu host and credentials to control panel"
+      description="
+        Registers the new host, email and password fields of the Tamanu
+        control panel so they can be configured centrally, replacing the
+        per-object host and auth that used to be kept in annotation storage.
+      "
+      source="1018"
+      destination="1019"
+      handler=".v01_00_000.setup_tamanu_host_credentials"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Setup Tamanu control panel"
       description="Setup the Tamanu's synchronization configuration view"
       source="1017"
