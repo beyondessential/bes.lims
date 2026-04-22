@@ -13,13 +13,17 @@ class ITamanuControlPanel(model.Schema):
     """
 
     create_clients_on_sync = schema.Bool(
-        title=_("Create clients automatically during Tamanu synchronization"),
+        title=_(
+            u"title_tamanu_settings_create_clients_on_sync",
+            default=u"Create clients automatically during Tamanu sync"),
         description=_(
-            "If enabled, the Tamanu sync automatically creates a SENAITE "
-            "client for each Encounter/ServiceProvider referenced by an "
-            "incoming ServiceRequest when no counterpart exists yet. If "
-            "disabled, ServiceRequests referencing unknown clients are "
-            "skipped and must be resolved manually."
+            u"description_tamanu_settings_create_clients_on_sync",
+            default=u"If enabled, the Tamanu sync automatically creates a "
+                    u"SENAITE client for each Encounter/ServiceProvider "
+                    u"referenced by an incoming ServiceRequest when no "
+                    u"counterpart exists yet. If disabled, ServiceRequests "
+                    u"referencing unknown clients are skipped and must be "
+                    u"resolved manually."
         ),
         default=False,
     )
@@ -28,7 +32,10 @@ class ITamanuControlPanel(model.Schema):
 class TamanuControlPanelForm(RegistryEditForm):
     schema = ITamanuControlPanel
     schema_prefix = "senaite.tamanu"
-    label = _(u"Tamanu Synchronization Settings")
+    label = _(
+        u"controlpanel_tamanu",
+        default=u"Tamanu Synchronization Settings"
+    )
 
 
 TamanuControlPanelView = layout.wrap_form(
