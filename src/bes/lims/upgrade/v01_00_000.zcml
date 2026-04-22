@@ -3,6 +3,14 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Setup Tamanu control panel"
+      description="Setup the Tamanu's synchronization configuration view"
+      source="1017"
+      destination="1018"
+      handler=".v01_00_000.setup_tamanu_controlpanel"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Fix cannot search by MRN or patient name in samples listing"
       description="Reindex listing_searchable_text from sample catalog"
       source="1016"

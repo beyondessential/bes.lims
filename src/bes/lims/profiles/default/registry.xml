@@ -1,0 +1,7 @@
+<registry>
+
+  <records
+      interface="bes.lims.tamanu.browser.controlpanel.ITamanuControlPanel"
+      prefix="senaite.tamanu" />
+
+</registry>

@@ -20,6 +20,11 @@
 
 import logging
 
-PRODUCT_NAME = "bes.lims.tamanu"
+from zope.i18nmessageid import MessageFactory
+
+PRODUCT_NAME = "senaite.tamanu"
+
+messageFactory = MessageFactory(PRODUCT_NAME)
+_ = messageFactory
 
 logger = logging.getLogger(PRODUCT_NAME)

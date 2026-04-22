@@ -1,9 +1,25 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser">
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone">
 
   <!-- Package includes -->
+  <include package=".theme"/>
   <include package=".viewlets"/>
+
+  <!-- Static directory for js, css and image resources -->
+  <plone:static
+      directory="static"
+      type="plone"
+      name="senaite.tamanu.static" />
+
+  <!-- Tamanu sync Control panel -->
+  <browser:page
+      name="tamanu-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".controlpanel.TamanuControlPanelView"
+      permission="senaite.core.permissions.ManageBika"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
 
   <!-- View for metadata -->
   <browser:page

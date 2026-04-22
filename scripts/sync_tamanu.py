@@ -190,8 +190,10 @@ def get_client(service_request):
     }
     brains = api.search(query, CLIENT_CATALOG)
     if not brains:
-        container = api.get_portal().clients
-        return tapi.create_object(container, resource, "Client")
+        if api.get_registry_record("create_clients_on_sync", default=False):
+            container = api.get_portal().clients
+            return tapi.create_object(container, resource, "Client")
+        return None
 
     # link the resource to this Client object
     client = api.get_object(brains[0])
@@ -645,6 +647,9 @@ def sync_service_request(sr):
 
     # get or create the client via FHIR's encounter/serviceProvider
     client = get_client(sr)
+    if not client:
+        logger.info("Skip %s. No client for this facility" % hash)
+        return
 
     # get or create the contact via FHIR's requester
     contact = get_contact(sr)
