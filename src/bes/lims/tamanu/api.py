@@ -76,9 +76,24 @@ def get_tamanu_host(obj):
     if is_tamanu_resource(obj):
         return obj.session.host
     if is_tamanu_content(obj):
-        storage = get_tamanu_storage(obj)
-        return storage.get("host", None)
+        host, _email, _password = get_tamanu_settings()
+        return host
     return None
+
+
+def get_tamanu_settings():
+    """Returns the (host, email, password) tuple configured in the Tamanu
+    control panel, used for all outbound requests against Tamanu content
+    """
+    from plone.registry.interfaces import IRegistry
+    from zope.component import getUtility
+    registry = getUtility(IRegistry)
+    prefix = "senaite.tamanu."
+    return (
+        registry.get(prefix + "host"),
+        registry.get(prefix + "email"),
+        registry.get(prefix + "password"),
+    )
 
 
 def get_tamanu_modified(obj):
@@ -109,21 +124,14 @@ def get_tamanu_session(host, email, password, login=True):
 def get_tamanu_session_for(obj, login=True):
     """Returns a Tamanu Session for the given object
     """
-    # TODO Use a singleton utility to get tamanu session
     if is_tamanu_resource(obj):
         return obj.session
     if is_tamanu_content(obj):
-        host = get_tamanu_host(obj)
+        host, email, password = get_tamanu_settings()
         if not host:
-            raise ValueError("Tamanu content, but no host: %s" % repr(obj))
-
-        # get the creds
-        storage = get_tamanu_storage(obj)
-        email, password = storage.get("auth")
-
-        # create the session
+            raise ValueError(
+                "Tamanu host is not configured in the control panel")
         return get_tamanu_session(host, email, password, login=login)
-
     return None
 
 
@@ -242,9 +250,6 @@ def link_tamanu_resource(obj, resource):
     annotation = get_tamanu_storage(obj)
     annotation["uid"] = resource.UID
     annotation["data"] = resource.to_dict()
-    annotation["host"] = resource.session.host
-    # TODO Rely on an utility instead of storing auth creds
-    annotation["auth"] = resource.session._auth
 
     # index tamanu_uid from uid_catalog
     catalog_object(obj)
