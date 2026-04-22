@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #132 Centralize Tamanu host and credentials in the control panel
 - #126 Disable automatic client creation on Tamanu sync by default
 - #124 Add result variables and improve result formatting to Tupaia export file
 - #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
