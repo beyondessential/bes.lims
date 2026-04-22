@@ -1,0 +1,19 @@
+<object
+  name="portal_controlpanel"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+
+  <configlet
+    title="Tamanu Settings"
+    action_id="senaite.tamanu"
+    appId="senaite.tamanu"
+    category="Products"
+    condition_expr=""
+    icon_expr="senaite_theme/icon/tamanu"
+    url_expr="string:${portal_url}/@@tamanu-controlpanel"
+    visible="True"
+    i18n:domain="senaite.tamanu"
+    i18n:attributes="title">
+    <permission>senaite.core: Manage Bika</permission>
+  </configlet>
+
+</object>

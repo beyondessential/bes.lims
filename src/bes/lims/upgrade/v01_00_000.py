@@ -518,3 +518,12 @@ def fix_cannot_search_by_mrn(tool):
     cat.reindexIndex(idx, api.get_request(), ZLogHandler(1000))
 
     logger.info("Fix cannot search by MRN [DONE]")
+
+
+def setup_tamanu_controlpanel(tool):
+    logger.info("Setup Tamanu controlpanel ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "plone.app.registry")
+    setup.runImportStepFromProfile(profile, "controlpanel")
+    logger.info("Setup Tamanu controlpanel [DONE]]")
