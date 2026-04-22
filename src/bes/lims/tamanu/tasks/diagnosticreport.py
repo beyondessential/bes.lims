@@ -164,9 +164,14 @@ class NotifyAdapter(object):
             }]
 
         # create the diagnostic report entry
+        diag_reference =  "DiagnosticReport/{}".format(report_uuid)
         diag_entry = {
-            "fullUrl": "DiagnosticReport/{}".format(report_uuid), #This might not be required. Will check with Rohan
+            "fullUrl": diag_reference, #This might not be required. Will check with Rohan
             "resource": payload,
+            "request": { #also probably not required
+                "method": "POST",
+                "url": diag_reference,
+            },
         }
         entries.insert(0, diag_entry)
 
