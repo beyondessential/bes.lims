@@ -21,6 +21,7 @@
 from bes.lims import logger
 from bes.lims import permissions
 from bes.lims import PRODUCT_NAME
+from bes.lims.config import REGISTRY_SETTINGS
 from bika.lims import api
 from bika.lims.api import security as sapi
 from plone import api as ploneapi
@@ -30,6 +31,7 @@ from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SETUP_CATALOG
+from senaite.core.registry import set_registry_record
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.setuphandlers import setup_other_catalogs
 from senaite.core.workflow import ANALYSIS_WORKFLOW
@@ -217,6 +219,9 @@ def setup_handler(context):
     # Setup workflows
     setup_workflows(portal)
 
+    # Setup registry settings
+    setup_senaite_registry(portal)
+
     # Setup microbiology department and assign ast-analyses
     setup_microbiology_department(portal)
 
@@ -262,6 +267,15 @@ def setup_workflows(portal):
     for wf_id, settings in WORKFLOWS_TO_UPDATE.items():
         wapi.update_workflow(wf_id, **settings)
     logger.info("Setup workflows [DONE]")
+
+
+def setup_senaite_registry(portal):
+    """Setup the default settings for senaite registry
+    """
+    logger.info("Setup registry settings ...")
+    for key, val in REGISTRY_SETTINGS:
+        set_registry_record(key, val)
+    logger.info("Setup registry settings [DONE]")
 
 
 def setup_roles(portal):

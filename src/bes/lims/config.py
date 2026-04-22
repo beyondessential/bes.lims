@@ -59,3 +59,80 @@ DATE_TYPES = DisplayList((
     ("getDateVerified", _("Date Verified")),
     ("getDatePublished", _("Date Published")),
 ))
+
+REGISTRY_SETTINGS = [
+    # When disabled (default), ServiceRequests from Tamanu belonging to a
+    # facility without a matching Client in SENAITE are skipped. This allows
+    # multiple SENAITE instances to share the same Tamanu, each processing
+    # only the ServiceRequests for its own facility.
+    ("create_clients_on_sync", False),
+    # Enable Ajax transitions
+    ("listing_enable_ajax_transitions", True),
+    # Transitions that are processed sequentially via ajax
+    ("listing_active_ajax_transitions", [
+        "activate",
+        "cancel",
+        "deactivate",
+        "receive",
+        "reinstate",
+        "reject",
+        "retest",
+        "retract",
+        "submit",
+        "verify",
+        # transitions from senaite.referral
+        "receive_inbound_sample",
+        "reject_inbound_sample",
+    ]),
+    # Additional catalogs for default portal types
+    ("catalog_mappings", {}),
+    # Content types to skip by default on content structure export
+    ("generic_setup_skip_export_types", [
+        # plone
+        "Document",
+        # senaite.core
+        "AnalysisRequest",
+        "ARReport",
+        "Attachment",
+        "AutoImportLog",
+        "Batch",
+        "BatchFolder",
+        "Client",
+        "Contact",
+        "Contacts",
+        "ClientFolder",
+        "LabContact",
+        "LabContacts",
+        "Laboratory",
+        "Invoice",
+        "Pricelist",
+        "PricelistFolder",
+        "ReferenceSample",
+        "ReferenceSamplesFolder",
+        "Report",
+        "ResultsReport",
+        "Samples",
+        "Worksheet",
+        "WorksheetFolder",
+        "Worksheets",
+        # senaite.databox
+        "DataBox",
+        "DataBoxFolder",
+        # senaite.patient
+        "Patient",
+        "PatientFolder",
+        # senaite.referral
+        "ExternalLaboratory",
+        "ExternalLaboratoryFolder",
+        "InboundSample",
+        "InboundSampleShipment",
+        "OutboundSampleShipment",
+        "ShipmentFolder",
+        # senaite.storage
+        "StorageContainer",
+        "StorageFacility",
+        "StoragePosition",
+        "StorageRootFolder",
+        "StorageSamplesContainer",
+    ]),
+]
