@@ -13,11 +13,13 @@ class ITamanuControlPanel(model.Schema):
     """
 
     create_clients_on_sync = schema.Bool(
-        title=_("Create missing clients"),
+        title=_("Create clients automatically during Tamanu synchronization"),
         description=_(
-            "Select this option for the Tamanu synchronization tool to "
-            "automatically create counterpart clients for non-existing "
-            "Encounter/ServiceProvider on ServiceRequest resources import."
+            "If enabled, the Tamanu sync automatically creates a SENAITE "
+            "client for each Encounter/ServiceProvider referenced by an "
+            "incoming ServiceRequest when no counterpart exists yet. If "
+            "disabled, ServiceRequests referencing unknown clients are "
+            "skipped and must be resolved manually."
         ),
         default=False,
     )
