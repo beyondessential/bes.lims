@@ -58,4 +58,12 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Number of AST panel used each month -->
+  <browser:page
+      for="*"
+      name="ast_panels_by_month"
+      class=".ast_panels_by_month.ASTPanelByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 </configure>

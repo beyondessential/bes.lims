@@ -51,6 +51,12 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+        <!-- Number of AST panel used each month  -->
+        <div class="report-section"
+             tal:define="id string:ast_panels_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
       <!-- 5. Sample rejection -->
 
         <!-- 5.1 Sample rejection rate by month -->
