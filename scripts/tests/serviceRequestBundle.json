@@ -1,0 +1,418 @@
+{
+  "resourceType": "Bundle",
+  "id": "LiverPanelTransactionBundle",
+  "meta": {
+    "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteRequestBundle"]
+  },
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cc",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "ddaf107d-a44d-4b7b-966b-65d82de495cc",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePatient"]
+        },
+        "identifier": [
+          {
+            "value": "MRN-20394857"
+          }
+        ],
+        "name": [
+          {
+            "family": "Nguyen",
+            "given": ["James"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1985-09-14"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6c248ba7-a4c4-4606-b4a0-efbff71fb902",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "6c248ba7-a4c4-4606-b4a0-efbff71fb902",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteOrganization"]
+        },
+        "identifier": [
+          {
+            "value": "ORG-RMH-MEL"
+          }
+        ],
+        "name": "Royal Melbourne Hospital"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Organization"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:41834172-8aeb-4814-8a15-77c24d5022cd",
+      "resource": {
+        "resourceType": "Location",
+        "id": "41834172-8aeb-4814-8a15-77c24d5022cd",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteLocation"]
+        },
+        "name": "Royal Melbourne Hospital – Hepatology Ward"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Location"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ab1ecb26-1942-4855-a32d-ee82c62e5327",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "ab1ecb26-1942-4855-a32d-ee82c62e5327",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePractitioner"]
+        },
+        "identifier": [
+          {
+            "value": "PRACT-DR-SULLIVAN"
+          }
+        ],
+        "name": [
+          {
+            "family": "Sullivan",
+            "given": ["Catherine"],
+            "prefix": ["Dr."]
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Practitioner"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c2019b9a-72eb-4bf8-ae84-6360a5f13fc7",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "c2019b9a-72eb-4bf8-ae84-6360a5f13fc7",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteEncounter"]
+        },
+        "status": "completed",
+        "class": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                "code": "AMB",
+                "display": "ambulatory"
+              }
+            ]
+          }
+        ],
+        "serviceProvider": {
+          "reference": "urn:uuid:6c248ba7-a4c4-4606-b4a0-efbff71fb902"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:41834172-8aeb-4814-8a15-77c24d5022cd",
+              "display": "Royal Melbourne Hospital – Hepatology Ward"
+            },
+            "form": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                  "code": "wa",
+                  "display": "Ward"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "Encounter"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9b8a478f-fd26-4765-8f09-3b3ea0ec6637",
+      "resource": {
+        "resourceType": "Specimen",
+        "id": "9b8a478f-fd26-4765-8f09-3b3ea0ec6637",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteSpecimen"]
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "119364003",
+              "display": "Serum specimen"
+            }
+          ]
+        },
+        "collection": {
+          "collectedDateTime": "2026-04-08T08:30:00+10:00"
+        }
+      },
+      "request": {
+        "method": "POST",
+        "url": "Specimen"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2d6bb491-6b87-4558-a07f-2d181831e298",
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "2d6bb491-6b87-4558-a07f-2d181831e298",
+        "meta": {
+          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteServiceRequest"]
+        },
+        "status": "active",
+        "intent": "order",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "108252007",
+                "display": "Laboratory procedure"
+              }
+            ],
+            "text": "Laboratory procedure"
+          }
+        ],
+        "code": {
+          "concept": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "24325-3",
+                "display": "Hepatic function 2000 panel - Serum or Plasma"
+              }
+            ]
+          }
+        },
+        "orderDetail": [
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "1742-6",
+                      "display": "ALT [Enzymatic activity/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "1920-8",
+                      "display": "AST [Enzymatic activity/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "6768-6",
+                      "display": "Alkaline phosphatase [Enzymatic activity/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "1975-2",
+                      "display": "Bilirubin.total [Mass/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "1968-7",
+                      "display": "Bilirubin.direct [Mass/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "2885-2",
+                      "display": "Protein [Mass/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "1751-7",
+                      "display": "Albumin [Mass/volume] in Serum or Plasma"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
+                      "code": "LOINC",
+                      "display": "Test Code"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "5902-2",
+                      "display": "Prothrombin time (PT)"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cc"
+        },
+        "encounter": {
+          "reference": "urn:uuid:c2019b9a-72eb-4bf8-ae84-6360a5f13fc7"
+        },
+        "requester": {
+          "reference": "urn:uuid:ab1ecb26-1942-4855-a32d-ee82c62e5327",
+          "type": "Practitioner"
+        },
+        "specimen": [
+          {
+            "reference": "urn:uuid:9b8a478f-fd26-4765-8f09-3b3ea0ec6637"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST",
+        "url": "ServiceRequest"
+      }
+    }
+  ]
+}
