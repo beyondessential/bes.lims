@@ -191,6 +191,23 @@ def get_potential_true_pathogen_microorganisms():
     return pathogen_microorganisms
 
 
+def get_contaminant_microorganisms():
+    """Returns the contaminant microorganisms that read from csv
+    """
+    # TODO Cleanup
+    microorganisms_file = get_file_resource(
+        "contaminant_microorganisms.csv"
+    )
+    microorganisms = read_csv(microorganisms_file)
+    contaminant_microorganisms = [
+        microorganism.get("Title") for microorganism in microorganisms
+        if microorganism.get(
+            "Probable contaminant in blood specimen"
+        ) == "Yes"
+    ]
+    return contaminant_microorganisms
+
+
 def is_matched_target_patient(target_patient, sample):
     """Checks whether the sample is match with target patient
     """

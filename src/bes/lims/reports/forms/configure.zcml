@@ -106,4 +106,20 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Contaminant isolated by month -->
+  <browser:page
+      for="*"
+      name="contaminant_isolated_by_month"
+      class=".contaminant_isolated_by_month.ContaminantIsolatedRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Contaminant isolated by sample type -->
+  <browser:page
+      for="*"
+      name="contaminant_isolated_by_sample_type"
+      class=".contaminant_isolated_by_sample_type.ContaminantBySampleType"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 </configure>
