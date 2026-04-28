@@ -143,6 +143,18 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+        <!-- 5.3 Sample rejection by department -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 5.4 Sample rejection by ward -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_by_ward"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
         <!-- Sample rejection summary  -->
         <div class="report-section"
              tal:define="id string:samples_rejected_summary"

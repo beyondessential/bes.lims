@@ -33,6 +33,22 @@
       class=".samples_rejection_rate_by_specimen_type.SamplesRejectionRateBySpecimenType"
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
+  
+  <!-- Samples rejection by department -->
+  <browser:page
+      for="*"
+      name="samples_rejection_by_department"
+      class=".samples_rejection_by_department.SamplesRejectionByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+  
+  <!-- Samples rejection by ward -->
+  <browser:page
+      for="*"
+      name="samples_rejection_by_ward"
+      class=".samples_rejection_by_ward.SamplesRejectionByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
 
   <!-- Sample rejection summary  -->
   <browser:page
