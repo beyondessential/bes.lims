@@ -53,8 +53,8 @@ SAMPLE_FINAL_STATUSES = (
     "invalid",
 )
 
-# Whether observations have to be included in DiagnosticReport
-SEND_OBSERVATIONS = False
+# Whether observations have to be included with DiagnosticReport Bundle
+SEND_OBSERVATIONS = True
 
 SAMPLE_STATUSES = (
     # mapping between sample status and tamanu statuses
