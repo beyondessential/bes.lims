@@ -2,27 +2,35 @@
   "resourceType": "Bundle",
   "id": "LiverPanelTransactionBundle",
   "meta": {
-    "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteRequestBundle"]
+    "profile": [
+      "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteRequestBundle"
+    ]
   },
   "type": "transaction",
   "entry": [
     {
-      "fullUrl": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cc",
+      "fullUrl": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cd",
       "resource": {
         "resourceType": "Patient",
-        "id": "ddaf107d-a44d-4b7b-966b-65d82de495cc",
+        "id": "ddaf107d-a44d-4b7b-966b-65d82de495cd",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePatient"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePatient"
+          ]
         },
         "identifier": [
           {
-            "value": "MRN-20394857"
+            "value": "MRN-667",
+            "use": "usual"
           }
         ],
         "name": [
           {
-            "family": "Nguyen",
-            "given": ["James"]
+            "family": "Johnson",
+            "given": [
+              "Burt"
+            ],
+            "use": "official"
           }
         ],
         "gender": "male",
@@ -39,7 +47,9 @@
         "resourceType": "Organization",
         "id": "6c248ba7-a4c4-4606-b4a0-efbff71fb902",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteOrganization"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteOrganization"
+          ]
         },
         "identifier": [
           {
@@ -59,7 +69,9 @@
         "resourceType": "Location",
         "id": "41834172-8aeb-4814-8a15-77c24d5022cd",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteLocation"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteLocation"
+          ]
         },
         "name": "Royal Melbourne Hospital – Hepatology Ward"
       },
@@ -74,7 +86,9 @@
         "resourceType": "Practitioner",
         "id": "ab1ecb26-1942-4855-a32d-ee82c62e5327",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePractitioner"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaitePractitioner"
+          ]
         },
         "identifier": [
           {
@@ -84,8 +98,12 @@
         "name": [
           {
             "family": "Sullivan",
-            "given": ["Catherine"],
-            "prefix": ["Dr."]
+            "given": [
+              "Catherine"
+            ],
+            "prefix": [
+              "Dr."
+            ]
           }
         ]
       },
@@ -100,7 +118,9 @@
         "resourceType": "Encounter",
         "id": "c2019b9a-72eb-4bf8-ae84-6360a5f13fc7",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteEncounter"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteEncounter"
+          ]
         },
         "status": "completed",
         "class": [
@@ -146,7 +166,9 @@
         "resourceType": "Specimen",
         "id": "9b8a478f-fd26-4765-8f09-3b3ea0ec6637",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteSpecimen"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteSpecimen"
+          ]
         },
         "type": {
           "coding": [
@@ -172,7 +194,9 @@
         "resourceType": "ServiceRequest",
         "id": "2d6bb491-6b87-4558-a07f-2d181831e298",
         "meta": {
-          "profile": ["https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteServiceRequest"]
+          "profile": [
+            "https://senaite-fhir.naralabs.com/StructureDefinition/SenaiteServiceRequest"
+          ]
         },
         "status": "active",
         "intent": "order",
@@ -394,7 +418,7 @@
           }
         ],
         "subject": {
-          "reference": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cc"
+          "reference": "urn:uuid:ddaf107d-a44d-4b7b-966b-65d82de495cd"
         },
         "encounter": {
           "reference": "urn:uuid:c2019b9a-72eb-4bf8-ae84-6360a5f13fc7"
