@@ -122,4 +122,13 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Microorganism isolated by month -->
+  <browser:page
+      for="*"
+      name="microorganism_isolated_by_month"
+      class=".microorganism_isolated_by_month.MicroorganismIsolatedByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+
 </configure>

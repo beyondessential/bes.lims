@@ -91,6 +91,12 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+        <!-- Microorganism isolated by month  -->
+        <div class="report-section"
+             tal:define="id string:microorganism_isolated_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
         <!-- 4.3 Number of pathogens by sample type  -->
         <div class="report-section"
              tal:define="id string:pathogen_by_sample_type"
