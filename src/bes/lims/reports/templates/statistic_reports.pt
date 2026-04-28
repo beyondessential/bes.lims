@@ -57,7 +57,7 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
-      <!-- 3. Blood culture true positive pathogen rate -->
+      <!-- 3. Sample Type true positive pathogen rate -->
 
         <!-- 3.1 True positive pathogen rate by month for each sample type -->
         <div class="report-section"
