@@ -66,6 +66,30 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Contamination rate by month for each sample type -->
+  <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_month"
+      class=".sample_type_contamination_rate_by_month.SampleTypeContaminationRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+    <!-- Contamination rate by department for each sample type -->
+    <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_department"
+      class=".sample_type_contamination_rate_by_department.SampleTypeContaminationRateByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+    <!-- Contamination rate by ward for each sample type -->
+    <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_ward"
+      class=".sample_type_contamination_rate_by_ward.SampleTypeContaminationRateByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
   <!-- Sample type positive pathogen rate by month -->
   <browser:page
       for="*"

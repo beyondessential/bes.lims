@@ -57,6 +57,26 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+      <!-- 2. Sample Type Contamination rate -->
+
+        <!-- 2.1 Contamination rate by month for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 2.2 Contamination rate by department for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 2.3 Contamination rate by ward for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_ward"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
       <!-- 3. Sample Type true positive pathogen rate -->
 
         <!-- 3.1 True positive pathogen rate by month for each sample type -->
