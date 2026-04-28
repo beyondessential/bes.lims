@@ -61,6 +61,8 @@ class PatientResource(TamanuResource):
         """Get patient's address from resource payload
         """
         patient_addresses = self.get("address")
+        if not patient_addresses:
+            return None
         address = next((
             patient_address for patient_address in patient_addresses
             if patient_address.get("type") == "physical"
@@ -76,13 +78,19 @@ class PatientResource(TamanuResource):
         mrn = self.get_mrn()
         sex = sexes.get(self.get("gender")) or ""
         fullname = self.get_fullname()
+        # If no "official" name found, use the first available name
+        if not fullname:
+            patient_names = self.get("name")
+            if patient_names:
+                fullname = patient_names[0]
+
         givenname = self.get_givenname()
         firstname = givenname[0] if givenname != "" else ""
         middlename = (
             givenname[1]
             if givenname != "" and len(givenname) == 2 else ""
         )
-        lastname = fullname.get("family", "")
+        lastname = fullname.get("family", "") if fullname else ""
         birthdate = self.get("birthDate")
         address = self.get_address()
 

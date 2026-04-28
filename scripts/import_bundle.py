@@ -68,7 +68,7 @@ def main(app):  # noqa: F841 - app injected by Zope bin/instance run
 
     from bes.lims.scripts import setup_script_environment
     setup_script_environment(app, username=args.senaite_user, logger=logger)
-
+    logging.getLogger("bes.lims.tamanu").setLevel(logging.INFO)
     mode = "DRY RUN" if args.dry else "LIVE"
     logger.info("=" * 60)
     logger.info("import_bundle.py  [{0}]".format(mode))

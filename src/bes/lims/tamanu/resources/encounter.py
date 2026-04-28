@@ -33,10 +33,15 @@ class Encounter(TamanuResource):
             return locations
 
         matches = []
+        if not locations:
+            return matches
         for location in locations:
-            print(location)
             record = location.get("form")
+            if not record:
+                continue
             codings = record.get("coding")
+            if not codings:
+                continue
 
             # find matches against code
             codes = [coding.get("code") for coding in codings]

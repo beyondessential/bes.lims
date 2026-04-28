@@ -81,6 +81,8 @@ class BundleResource(TamanuResource):
     def _build_index(self, data):
         """Index all entries by fullUrl and by ResourceType/id."""
         index = {}
+        self._resources = []  # deduplicated list of raw resource dicts
+
         for entry in data.get("entry", []):
             resource = entry.get("resource", {})
             full_url = entry.get("fullUrl", "")
@@ -91,6 +93,10 @@ class BundleResource(TamanuResource):
                 index[full_url] = resource
             if rtype and rid:
                 index["{}/{}".format(rtype, rid)] = resource
+
+            # Track each resource once for iteration
+            if rtype:
+                self._resources.append(resource)
 
         return index
 
@@ -153,7 +159,7 @@ class BundleResource(TamanuResource):
         cls = RESOURCE_CLASS_MAP.get(resource_type, TamanuResource)
         return [
             cls(self, resource)
-            for resource in self._index.values()
+            for resource in self._resources
             if resource.get("resourceType") == resource_type
         ]
 

@@ -50,6 +50,8 @@ class HumanName(dict):
 
         # Rely on the 'text' entry
         fullname = self.get("text")
+        if not fullname:
+            return info
         parts = filter(None, fullname.split(" "))
         if not parts:
             return info
