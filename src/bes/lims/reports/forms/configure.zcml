@@ -90,4 +90,20 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Pathogens isolated by month -->
+  <browser:page
+      for="*"
+      name="pathogen_isolated_by_month"
+      class=".pathogen_isolated_by_month.PathogenIsolatedByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Number of pathogens by sample type -->
+  <browser:page
+      for="*"
+      name="pathogen_by_sample_type"
+      class=".pathogen_by_sample_type.PathogenBySampleType"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 </configure>

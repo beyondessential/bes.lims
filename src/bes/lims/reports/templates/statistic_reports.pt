@@ -77,6 +77,20 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+      <!-- 4. Organisms isolated in specimen by month -->
+
+        <!-- 4.1 Pathogens isolated by month -->
+        <div class="report-section"
+             tal:define="id string:pathogen_isolated_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 4.3 Number of pathogens by sample type  -->
+        <div class="report-section"
+             tal:define="id string:pathogen_by_sample_type"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
       <!-- 5. Sample rejection -->
 
         <!-- 5.1 Sample rejection rate by month -->
