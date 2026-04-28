@@ -18,6 +18,8 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+import csv
+import os
 from bes.lims.config import ANALYSIS_REPORTABLE_STATUSES
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
@@ -123,3 +125,53 @@ def get_field_value(instance, field_name, default=None):
         return default
 
     return field.get(instance)
+
+
+def sniff_csv_dialect(infile, default=None):
+    """Returns the sniffed dialect of the input file
+    """
+    try:
+        with open(infile, 'rb') as f:
+            dialect = csv.Sniffer().sniff(f.readline())
+        return dialect
+    except csv.Error:
+        if default:
+            return csv.register_dialect("dummy", **default)
+        return None
+
+
+def get_file_resource(name):
+    """Returns the path of the resources from the base resources dir
+    """
+    dir_name = os.path.dirname(os.path.abspath(__file__))
+    base_path = os.path.join(dir_name, "resources")
+    return os.path.join(base_path, name)
+
+
+def read_csv(infile):
+    """Reads a CSV-like file and returns a list of dicts with the key as the
+    column header and the value as the cell value
+    """
+    # Detect the dialect of the CSV file
+    default = {"delimiter": ",", "quoting": csv.QUOTE_NONE}
+    dialect = sniff_csv_dialect(infile, default)
+
+    # Read the csv
+    with open(infile, "rb") as csv_file:
+        reader = csv.reader(csv_file, dialect)
+        raw_rows = []
+        for row in reader:
+            stripped = [val.strip() for val in row]
+            raw_rows.append(stripped)
+
+    # Transform to a list of dictionaries
+    if len(raw_rows) < 2:
+        # Empty or with header only
+        return {}
+
+    # Extract the header
+    header = raw_rows.pop(0)
+    header = [column_name.strip() for column_name in header]
+
+    # Build a list of row dicts
+    return [dict(zip(header, row)) for row in raw_rows]

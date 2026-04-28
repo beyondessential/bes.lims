@@ -57,6 +57,26 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+      <!-- 3. Blood culture true positive pathogen rate -->
+
+        <!-- 3.1 True positive pathogen rate by month for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 3.2 True positive pathogen rate by department for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 3.3 True positive pathogen rate by ward for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_ward"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
       <!-- 5. Sample rejection -->
 
         <!-- 5.1 Sample rejection rate by month -->

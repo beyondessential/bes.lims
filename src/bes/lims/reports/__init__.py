@@ -20,7 +20,12 @@
 
 from datetime import datetime
 
+from bes.lims.config import TARGET_PATIENTS
+from bes.lims.utils import get_field_value
+from bes.lims.utils import get_file_resource
+from bes.lims.utils import read_csv
 from bika.lims import api
+from senaite.ast.utils import get_identified_microorganisms
 from senaite.core.api import dtime
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
@@ -132,3 +137,89 @@ def get_analyses_by_year(year, **kwargs):
     from_date = dtime.date_to_string(datetime(year, 1, 1))
     to_date = dtime.date_to_string(datetime(year, 12, 31))
     return get_analyses(from_date, to_date, **kwargs)
+
+
+def calculate_rate(total_samples, matched_samples):
+    """Calculate the rate of matched samples in total samples
+    """
+    rate = 0
+    if total_samples > 0:
+        rate = 100 * float(matched_samples) / total_samples
+    return round(rate, 2)
+
+
+def is_matched_microorganisms_sample(microorganisms, sample):
+    """Checks whether the sample contains the microorganisms that in
+    target microorganisms list.
+    """
+    # TODO Cleanup
+    # Get the names of the selected microorganisms
+    sample_microorganisms = get_identified_microorganisms(sample)
+    sample_microorganisms = [api.get_title(m) for m in sample_microorganisms]
+
+    if any(item in microorganisms for item in sample_microorganisms):
+        return True
+    return False
+
+
+def get_matched_microorganisms_sample(microorganisms, samples):
+    """Returns the samples with growth of potential pathogens
+    """
+    # TODO Cleanup
+    matched_microorganisms_samples = filter(
+        lambda sample: is_matched_microorganisms_sample(microorganisms, sample),  # noqa: E501
+        samples
+    )
+
+    return matched_microorganisms_samples
+
+
+def get_potential_true_pathogen_microorganisms():
+    """Returns the potential true pathogens microorganisms that read from csv
+    """
+    # TODO Cleanup
+    microorganisms_file = get_file_resource(
+        "potential_true_pathogen_microorganisms.csv"
+    )
+    microorganisms = read_csv(microorganisms_file)
+    pathogen_microorganisms = [
+        microorganism.get("Title") for microorganism in microorganisms
+        if microorganism.get(
+            "Potential true pathogen in blood specimen"
+        ) == "Yes"
+    ]
+    return pathogen_microorganisms
+
+
+def is_matched_target_patient(target_patient, sample):
+    """Checks whether the sample is match with target patient
+    """
+    # TODO Cleanup
+    bottles = get_field_value(sample, "Bottles")
+    container_bottles = [bottle["Container"] for bottle in bottles]
+    if (
+        TARGET_PATIENTS.getValue(target_patient) == "Adult patient" and
+        "Aerobic Blood Bottle" in container_bottles and
+        "Anaerobic Blood Bottle" in container_bottles
+    ):
+        return True
+    elif (
+        TARGET_PATIENTS.getValue(target_patient) == "Paediatric patient" and
+        "Aerobic Blood Bottle" in container_bottles and
+        "Anaerobic Blood Bottle" not in container_bottles
+    ):
+        return True
+
+    return False
+
+
+def get_target_patient_samples(target_patient, samples):
+    """Returns the samples that matched with target patient
+    """
+    # TODO Cleanup
+    target_patient_samples = filter(
+        lambda sample: is_matched_target_patient(target_patient, sample),
+        samples
+    )
+
+    return target_patient_samples

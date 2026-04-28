@@ -66,4 +66,28 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
+  <!-- Sample type positive pathogen rate by month -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_month"
+      class=".sample_type_positive_pathogen_rate_by_month.SampleTypePositivePathogenRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Sample type positive pathogen rate by department -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_department"
+      class=".sample_type_positive_pathogen_rate_by_department.SampleTypePositivePathogenRateByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Sample type positive pathogen rate by ward -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_ward"
+      class=".sample_type_positive_pathogen_rate_by_ward.SampleTypePositivePathogenRateByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 </configure>

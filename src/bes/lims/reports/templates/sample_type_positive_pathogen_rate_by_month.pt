@@ -1,0 +1,29 @@
+<tal:r i18n:domain="bes.lims"
+  define="report_id string:sample_type_positive_pathogen_rate_by_month">
+
+  <h2 i18n:translate="">
+    3.1 True positive pathogen rate by month for each sample type
+  </h2>
+
+  <form method="post">
+
+    <!-- Year control -->
+    <div class="form-group form-inline">
+      <tal:year replace="structure python:view.year_control()"/>
+    </div>
+
+    <!-- Submit button -->
+    <input tabindex=""
+           class="searchButton allowMultiSubmit"
+           type="submit"
+           name="submit"
+           value="Generate report"
+           i18n:attributes="value"/>
+
+    <!-- hidden fields -->
+    <input tal:replace="structure context/@@authenticator/authenticator"/>
+    <input type="hidden" name="report_id" tal:attributes="value report_id"/>
+
+  </form>
+
+</tal:r>
