@@ -90,7 +90,7 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
-  <!-- Sample type positive pathogen rate by month -->
+  <!-- True positive pathogen rate by month for each sample type -->
   <browser:page
       for="*"
       name="sample_type_positive_pathogen_rate_by_month"
@@ -98,7 +98,7 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
-  <!-- Sample type positive pathogen rate by department -->
+  <!-- True positive pathogen rate by department for each sample type -->
   <browser:page
       for="*"
       name="sample_type_positive_pathogen_rate_by_department"
@@ -106,7 +106,7 @@
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
 
-  <!-- Sample type positive pathogen rate by ward -->
+  <!-- True positive pathogen rate by ward for each sample type -->
   <browser:page
       for="*"
       name="sample_type_positive_pathogen_rate_by_ward"
