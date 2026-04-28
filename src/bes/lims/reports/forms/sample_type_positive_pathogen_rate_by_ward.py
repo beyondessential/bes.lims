@@ -26,6 +26,7 @@ from bes.lims.reports import count_by
 from bes.lims.reports import get_potential_true_pathogen_microorganisms
 from bes.lims.reports import get_matched_microorganisms_sample
 from bes.lims.reports import get_received_samples
+from bes.lims.reports import get_target_patient_samples
 from bes.lims.reports import group_by
 from bes.lims.reports.forms import CSVReport
 
@@ -42,6 +43,8 @@ class SampleTypePositivePathogenRateByWard(CSVReport):
         }
         brains = get_received_samples(date_from, date_to, **query)
         samples = list(map(api.get_object, brains))
+        target_patient = self.request.form.get("target_patient")
+        samples = list(get_target_patient_samples(target_patient, samples))
         samples_by_sample_type = group_by(samples, "getSampleTypeTitle")
         wards = sorted(
             set(map(lambda sample: sample.getWard(), samples)),

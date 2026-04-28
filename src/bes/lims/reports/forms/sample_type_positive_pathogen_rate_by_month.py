@@ -27,6 +27,7 @@ from bes.lims.reports import count_by
 from bes.lims.reports import get_matched_microorganisms_sample
 from bes.lims.reports import get_potential_true_pathogen_microorganisms
 from bes.lims.reports import get_received_samples_by_year
+from bes.lims.reports import get_target_patient_samples
 from bes.lims.reports import group_by
 from bes.lims.reports.forms import CSVReport
 
@@ -38,7 +39,9 @@ class SampleTypePositivePathogenRateByMonth(CSVReport):
     def process_form(self):
         year = int(self.request.form.get("year"))
         brains = get_received_samples_by_year(year, review_state="published")
-        samples = map(api.get_object, brains)
+        samples = list(map(api.get_object, brains))
+        target_patient = self.request.form.get("target_patient")
+        samples = list(get_target_patient_samples(target_patient, samples))
         samples_by_sample_type = group_by(samples, "getSampleTypeTitle")
 
         microorganisms = get_potential_true_pathogen_microorganisms()

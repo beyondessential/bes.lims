@@ -7,6 +7,11 @@
 
   <form method="post">
 
+    <!-- Target patient control -->
+    <div class="form-group form-inline">
+      <tal:target_patient replace="structure python:view.target_patient_control()"/>
+    </div>
+
     <!-- Year control -->
     <div class="form-group form-inline">
       <tal:year replace="structure python:view.year_control()"/>
