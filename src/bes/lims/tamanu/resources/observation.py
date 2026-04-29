@@ -38,6 +38,10 @@ class Observation(TamanuResource):
 
     def get_initial_test(self):
         keyword = self.analysis.getKeyword()
+        return self.match_order_detail(keyword)
+
+    def match_order_detail(self, keyword):
+        keyword = self.analysis.getKeyword()
         sample = self.analysis.getRequest()
         meta = tapi.get_tamanu_storage(sample)
         data = meta.get("data") or {}
@@ -52,17 +56,21 @@ class Observation(TamanuResource):
     def to_fhir(self):
         """Returns the FHIR format
         """
-        ordered_test = self.get_initial_test()
+
         # generate unique ID for the observation
         obs_id = str(tapi.get_uuid(self.analysis))
 
+        ordered_test = self.get_initial_test()
+
         if not ordered_test:
+            name = api.get_title(self.analysis)
+            fallback_code = self.match_order_detail(name) or { "coding" : [] }
             # An unmatched
             return {
                 "resourceType": "Observation",
                 "id": obs_id,
-                "status": "cancelled",
-                "code": ordered_test,
+                "status": dict(ANALYSIS_STATUSES).get("rejected", "cancelled"),
+                "code": fallback_code,
             }
 
 
