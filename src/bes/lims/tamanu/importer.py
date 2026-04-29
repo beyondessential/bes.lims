@@ -70,21 +70,41 @@ class BundleImporter(object):
         self.bundle = bundle
 
     def run(self, dry_run=False):
-        """Process all ServiceRequests in the bundle.
+        """Iterate all resources of root_resource_type and call processor.
 
-        Delegates to bundle.process() so the iteration and error handling
-        live in one place.
+        The bundle drives the loop; the processor supplies all
+        environment-specific logic (SENAITE writes, dry-run logging, etc.)
+        so BundleResource itself stays free of Zope/SENAITE dependencies.
 
-        :param dry_run: when True, log what would happen without writing.
-        :returns: tuple of (ok, errors) counts.
+        :param root_resource_type: FHIR resourceType string that acts as the
+            entry point, e.g. ``"ServiceRequest"``.
+        :param processor: callable with signature ``processor(resource, **kwargs)``.
+            Receives each wrapped resource in turn. Any exception raised by
+            the processor is caught, logged, and counted so processing
+            continues with the next resource.
+        :param kwargs: passed through to every processor call unchanged,
+            e.g. ``dry_run=True``.
+        :returns: tuple of ``(ok, errors)`` counts.
         """
         self._log_summary()
-        ok, errors = self.bundle.process(
-            "ServiceRequest",
-            self._process_service_request,
-            dry_run=dry_run,
-        )
-        logger.info("Done - ok: {0}  errors: {1}".format(ok, errors))
+        root_resource_type = "ServiceRequest"
+        resources = self.bundle.get_all(root_resource_type)
+        if not resources:
+            logger.warning(
+                "BundleResource.process: no {!r} entries found".format(
+                    root_resource_type))
+            return 0, 0
+        ok = errors = 0
+        for resource in resources:
+            try:
+                self._process_service_request(resource)
+                ok += 1
+            except Exception as e:
+                logger.error(
+                    "BundleResource.process: error handling {0} {1}: {2}".format(
+                        root_resource_type, resource.UID, e))
+                errors += 1
+
         return ok, errors
 
     # ------------------------------------------------------------------
