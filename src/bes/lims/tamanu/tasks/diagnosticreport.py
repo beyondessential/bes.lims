@@ -3,6 +3,7 @@
 from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
+from bes.lims.tamanu.resources.observation import Observation
 from bika.lims.utils import tmpID
 from senaite.core.api import dtime
 from zope.component import adapter
@@ -10,7 +11,7 @@ from zope.interface import implementer
 
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu import logger
-from bes.lims.tamanu.config import ANALYSIS_STATUSES
+
 from bes.lims.tamanu.config import LOINC_CODING_SYSTEM
 from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SAMPLE_STATUSES
@@ -193,77 +194,16 @@ class NotifyAdapter(object):
     def get_observations(self, sample):
         """Returns a list of observation records suitable as a Tamanu payload
         """
-        # get the original data
-        meta = tapi.get_tamanu_storage(sample)
-        data = meta.get("data") or {}
-
-        # group the tests (orderDetails) requested by their original id
-        ordered_tests_by_key = {}
-        for order_detail in data.get("orderDetail", []):
-            test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
-            if test:
-                key = test[0].get("code")
-                ordered_tests_by_key[key] = order_detail
-
         # add the observations (analyses included in the results report)
         observations = []
         for analysis in sample.getAnalyses(full_objects=True):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
-
-            # get the original LabRequest's LOINC Code
-            name = api.get_title(analysis)
-            keyword = analysis.getKeyword()
-            ordered_test = ordered_tests_by_key.get(keyword)
-            if not ordered_test:
-                ordered_test = ordered_tests_by_key.get(name, {"coding": []})
-
-            # generate unique ID for the observation
-            obs_id = str(tapi.get_uuid(analysis))
-
-            # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
-            status = api.get_review_status(analysis)
-            status = dict(ANALYSIS_STATUSES).get(status, "partial")
-            observation = {
-                "resourceType": "Observation",
-                "id": obs_id,
-                "status": status,
-                "code": ordered_test,
-            }
-
-            # Adding the verificator to the performer of the Observation
-            verificators = analysis.getVerificators()
-
-            # The last one is the final verifier
-            verifier_id = verificators[-1] if verificators else None
-
-            # Get the full user object if needed
-            if verifier_id:
-                user = api.get_user(verifier_id)
-                verifier_name = api.get_user_fullname(user)
-                observation["performer"] = [
-                    {
-                        "display": verifier_name,
-                        "identifier": {
-                            "value": user.getId()
-                        }
-                    }
-                ]
-            # quantitative / qualitative
-            if analysis.getStringResult() or analysis.getResultOptions():
-                # qualitative
-                observation["valueString"] = analysis.getFormattedResult()
-            else:
-                # quantitative
-                observation["valueQuantity"] = {
-                    "value": analysis.getResult(),
-                    "unit": analysis.getUnit(),
-                }
-
+            observation_object = Observation(analysis)
+            observation = observation_object.to_fhir()
             # append the observations
-            observations.append((obs_id, observation))
-
+            observations.append((observation["id"], observation))
         return observations
 
 
