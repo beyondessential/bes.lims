@@ -232,6 +232,24 @@ class NotifyAdapter(object):
                 "code": ordered_test,
             }
 
+            # Adding the verificator to the performer of the Observation
+            verificators = analysis.getVerificators()
+
+            # The last one is the final verifier
+            verifier_id = verificators[-1] if verificators else None
+
+            # Get the full user object if needed
+            if verifier_id:
+                user = api.get_user(verifier_id)
+                verifier_name = api.get_user_fullname(user)
+                observation["performer"] = [
+                    {
+                        "display": verifier_name,
+                        "identifier": {
+                            "value": user.getId()
+                        }
+                    }
+                ]
             # quantitative / qualitative
             if analysis.getStringResult() or analysis.getResultOptions():
                 # qualitative
