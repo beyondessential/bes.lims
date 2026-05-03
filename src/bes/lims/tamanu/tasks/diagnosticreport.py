@@ -3,6 +3,7 @@
 from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
+from bes.lims.tamanu.resources.observation import Observation
 from bika.lims.utils import tmpID
 from senaite.core.api import dtime
 from zope.component import adapter
@@ -10,7 +11,7 @@ from zope.interface import implementer
 
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu import logger
-from bes.lims.tamanu.config import ANALYSIS_STATUSES
+
 from bes.lims.tamanu.config import LOINC_CODING_SYSTEM
 from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SAMPLE_STATUSES
@@ -19,6 +20,9 @@ from bes.lims.tamanu.config import SEND_OBSERVATIONS
 from bes.lims.tamanu.interfaces import ITamanuTask
 from bes.lims.tamanu.tasks import queue
 from bes.lims.utils import is_reportable
+
+import json
+import uuid
 
 
 @adapter(IAnalysisRequest)
@@ -44,7 +48,7 @@ class NotifyAdapter(object):
         # send the diagnostic report
         return self.send_diagnostic_report(self.context, report)
 
-    def send_diagnostic_report(self, sample, report, status=None):
+    def send_diagnostic_report(self, sample, report, status=None, dry_run=False):
         if not status:
             status = api.get_review_status(sample)
             if status in ["sample_received"]:
@@ -56,7 +60,7 @@ class NotifyAdapter(object):
             # registered | partial | preliminary | final | entered-in-error
             status = dict(SAMPLE_STATUSES).get(status)
             if not status:
-                # any of the supported status, do nothing
+                # does not match any of the supported statuses, do nothing
                 return None
 
         # notify about the invalidated if necessary. We can only have one
@@ -125,9 +129,30 @@ class NotifyAdapter(object):
                 break
         payload["code"] = {"coding": coding}
 
-        # add the observations
+        # add subject if available
+        subject = data.get("subject")
+        if subject:
+            payload["subject"] = subject
+
+        # prepare observations
+        obs_refs = []
+        entries = []
         if SEND_OBSERVATIONS:
-            payload["results"] = self.get_observations(sample)
+            obs_list = self.get_observations(sample)
+            for obs_id, obs in obs_list:
+                display = obs.get("code", {}).get("text", "")
+                obvs_reference = "Observation/{}".format(obs_id)
+                obvs_entry = {
+                    "fullUrl": obvs_reference, #This might not be required. Also to check with Rohan
+                    "resource": obs,
+                    "request": { #also probably not required
+                        "method": "POST",
+                        "url": obvs_reference,
+                    },
+                }
+                obs_refs.append({"reference": obvs_reference, "display": display})
+                entries.append(obvs_entry)
+            payload["result"] = obs_refs
 
         # attach the pdf encoded in base64
         if report:
@@ -135,64 +160,50 @@ class NotifyAdapter(object):
             payload["presentedForm"] = [{
                 "data": pdf.data.encode("base64"),
                 "contentType": "application/pdf",
+                "language": "en",
                 "title": api.get_id(sample),
             }]
 
+        # create the diagnostic report entry
+        diag_reference =  "DiagnosticReport/{}".format(report_uuid)
+        diag_entry = {
+            "fullUrl": diag_reference, #This might not be required. Will check with Rohan
+            "resource": payload,
+            "request": { #also probably not required
+                "method": "POST",
+                "url": diag_reference,
+            },
+        }
+        entries.insert(0, diag_entry)
+
+        # build the bundle
+        bundle_id = str(uuid.uuid4())
+        bundle = {
+            "resourceType": "Bundle",
+            "id": bundle_id,
+            "type": "transaction",
+            "entry": entries
+        }
+
+        if dry_run:
+            print(json.dumps(bundle, indent=2))
+            return bundle
         # notify back to Tamanu
-        return session.post("DiagnosticReport", payload, raise_for_status=True)
+        return session.post("Bundle", bundle, raise_for_status=True)
 
     def get_observations(self, sample):
         """Returns a list of observation records suitable as a Tamanu payload
         """
-        # get the original data
-        meta = tapi.get_tamanu_storage(sample)
-        data = meta.get("data") or {}
-
-        # group the tests (orderDetails) requested by their original id
-        ordered_tests_by_key = {}
-        for order_detail in data.get("orderDetail", []):
-            test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
-            if test:
-                key = test[0].get("code")
-                ordered_tests_by_key[key] = order_detail
-
         # add the observations (analyses included in the results report)
         observations = []
         for analysis in sample.getAnalyses(full_objects=True):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
-
-            # get the original LabRequest's LOINC Code
-            name = api.get_title(analysis)
-            keyword = analysis.getKeyword()
-            ordered_test = ordered_tests_by_key.get(keyword)
-            if not ordered_test:
-                ordered_test = ordered_tests_by_key.get(name, {"coding": []})
-
-            # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
-            status = api.get_review_status(analysis)
-            status = dict(ANALYSIS_STATUSES).get(status, "partial")
-            observation = {
-                "resourceType": "Observation",
-                "status": status,
-                "code": ordered_test,
-            }
-
-            # quantitative / qualitative
-            if analysis.getStringResult() or analysis.getResultOptions():
-                # qualitative
-                observation["valueString"] = analysis.getFormattedResult()
-            else:
-                # quantitative
-                observation["valueQuantity"] = {
-                    "value": analysis.getResult(),
-                    "unit": analysis.getUnit(),
-                }
-
+            observation_object = Observation(analysis)
+            observation = observation_object.to_fhir()
             # append the observations
-            observations.append(observation)
-
+            observations.append((observation["id"], observation))
         return observations
 
 
