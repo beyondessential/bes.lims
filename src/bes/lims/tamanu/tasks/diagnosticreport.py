@@ -281,7 +281,7 @@ class NotifyAdapter(object):
         return copy.deepcopy(match)
 
     def get_performer(self, analysis):
-        """Return a dict representation of the user who verified the analysis
+        """Return a FHIR performer list of the user who verified the analysis
         passed-in, suitable for the injection in a FHIR resource (Observation)
         """
         # Adding the verificator to the performer of the Observation
@@ -293,14 +293,14 @@ class NotifyAdapter(object):
             # not yet verified?
             return None
 
+        # Get the fullname if there is one assigned for this user
         display = api.get_user_fullname(user_id) or user_id
-
-        return {
+        return [{
             "display": display,
             "identifier": {
                 "value": user_id,
             }
-        }
+        }]
 
 
 def can_notify(sample):
