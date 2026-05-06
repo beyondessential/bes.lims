@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import copy
-import json
 import uuid
 
 from bes.lims.tamanu import api as tapi
@@ -47,7 +46,7 @@ class NotifyAdapter(object):
         # send the diagnostic report
         return self.send_diagnostic_report(self.context, report)
 
-    def send_diagnostic_report(self, sample, report, status=None, dry_run=False):
+    def send_diagnostic_report(self, sample, report, status=None):
         if not status:
             status = api.get_review_status(sample)
             if status in ["sample_received"]:
@@ -142,9 +141,11 @@ class NotifyAdapter(object):
                 display = obs.get("code", {}).get("text", "")
                 obvs_reference = "Observation/{}".format(obs_id)
                 obvs_entry = {
-                    "fullUrl": obvs_reference, #This might not be required. Also to check with Rohan
+                    # TODO Might not be required, check with Rohan
+                    "fullUrl": obvs_reference,
                     "resource": obs,
-                    "request": { #also probably not required
+                    # TODO Might not be required, check with Rohan
+                    "request": {
                         "method": "POST",
                         "url": obvs_reference,
                     },
@@ -166,9 +167,11 @@ class NotifyAdapter(object):
         # create the diagnostic report entry
         diag_reference =  "DiagnosticReport/{}".format(report_uuid)
         diag_entry = {
-            "fullUrl": diag_reference, #This might not be required. Will check with Rohan
+            # TODO Might not be required, check with Rohan
+            "fullUrl": diag_reference,
             "resource": payload,
-            "request": { #also probably not required
+            # TODO Might not be required, check with Rohan
+            "request": {
                 "method": "POST",
                 "url": diag_reference,
             },
@@ -184,9 +187,6 @@ class NotifyAdapter(object):
             "entry": entries
         }
 
-        if dry_run:
-            print(json.dumps(bundle, indent=2))
-            return bundle
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
