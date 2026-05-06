@@ -70,6 +70,12 @@ SAMPLE_STATUSES = (
 
 ANALYSIS_STATUSES = (
     # mapping between analyses status and tamanu statuses
+    ("registered", "partial"),
+    ("cancelled", "cancelled"),
+    ("unassigned", "partial"),
+    ("assigned", "partial"),
+    ("retracted", "cancelled"),
+    ("rejected", "cancelled"),
     ("to_be_verified", "partial"),
     ("verified", "preliminary"),
     ("published", "final"),
