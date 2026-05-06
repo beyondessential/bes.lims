@@ -58,7 +58,7 @@ class NotifyAdapter(object):
             # registered | partial | preliminary | final | entered-in-error
             status = dict(SAMPLE_STATUSES).get(status)
             if not status:
-                # any of the supported status, do nothing
+                # does not match any of the supported statuses, do nothing
                 return None
 
         # notify about the invalidated if necessary. We can only have one
