@@ -518,3 +518,25 @@ def fix_cannot_search_by_mrn(tool):
     cat.reindexIndex(idx, api.get_request(), ZLogHandler(1000))
 
     logger.info("Fix cannot search by MRN [DONE]")
+
+
+def setup_tamanu_controlpanel(tool):
+    logger.info("Setup Tamanu controlpanel ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "plone.app.registry")
+    setup.runImportStepFromProfile(profile, "controlpanel")
+    logger.info("Setup Tamanu controlpanel [DONE]]")
+
+
+def setup_tamanu_host_credentials(tool):
+    """Registers the new host/email/password fields of the Tamanu control
+    panel. Outbound requests against previously imported Tamanu content now
+    consult the control panel instead of each object's annotation storage,
+    so admins must set these values after the upgrade.
+    """
+    logger.info("Setup Tamanu host and credentials ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "plone.app.registry")
+    logger.info("Setup Tamanu host and credentials [DONE]")

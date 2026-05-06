@@ -51,6 +51,84 @@
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
+        <!-- Number of AST panel used each month  -->
+        <div class="report-section"
+             tal:define="id string:ast_panels_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+      <!-- 2. Sample Type Contamination rate -->
+
+        <!-- 2.1 Contamination rate by month for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 2.2 Contamination rate by department for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 2.3 Contamination rate by ward for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_contamination_rate_by_ward"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+      <!-- 3. Sample Type true positive pathogen rate -->
+
+        <!-- 3.1 True positive pathogen rate by month for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 3.2 True positive pathogen rate by department for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 3.3 True positive pathogen rate by ward for each sample type -->
+        <div class="report-section"
+             tal:define="id string:sample_type_positive_pathogen_rate_by_ward"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+      <!-- 4. Organisms isolated in specimen by month -->
+
+        <!-- 4.1 Pathogens isolated by month -->
+        <div class="report-section"
+             tal:define="id string:pathogen_isolated_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 4.2 Probable contaminants isolated by month  -->
+        <div class="report-section"
+             tal:define="id string:contaminant_isolated_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- Microorganism isolated by month  -->
+        <div class="report-section"
+             tal:define="id string:microorganism_isolated_by_month"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 4.3 Number of pathogens by sample type  -->
+        <div class="report-section"
+             tal:define="id string:pathogen_by_sample_type"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 4.4 Number of probable contaminants by sample type  -->
+        <div class="report-section"
+             tal:define="id string:contaminant_isolated_by_sample_type"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
       <!-- 5. Sample rejection -->
 
         <!-- 5.1 Sample rejection rate by month -->
@@ -62,6 +140,18 @@
         <!-- 5.2 Sample rejection rate by specimen type -->
         <div class="report-section"
              tal:define="id string:samples_rejection_rate_by_specimen_type"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 5.3 Sample rejection by department -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_by_department"
+             tal:content="structure python:view.render_report_section(id)">
+        </div>
+
+        <!-- 5.4 Sample rejection by ward -->
+        <div class="report-section"
+             tal:define="id string:samples_rejection_by_ward"
              tal:content="structure python:view.render_report_section(id)">
         </div>
 
