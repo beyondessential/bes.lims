@@ -71,21 +71,15 @@ class Observation(TamanuResource):
     def to_fhir(self):
         """Returns the FHIR format
         """
-
         # generate unique ID for the observation
         obs_id = str(tapi.get_uuid(self.analysis))
 
+        # get the test ordered initially in the FHIR ServiceRequest
         ordered_test = self.get_initial_test()
-
         if not ordered_test:
-            # An unmatched
-            return {
-                "resourceType": "Observation",
-                "id": obs_id,
-                "status": dict(ANALYSIS_STATUSES).get("rejected", "cancelled"),
-                "code": {"coding": []},
-            }
-
+            # Although not initially requested, we also report this analysis
+            # and its result back to Tamanu as an Observation!
+            ordered_test = {"coding": []}
 
         # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
         status = api.get_review_status(self.analysis)
@@ -107,4 +101,3 @@ class Observation(TamanuResource):
                 "unit": self.analysis.getUnit(),
             }
         return observation
-
