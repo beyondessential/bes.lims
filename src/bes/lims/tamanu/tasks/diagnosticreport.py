@@ -242,7 +242,7 @@ class NotifyAdapter(object):
         # assign the person who verified the analysis (performer)
         performer = self.get_performer(analysis)
         if performer:
-            observation["performer"] = self.get_performer(analysis)
+            observation["performer"] = performer
 
         return observation
 
