@@ -63,14 +63,6 @@ parser = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawTextHelpFormatter)
 
 parser.add_argument(
-    "-th", "--tamanu_host",
-    help="URL from the Tamanu instance to extract the data from"
-)
-parser.add_argument(
-    "-tu", "--tamanu_user",
-    help="User and password in the <username>:<password> form"
-)
-parser.add_argument(
     "-su", "--senaite_user",
     help="SENAITE user"
 )
@@ -190,8 +182,10 @@ def get_client(service_request):
     }
     brains = api.search(query, CLIENT_CATALOG)
     if not brains:
-        container = api.get_portal().clients
-        return tapi.create_object(container, resource, "Client")
+        if api.get_registry_record("create_clients_on_sync", default=False):
+            container = api.get_portal().clients
+            return tapi.create_object(container, resource, "Client")
+        return None
 
     # link the resource to this Client object
     client = api.get_object(brains[0])
@@ -645,6 +639,9 @@ def sync_service_request(sr):
 
     # get or create the client via FHIR's encounter/serviceProvider
     client = get_client(sr)
+    if not client:
+        logger.info("Skip %s. No client for this facility" % hash)
+        return
 
     # get or create the contact via FHIR's requester
     contact = get_contact(sr)
@@ -844,20 +841,8 @@ def main(app):
         parser.exit()
         return
 
-    # get the remote host
-    host = args.tamanu_host
-    if not host:
-        error("Remote URL is missing")
-
     # get the local filesystem path for cached content
     _cache_path = args.cache
-
-    # get the user and password
-    try:
-        user, password = args.tamanu_user.split(":")
-    except (AttributeError, ValueError):
-        error("Credentials are missing or not valid format")
-        return
 
     # get since dhms
     since = args.since or DEFAULT_SINCE
@@ -883,6 +868,14 @@ def main(app):
     # Setup environment
     username = args.senaite_user or USERNAME
     setup_script_environment(app, username=username, logger=logger)
+
+    # Host and credentials are read from the Tamanu control panel once the
+    # portal context is available. Configure them at /@@tamanu-controlpanel.
+    host, user, password = tapi.get_tamanu_settings()
+    if not host:
+        error("Tamanu host is not configured in the control panel")
+    if not user or not password:
+        error("Tamanu credentials are not configured in the control panel")
 
     # do the work
     logger.info("-" * 79)

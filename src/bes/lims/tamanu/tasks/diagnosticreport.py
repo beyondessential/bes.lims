@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
-from bika.lims import api
-from bika.lims.interfaces import IAnalysisRequest
-from bes.lims.tamanu.resources.observation import Observation
-from bika.lims.utils import tmpID
-from senaite.core.api import dtime
-from zope.component import adapter
-from zope.interface import implementer
+import copy
+import uuid
 
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu import logger
-
+from bes.lims.tamanu.config import ANALYSIS_STATUSES
 from bes.lims.tamanu.config import LOINC_CODING_SYSTEM
 from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SAMPLE_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
 from bes.lims.tamanu.config import SEND_OBSERVATIONS
 from bes.lims.tamanu.interfaces import ITamanuTask
+from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bes.lims.tamanu.tasks import queue
 from bes.lims.utils import is_reportable
-
-import json
-import uuid
+from bika.lims import api
+from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.utils import tmpID
+from senaite.core.api import dtime
+from zope.component import adapter
+from zope.interface import implementer
 
 
 @adapter(IAnalysisRequest)
@@ -48,7 +46,7 @@ class NotifyAdapter(object):
         # send the diagnostic report
         return self.send_diagnostic_report(self.context, report)
 
-    def send_diagnostic_report(self, sample, report, status=None, dry_run=False):
+    def send_diagnostic_report(self, sample, report, status=None):
         if not status:
             status = api.get_review_status(sample)
             if status in ["sample_received"]:
@@ -60,7 +58,7 @@ class NotifyAdapter(object):
             # registered | partial | preliminary | final | entered-in-error
             status = dict(SAMPLE_STATUSES).get(status)
             if not status:
-                # does not match any of the supported statuses, do nothing
+                # any of the supported status, do nothing
                 return None
 
         # notify about the invalidated if necessary. We can only have one
@@ -143,9 +141,11 @@ class NotifyAdapter(object):
                 display = obs.get("code", {}).get("text", "")
                 obvs_reference = "Observation/{}".format(obs_id)
                 obvs_entry = {
-                    "fullUrl": obvs_reference, #This might not be required. Also to check with Rohan
+                    # TODO Might not be required, check with Rohan
+                    "fullUrl": obvs_reference,
                     "resource": obs,
-                    "request": { #also probably not required
+                    # TODO Might not be required, check with Rohan
+                    "request": {
                         "method": "POST",
                         "url": obvs_reference,
                     },
@@ -167,9 +167,11 @@ class NotifyAdapter(object):
         # create the diagnostic report entry
         diag_reference =  "DiagnosticReport/{}".format(report_uuid)
         diag_entry = {
-            "fullUrl": diag_reference, #This might not be required. Will check with Rohan
+            # TODO Might not be required, check with Rohan
+            "fullUrl": diag_reference,
             "resource": payload,
-            "request": { #also probably not required
+            # TODO Might not be required, check with Rohan
+            "request": {
                 "method": "POST",
                 "url": diag_reference,
             },
@@ -185,9 +187,6 @@ class NotifyAdapter(object):
             "entry": entries
         }
 
-        if dry_run:
-            print(json.dumps(bundle, indent=2))
-            return bundle
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
@@ -200,11 +199,80 @@ class NotifyAdapter(object):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
-            observation_object = Observation(analysis)
-            observation = observation_object.to_fhir()
+            # get the representation of the analysis as a FHIR Observation
+            observation = self.get_observation(analysis)
             # append the observations
             observations.append((observation["id"], observation))
         return observations
+
+    def get_observation(self, analysis):
+        """Returns a dict that represents a FHIR Observation counterpart of the
+        analysis passed-in
+        """
+        # generate unique ID for the observation
+        obs_id = str(tapi.get_uuid(analysis))
+
+        # get the test ordered initially in the FHIR ServiceRequest
+        ordered_test = self.get_order_detail(analysis)
+        if not ordered_test:
+            # Although not initially requested, we also report this analysis
+            # and its result back to Tamanu as an Observation!
+            ordered_test = {"coding": []}
+
+        # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
+        status = api.get_review_status(analysis)
+        status = dict(ANALYSIS_STATUSES).get(status, "partial")
+        observation = {
+            "resourceType": "Observation",
+            "id": obs_id,
+            "status": status,
+            "code": ordered_test,
+        }
+        # quantitative / qualitative
+        if analysis.getStringResult() or analysis.getResultOptions():
+            # qualitative
+            observation["valueString"] = analysis.getFormattedResult()
+        else:
+            # quantitative
+            observation["valueQuantity"] = {
+                "value": analysis.getResult(),
+                "unit": analysis.getUnit(),
+            }
+        return observation
+
+    def get_order_detail(self, analysis):
+        """Returns the orderDetail of the initial ServiceRequest that
+        originated the analysis passed-in, if any. It searches for the first
+        orderDetail whose code matches with the analysis keyword. If no
+        orderDetail by analysis keyword is found, it falls-back to a search by
+        analysis name.
+        """
+        # get the original ServiceRequest FHIR resource dict
+        sample = analysis.getRequest()
+        meta = tapi.get_tamanu_storage(sample)
+
+        # group the tests by code
+        tests = dict()
+        data = meta.get("data") or {}
+        for order_detail in data.get("orderDetail", []):
+            test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
+            code = test[0].get("code") if test else None
+            if not code:
+                continue
+            if code in tests:
+                # only interested on the first test
+                continue
+            tests[code] = order_detail
+
+        # find matches by keyword
+        keyword = analysis.getKeyword()
+        match = tests.get(keyword)
+        if not match:
+            # fallback to match by name
+            name = api.get_title(analysis)
+            match = tests.get(name)
+
+        return copy.deepcopy(match)
 
 
 def can_notify(sample):

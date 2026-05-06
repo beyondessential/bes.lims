@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-HOST=${sync_tamanu:host}
-CREDS=${sync_tamanu:credentials}
-
 SINCE_SERVICE_REQUEST=${sync_tamanu:sample_since}
 SINCE_PATIENTS=${sync_tamanu:patients_since}
 
@@ -11,11 +8,14 @@ SRC_DIR=${buildout:directory}/src/bes.lims/scripts
 ZEO_DIR=${buildout:var-dir}/${sync_tamanu:zeoclient}
 FLOCK="flock -n /tmp/sync_tamanu.lock"
 
+# Tamanu host and credentials are read from the control panel
+# (@@tamanu-controlpanel). Configure them there before running this script.
+
 # Synchronize service requests
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Synchronize patients
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Run Tamanu specific tasks
 $FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log

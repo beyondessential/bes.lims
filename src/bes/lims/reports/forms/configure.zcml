@@ -33,6 +33,22 @@
       class=".samples_rejection_rate_by_specimen_type.SamplesRejectionRateBySpecimenType"
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
+  
+  <!-- Samples rejection by department -->
+  <browser:page
+      for="*"
+      name="samples_rejection_by_department"
+      class=".samples_rejection_by_department.SamplesRejectionByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+  
+  <!-- Samples rejection by ward -->
+  <browser:page
+      for="*"
+      name="samples_rejection_by_ward"
+      class=".samples_rejection_by_ward.SamplesRejectionByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
 
   <!-- Sample rejection summary  -->
   <browser:page
@@ -57,5 +73,102 @@
       class=".analyses_results.AnalysesResults"
       permission="zope.Public"
       layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Number of AST panel used each month -->
+  <browser:page
+      for="*"
+      name="ast_panels_by_month"
+      class=".ast_panels_by_month.ASTPanelByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Contamination rate by month for each sample type -->
+  <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_month"
+      class=".sample_type_contamination_rate_by_month.SampleTypeContaminationRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+    <!-- Contamination rate by department for each sample type -->
+    <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_department"
+      class=".sample_type_contamination_rate_by_department.SampleTypeContaminationRateByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+    <!-- Contamination rate by ward for each sample type -->
+    <browser:page
+      for="*"
+      name="sample_type_contamination_rate_by_ward"
+      class=".sample_type_contamination_rate_by_ward.SampleTypeContaminationRateByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- True positive pathogen rate by month for each sample type -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_month"
+      class=".sample_type_positive_pathogen_rate_by_month.SampleTypePositivePathogenRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- True positive pathogen rate by department for each sample type -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_department"
+      class=".sample_type_positive_pathogen_rate_by_department.SampleTypePositivePathogenRateByDepartment"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- True positive pathogen rate by ward for each sample type -->
+  <browser:page
+      for="*"
+      name="sample_type_positive_pathogen_rate_by_ward"
+      class=".sample_type_positive_pathogen_rate_by_ward.SampleTypePositivePathogenRateByWard"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Pathogens isolated by month -->
+  <browser:page
+      for="*"
+      name="pathogen_isolated_by_month"
+      class=".pathogen_isolated_by_month.PathogenIsolatedByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Number of pathogens by sample type -->
+  <browser:page
+      for="*"
+      name="pathogen_by_sample_type"
+      class=".pathogen_by_sample_type.PathogenBySampleType"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Contaminant isolated by month -->
+  <browser:page
+      for="*"
+      name="contaminant_isolated_by_month"
+      class=".contaminant_isolated_by_month.ContaminantIsolatedRateByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Contaminant isolated by sample type -->
+  <browser:page
+      for="*"
+      name="contaminant_isolated_by_sample_type"
+      class=".contaminant_isolated_by_sample_type.ContaminantBySampleType"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
+  <!-- Microorganism isolated by month -->
+  <browser:page
+      for="*"
+      name="microorganism_isolated_by_month"
+      class=".microorganism_isolated_by_month.MicroorganismIsolatedByMonth"
+      permission="zope.Public"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 
 </configure>
