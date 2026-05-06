@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
-from bika.lims import api
-from bika.lims.interfaces import IAnalysisRequest
-from bika.lims.utils import tmpID
-from senaite.core.api import dtime
-from zope.component import adapter
-from zope.interface import implementer
+import copy
+import uuid
 
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu import logger
@@ -17,8 +12,15 @@ from bes.lims.tamanu.config import SAMPLE_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
 from bes.lims.tamanu.config import SEND_OBSERVATIONS
 from bes.lims.tamanu.interfaces import ITamanuTask
+from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bes.lims.tamanu.tasks import queue
 from bes.lims.utils import is_reportable
+from bika.lims import api
+from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.utils import tmpID
+from senaite.core.api import dtime
+from zope.component import adapter
+from zope.interface import implementer
 
 
 @adapter(IAnalysisRequest)
@@ -56,7 +58,7 @@ class NotifyAdapter(object):
             # registered | partial | preliminary | final | entered-in-error
             status = dict(SAMPLE_STATUSES).get(status)
             if not status:
-                # any of the supported status, do nothing
+                # does not match any of the supported statuses, do nothing
                 return None
 
         # notify about the invalidated if necessary. We can only have one
@@ -125,9 +127,32 @@ class NotifyAdapter(object):
                 break
         payload["code"] = {"coding": coding}
 
-        # add the observations
+        # add subject if available
+        subject = data.get("subject")
+        if subject:
+            payload["subject"] = subject
+
+        # prepare observations
+        obs_refs = []
+        entries = []
         if SEND_OBSERVATIONS:
-            payload["results"] = self.get_observations(sample)
+            obs_list = self.get_observations(sample)
+            for obs_id, obs in obs_list:
+                display = obs.get("code", {}).get("text", "")
+                obvs_reference = "Observation/{}".format(obs_id)
+                obvs_entry = {
+                    # TODO Might not be required, check with Rohan
+                    "fullUrl": obvs_reference,
+                    "resource": obs,
+                    # TODO Might not be required, check with Rohan
+                    "request": {
+                        "method": "POST",
+                        "url": obvs_reference,
+                    },
+                }
+                obs_refs.append({"reference": obvs_reference, "display": display})
+                entries.append(obvs_entry)
+            payload["result"] = obs_refs
 
         # attach the pdf encoded in base64
         if report:
@@ -135,65 +160,119 @@ class NotifyAdapter(object):
             payload["presentedForm"] = [{
                 "data": pdf.data.encode("base64"),
                 "contentType": "application/pdf",
+                "language": "en",
                 "title": api.get_id(sample),
             }]
 
+        # create the diagnostic report entry
+        diag_reference =  "DiagnosticReport/{}".format(report_uuid)
+        diag_entry = {
+            # TODO Might not be required, check with Rohan
+            "fullUrl": diag_reference,
+            "resource": payload,
+            # TODO Might not be required, check with Rohan
+            "request": {
+                "method": "POST",
+                "url": diag_reference,
+            },
+        }
+        entries.insert(0, diag_entry)
+
+        # build the bundle
+        bundle_id = str(uuid.uuid4())
+        bundle = {
+            "resourceType": "Bundle",
+            "id": bundle_id,
+            "type": "transaction",
+            "entry": entries
+        }
+
         # notify back to Tamanu
-        return session.post("DiagnosticReport", payload, raise_for_status=True)
+        return session.post("Bundle", bundle, raise_for_status=True)
 
     def get_observations(self, sample):
         """Returns a list of observation records suitable as a Tamanu payload
         """
-        # get the original data
-        meta = tapi.get_tamanu_storage(sample)
-        data = meta.get("data") or {}
-
-        # group the tests (orderDetails) requested by their original id
-        ordered_tests_by_key = {}
-        for order_detail in data.get("orderDetail", []):
-            test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
-            if test:
-                key = test[0].get("code")
-                ordered_tests_by_key[key] = order_detail
-
         # add the observations (analyses included in the results report)
         observations = []
         for analysis in sample.getAnalyses(full_objects=True):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
-
-            # get the original LabRequest's LOINC Code
-            name = api.get_title(analysis)
-            keyword = analysis.getKeyword()
-            ordered_test = ordered_tests_by_key.get(keyword)
-            if not ordered_test:
-                ordered_test = ordered_tests_by_key.get(name, {"coding": []})
-
-            # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
-            status = api.get_review_status(analysis)
-            status = dict(ANALYSIS_STATUSES).get(status, "partial")
-            observation = {
-                "resourceType": "Observation",
-                "status": status,
-                "code": ordered_test,
-            }
-
-            # quantitative / qualitative
-            if analysis.getStringResult() or analysis.getResultOptions():
-                # qualitative
-                observation["valueString"] = analysis.getFormattedResult()
-            else:
-                # quantitative
-                observation["valueQuantity"] = {
-                    "value": analysis.getResult(),
-                    "unit": analysis.getUnit(),
-                }
-
+            # get the representation of the analysis as a FHIR Observation
+            observation = self.get_observation(analysis)
             # append the observations
-            observations.append(observation)
-
+            observations.append((observation["id"], observation))
         return observations
+
+    def get_observation(self, analysis):
+        """Returns a dict that represents a FHIR Observation counterpart of the
+        analysis passed-in
+        """
+        # generate unique ID for the observation
+        obs_id = str(tapi.get_uuid(analysis))
+
+        # get the test ordered initially in the FHIR ServiceRequest
+        ordered_test = self.get_order_detail(analysis)
+        if not ordered_test:
+            # Although not initially requested, we also report this analysis
+            # and its result back to Tamanu as an Observation!
+            ordered_test = {"coding": []}
+
+        # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
+        status = api.get_review_status(analysis)
+        status = dict(ANALYSIS_STATUSES).get(status, "partial")
+        observation = {
+            "resourceType": "Observation",
+            "id": obs_id,
+            "status": status,
+            "code": ordered_test,
+        }
+        # quantitative / qualitative
+        if analysis.getStringResult() or analysis.getResultOptions():
+            # qualitative
+            observation["valueString"] = analysis.getFormattedResult()
+        else:
+            # quantitative
+            observation["valueQuantity"] = {
+                "value": analysis.getResult(),
+                "unit": analysis.getUnit(),
+            }
+        return observation
+
+    def get_order_detail(self, analysis):
+        """Returns the orderDetail of the initial ServiceRequest that
+        originated the analysis passed-in, if any. It searches for the first
+        orderDetail whose code matches with the analysis keyword. If no
+        orderDetail by analysis keyword is found, it falls-back to a search by
+        analysis name.
+        """
+        # get the original ServiceRequest FHIR resource dict
+        sample = analysis.getRequest()
+        meta = tapi.get_tamanu_storage(sample)
+
+        # group the tests by code
+        tests = dict()
+        data = meta.get("data") or {}
+        for order_detail in data.get("orderDetail", []):
+            test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
+            code = test[0].get("code") if test else None
+            if not code:
+                continue
+            if code in tests:
+                # only interested on the first test
+                continue
+            tests[code] = order_detail
+
+        # find matches by keyword
+        keyword = analysis.getKeyword()
+        match = tests.get(keyword)
+        if not match:
+            # fallback to match by name
+            name = api.get_title(analysis)
+            match = tests.get(name)
+
+        return copy.deepcopy(match)
 
 
 def can_notify(sample):
