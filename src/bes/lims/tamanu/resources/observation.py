@@ -17,6 +17,7 @@
 #
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
+import copy
 
 from bes.lims.tamanu import api as tapi
 from bes.lims.tamanu.config import ANALYSIS_STATUSES
@@ -65,7 +66,7 @@ class Observation(TamanuResource):
             name = api.get_title(self.analysis)
             match = tests.get(name)
 
-        return match
+        return copy.deepcopy(match)
 
     def to_fhir(self):
         """Returns the FHIR format
