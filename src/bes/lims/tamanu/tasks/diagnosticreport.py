@@ -238,6 +238,12 @@ class NotifyAdapter(object):
                 "value": analysis.getResult(),
                 "unit": analysis.getUnit(),
             }
+
+        # assign the person who verified the analysis (performer)
+        performer = self.get_performer(analysis)
+        if performer:
+            observation["performer"] = self.get_performer(analysis)
+
         return observation
 
     def get_order_detail(self, analysis):
@@ -273,6 +279,28 @@ class NotifyAdapter(object):
             match = tests.get(name)
 
         return copy.deepcopy(match)
+
+    def get_performer(self, analysis):
+        """Return a dict representation of the user who verified the analysis
+        passed-in, suitable for the injection in a FHIR resource (Observation)
+        """
+        # Adding the verificator to the performer of the Observation
+        verificators = analysis.getVerificators()
+
+        # The last one is the final verifier
+        user_id = verificators[-1] if verificators else None
+        if not user_id:
+            # not yet verified?
+            return None
+
+        display = api.get_user_fullname(user_id) or user_id
+
+        return {
+            "display": display,
+            "identifier": {
+                "value": user_id,
+            }
+        }
 
 
 def can_notify(sample):
