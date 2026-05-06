@@ -18,14 +18,12 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bika.lims import api
-
 from bes.lims.tamanu import api as tapi
-
-from bes.lims.tamanu.resources import TamanuResource
-
 from bes.lims.tamanu.config import ANALYSIS_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
+from bes.lims.tamanu.resources import TamanuResource
+from bika.lims import api
+
 
 class Observation(TamanuResource):
     """Object that represents an Observation resource from Tamanu
@@ -37,21 +35,37 @@ class Observation(TamanuResource):
         self.analysis = analysis
 
     def get_initial_test(self):
-        keyword = self.analysis.getKeyword()
-        return self.match_order_detail(keyword)
-
-    def match_order_detail(self, keyword):
-        keyword = self.analysis.getKeyword()
+        """Returns the test initially requested in FHIR's ServiceRequest whose
+        code matches with the keyword of the current analysis and falls-back to
+        a search by name when no match is found
+        """
+        # get the original ServiceRequest FHIR resource dict
+        # TODO We are assuming is assigned to a sample coming from Tamanu!
         sample = self.analysis.getRequest()
         meta = tapi.get_tamanu_storage(sample)
+
+        # group the tests by code
+        tests = dict()
         data = meta.get("data") or {}
         for order_detail in data.get("orderDetail", []):
             test = tapi.get_codings(order_detail, SENAITE_TESTS_CODING_SYSTEM)
-            if test:
-                key = test[0].get("code")
-                if key == keyword:
-                    return order_detail
-        return None
+            code = test[0].get("code") if test else None
+            if not code:
+                continue
+            if code in tests:
+                # only interested on the first test
+                continue
+            tests[code] = order_detail
+
+        # find matches by keyword
+        keyword = self.analysis.getKeyword()
+        match = tests.get(keyword)
+        if not match:
+            # fallback to match by name
+            name = api.get_title(self.analysis)
+            match = tests.get(name)
+
+        return match
 
     def to_fhir(self):
         """Returns the FHIR format
@@ -63,14 +77,12 @@ class Observation(TamanuResource):
         ordered_test = self.get_initial_test()
 
         if not ordered_test:
-            name = api.get_title(self.analysis)
-            fallback_code = self.match_order_detail(name) or { "coding" : [] }
             # An unmatched
             return {
                 "resourceType": "Observation",
                 "id": obs_id,
                 "status": dict(ANALYSIS_STATUSES).get("rejected", "cancelled"),
-                "code": fallback_code,
+                "code": {"coding": []},
             }
 
 
