@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #136 Add ProfileAnalyses column to Analysis Profiles listing
 - #134 Include the name of the verifier when sending results to Tamanu
 - #131 Push FHIR Observations to Tamanu using a FHIR Transaction Bundle
 - #133 Add microbiology statistic reports for contamination, pathogen, AST panel, and sample rejection
