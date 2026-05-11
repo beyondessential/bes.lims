@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #137 Port BaseAnalysis ResultOptions schema to bes.lims
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
 - #141 Tamanu integration: handle new tests added after ServiceRequest received
 - #140 Including the method where available in the Observation results to Tamanu
