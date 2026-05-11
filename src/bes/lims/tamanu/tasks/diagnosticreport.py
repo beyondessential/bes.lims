@@ -11,6 +11,7 @@ from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SAMPLE_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
 from bes.lims.tamanu.config import SEND_OBSERVATIONS
+from bes.lims.tamanu.config import SNOMED_CODING_SYSTEM
 from bes.lims.tamanu.interfaces import ITamanuTask
 from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bes.lims.tamanu.tasks import queue
@@ -205,6 +206,23 @@ class NotifyAdapter(object):
             observations.append((observation["id"], observation))
         return observations
 
+    def get_observation_method(self, analysis):
+        """Returns the method if one exists of the particular
+        Observation
+        """
+        method = analysis.getMethod()
+
+        # method.Title() is mandatory
+        if method and method.getMethodID():
+            return {
+                "coding": [{
+                    "system": SNOMED_CODING_SYSTEM,
+                    "code": method.getMethodID(),
+                    "display": method.Title(),
+                }]
+            }
+        return None
+
     def get_observation(self, analysis):
         """Returns a dict that represents a FHIR Observation counterpart of the
         analysis passed-in
@@ -243,6 +261,10 @@ class NotifyAdapter(object):
         performer = self.get_performer(analysis)
         if performer:
             observation["performer"] = performer
+
+        method = self.get_observation_method(analysis)
+        if method:
+            observation["method"] = method
 
         return observation
 
