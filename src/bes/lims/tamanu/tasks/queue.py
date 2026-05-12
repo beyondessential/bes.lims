@@ -2,30 +2,34 @@
 
 import time
 
+from BTrees.OOBTree import OOBTree
 from bes.lims.tamanu import logger
 from bes.lims.tamanu.config import TAMANU_TASKS_QUEUE
 from bes.lims.tamanu.interfaces import ITamanuTask
 from bika.lims import api
 from bika.lims.decorators import synchronized
-from persistent.list import PersistentList
 from zope.annotation.interfaces import IAnnotations
 from zope.component import queryAdapter
 
 
 def _get_tasks():
-    """Returns a PersistentList containing a list of dicts, each representing
-    a Tamanu task, sorted reverse, from newest to oldest
+    """Returns an OOBTree of pending Tamanu tasks, keyed by task_id
+    (``"<uid>-<name>"``) with the scheduled-on epoch timestamp as value.
+
+    OOBTree is used (rather than a flat ``persistent.list.PersistentList``)
+    so concurrent producers inserting distinct keys do not generate
+    unresolvable ConflictErrors on the underlying persistent container.
     """
     portal = api.get_portal()
     annotation = IAnnotations(portal)
     if annotation.get(TAMANU_TASKS_QUEUE) is None:
-        annotation[TAMANU_TASKS_QUEUE] = PersistentList()
+        annotation[TAMANU_TASKS_QUEUE] = OOBTree()
     return annotation[TAMANU_TASKS_QUEUE]
 
 
 @synchronized(max_connections=1)
 def get():
-    """Pops the next task to be processed
+    """Pops the next task whose scheduled time has elapsed
     """
     # get the tasks
     tasks = _get_tasks()
@@ -33,26 +37,25 @@ def get():
     # current time in seconds since the epoch
     now = int(time.time())
 
-    # first elements added have priority (FIFO)
-    task = None
-    for idx in range(len(tasks)):
-        # check if the task has to be delayed
-        if tasks[idx][1] <= now:
-            task = tasks.pop(idx)[0]
+    task_id = None
+    for tid, when in tasks.items():
+        if when <= now:
+            task_id = tid
             break
 
-    # no task found
-    if not task:
+    if not task_id:
         return None
 
+    del tasks[task_id]
+
     # get the name of the task and the context uid
-    idx = task.index("-")
-    uid = task[:idx]
-    name = task[idx+1:]
+    idx = task_id.index("-")
+    uid = task_id[:idx]
+    name = task_id[idx+1:]
 
     # validate the task id
     if not all([name, api.is_uid(uid)]):
-        logger.error("Not a valid task: %s" % task)
+        logger.error("Not a valid task: %s" % task_id)
         return None
 
     # get the context
@@ -67,7 +70,7 @@ def get():
 
 @synchronized(max_connections=1)
 def put(name, context, delay=120):
-    """Appends a task for the given name and context to the queue
+    """Adds a task for the given name and context to the queue
     :param name: The name of the task
     :param context: Context the task is bound to
     :param delay: Minimum delay in seconds before the task is executed
@@ -78,9 +81,8 @@ def put(name, context, delay=120):
     task_id = "%s-%s" % (uid, name)
     tasks = _get_tasks()
 
-    # do not append unless new
-    ids = [task[0] for task in tasks]
-    if task_id in ids:
+    # do not add unless new
+    if task_id in tasks:
         return False
 
     # current time in seconds since the epoch + delay
@@ -88,5 +90,5 @@ def put(name, context, delay=120):
 
     # add the task
     logger.info("Task %s [scheduled on %s]" % (task_id, when))
-    tasks.append((task_id, when))
+    tasks[task_id] = when
     return True
