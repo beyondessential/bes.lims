@@ -217,8 +217,15 @@ class NotifyAdapter(object):
         if not ordered_test:
             # Although not initially requested, we also report this analysis
             # and its result back to Tamanu as an Observation!
-            ordered_test = {"coding": []}
-
+            keyword = analysis.getKeyword()
+            name = api.get_title(analysis)
+            display = "%s | %s" % (keyword, name)
+            coding =  {
+                "code": keyword,
+                "system": SENAITE_TESTS_CODING_SYSTEM,
+                "display": display
+            }
+            ordered_test = {"coding": [coding]}
         # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
         status = api.get_review_status(analysis)
         status = dict(ANALYSIS_STATUSES).get(status, "partial")

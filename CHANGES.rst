@@ -3,7 +3,7 @@ Changelog
 
 1.0.0
 -----
-
+- #101 Tamanu integration: handle new tests added after ServiceRequest received
 - #134 Include the name of the verifier when sending results to Tamanu
 - #131 Push FHIR Observations to Tamanu using a FHIR Transaction Bundle
 - #133 Add microbiology statistic reports for contamination, pathogen, AST panel, and sample rejection
