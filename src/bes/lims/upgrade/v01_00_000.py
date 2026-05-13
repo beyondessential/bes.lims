@@ -21,6 +21,7 @@
 import copy
 import transaction
 
+from BTrees.OOBTree import OOBTree
 from bes.lims import PRODUCT_NAME as product
 from bes.lims import logger
 from bes.lims.setuphandlers import setup_behaviors
@@ -31,8 +32,10 @@ from bes.lims.setuphandlers import setup_roles
 from bes.lims.setuphandlers import setup_workflows
 from bes.lims.setuphandlers import WORKFLOWS_TO_UPDATE
 from bes.lims.tamanu import api as tapi
+from bes.lims.tamanu.config import TAMANU_TASKS_QUEUE
 from bes.lims.tamanu.interfaces import ITamanuContent
 from bika.lims import api
+from persistent.list import PersistentList
 from Products.ZCatalog.ProgressHandler import ZLogHandler
 from senaite.core.api import workflow as wapi
 from senaite.core.catalog import ANALYSIS_CATALOG
@@ -48,6 +51,7 @@ from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import REFERENCE_ANALYSIS_WORKFLOW
 from senaite.core.workflow import SAMPLE_WORKFLOW
 from zope import component
+from zope.annotation.interfaces import IAnnotations
 from zope.interface import alsoProvides
 from zope.schema.interfaces import IVocabularyFactory
 
@@ -540,3 +544,32 @@ def setup_tamanu_host_credentials(tool):
     setup = portal.portal_setup
     setup.runImportStepFromProfile(profile, "plone.app.registry")
     logger.info("Setup Tamanu host and credentials [DONE]")
+
+
+def migrate_tamanu_queue_to_btree(tool):
+    """Migrates the Tamanu tasks queue annotation from PersistentList to
+    OOBTree. The previous container conflicted on every concurrent producer
+    because PersistentList has no `_p_resolveConflict`; OOBTree merges
+    non-overlapping inserts via its built-in resolver.
+    """
+    logger.info("Migrate Tamanu tasks queue to OOBTree ...")
+    portal = api.get_portal()
+    annotation = IAnnotations(portal)
+    existing = annotation.get(TAMANU_TASKS_QUEUE)
+    if isinstance(existing, OOBTree):
+        logger.info("Tamanu tasks queue is already an OOBTree [SKIP]")
+        return
+
+    new_queue = OOBTree()
+    if isinstance(existing, PersistentList):
+        for entry in existing:
+            # entries used to be (task_id, when) tuples
+            try:
+                task_id, when = entry
+            except (TypeError, ValueError):
+                logger.warn("Skipping malformed queue entry: %r" % (entry,))
+                continue
+            new_queue[task_id] = when
+
+    annotation[TAMANU_TASKS_QUEUE] = new_queue
+    logger.info("Migrate Tamanu tasks queue to OOBTree [DONE]")
