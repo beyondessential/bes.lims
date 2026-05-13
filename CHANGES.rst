@@ -3,6 +3,7 @@ Changelog
 
 1.0.0
 -----
+- #144 Adding reference results to Tamanu FHIR Observations
 - #141 Tamanu integration: handle new tests added after ServiceRequest received
 - #140 Including the method where available in the Observation results to Tamanu
 - #134 Include the name of the verifier when sending results to Tamanu
