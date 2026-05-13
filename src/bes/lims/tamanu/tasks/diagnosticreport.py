@@ -263,6 +263,9 @@ class NotifyAdapter(object):
                 "value": analysis.getResult(),
                 "unit": analysis.getUnit(),
             }
+            reference_range = self.get_reference_range(analysis)
+            if reference_range:
+                observation["referenceRange"] = reference_range
 
         # assign the person who verified the analysis (performer)
         performer = self.get_performer(analysis)
@@ -330,6 +333,44 @@ class NotifyAdapter(object):
                 "value": user_id,
             }
         }]
+
+    def get_reference_range(self, analysis):
+        """This will return a FHIR Observation's reference range for a
+        quantitative analysis.
+        """
+        # including this duplicated check in case function is reused
+        if analysis.getStringResult() or analysis.getResultOptions():
+            # qualitative not quantitative
+            return None
+        # Qualitative
+        results_range = analysis.getResultsRange()
+
+        if not results_range:
+            return None
+        low = results_range.get('min')
+        high = results_range.get('max')
+
+        if not low and not high:
+            return None
+
+        reference_range = {}
+        if low:
+            reference_range['low'] = {
+                'value': float(low),
+                'unit': analysis.getUnit(),
+                'system': 'http://unitsofmeasure.org',
+                'code': analysis.getUnit(),
+            }
+
+        if high:
+            reference_range['high'] = {
+                'value': float(high),
+                'unit': analysis.getUnit(),
+                'system': 'http://unitsofmeasure.org',
+                'code': analysis.getUnit(),
+            }
+
+        return [reference_range]
 
 
 def can_notify(sample):

@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #144 Adding reference results to Tamanu FHIR Observations
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
 - #141 Tamanu integration: handle new tests added after ServiceRequest received
 - #140 Including the method where available in the Observation results to Tamanu
