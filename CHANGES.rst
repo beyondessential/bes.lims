@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #146 Support DynamicAnalysisSpec range comment text for 0/0 ranges
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
 - #141 Tamanu integration: handle new tests added after ServiceRequest received
 - #140 Including the method where available in the Observation results to Tamanu
