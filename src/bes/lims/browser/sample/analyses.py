@@ -107,13 +107,14 @@ class SampleAnalysesListingAdapter(object):
         """
         analysis = self.listing.get_object(obj)
 
-        # use listing's default if value for max is above 0
+        # Show textual range comments only for 0/0 sentinel ranges
         specs = analysis.getResultsRange()
+        range_min = api.to_float(specs.get("min"), default=0)
         range_max = api.to_float(specs.get("max"), default=0)
-        if range_max > 0:
+        if range_min != 0 or range_max != 0:
             return
 
-        # no value set for neither min nor max, show the range comment
+        # no numeric range set, show the range comment if any
         comment = specs.get("rangecomment")
         if comment:
             item["replace"]["Specification"] = comment
