@@ -4,6 +4,7 @@
   <include package="archetypes.schemaextender"/>
 
   <!-- File includes -->
+  <include file="baseanalysis.zcml"/>
   <include file="client.zcml"/>
   <include file="setup.zcml"/>
   <include file="analysisrequest.zcml"/>
