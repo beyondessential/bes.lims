@@ -8,4 +8,10 @@
     provides="senaite.app.listing.interfaces.IListingViewAdapter"
     factory=".samples.SamplesListingAdapter" />
 
+  <subscriber
+    for="senaite.core.browser.controlpanel.analysisprofiles.view.AnalysisProfilesView
+         *"
+    provides="senaite.app.listing.interfaces.IListingViewAdapter"
+    factory=".analysisprofiles.AnalysisProfilesListingAdapter" />
+
 </configure>
