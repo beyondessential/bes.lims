@@ -11,6 +11,7 @@ from bes.lims.tamanu.config import LOINC_GENERIC_DIAGNOSTIC
 from bes.lims.tamanu.config import SAMPLE_STATUSES
 from bes.lims.tamanu.config import SENAITE_TESTS_CODING_SYSTEM
 from bes.lims.tamanu.config import SEND_OBSERVATIONS
+from bes.lims.tamanu.config import SNOMED_CODING_SYSTEM
 from bes.lims.tamanu.interfaces import ITamanuTask
 from bes.lims.tamanu.tasks import NOTIFY_DIAGNOSTIC_REPORT
 from bes.lims.tamanu.tasks import queue
@@ -199,11 +200,34 @@ class NotifyAdapter(object):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
+
+            # only report analyses that are either verified or published
+            status = api.get_review_status(analysis)
+            if status not in ["verified", "published"]:
+                continue
+
             # get the representation of the analysis as a FHIR Observation
             observation = self.get_observation(analysis)
             # append the observations
             observations.append((observation["id"], observation))
         return observations
+
+    def get_observation_method(self, analysis):
+        """Returns the method if one exists of the particular
+        Observation
+        """
+        method = analysis.getMethod()
+
+        # method.Title() is mandatory
+        if method and method.getMethodID():
+            return {
+                "coding": [{
+                    "system": SNOMED_CODING_SYSTEM,
+                    "code": method.getMethodID(),
+                    "display": method.Title(),
+                }]
+            }
+        return None
 
     def get_observation(self, analysis):
         """Returns a dict that represents a FHIR Observation counterpart of the
@@ -217,8 +241,15 @@ class NotifyAdapter(object):
         if not ordered_test:
             # Although not initially requested, we also report this analysis
             # and its result back to Tamanu as an Observation!
-            ordered_test = {"coding": []}
-
+            keyword = analysis.getKeyword()
+            name = api.get_title(analysis)
+            display = "%s | %s" % (keyword, name)
+            coding =  {
+                "code": keyword,
+                "system": SENAITE_TESTS_CODING_SYSTEM,
+                "display": display
+            }
+            ordered_test = {"coding": [coding]}
         # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
         status = api.get_review_status(analysis)
         status = dict(ANALYSIS_STATUSES).get(status, "partial")
@@ -243,6 +274,10 @@ class NotifyAdapter(object):
         performer = self.get_performer(analysis)
         if performer:
             observation["performer"] = performer
+
+        method = self.get_observation_method(analysis)
+        if method:
+            observation["method"] = method
 
         return observation
 
