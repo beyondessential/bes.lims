@@ -200,6 +200,12 @@ class NotifyAdapter(object):
             if not is_reportable(analysis):
                 # skip non-reportable samples
                 continue
+
+            # only report analyses that are either verified or published
+            status = api.get_review_status(analysis)
+            if status not in ["verified", "published"]:
+                continue
+
             # get the representation of the analysis as a FHIR Observation
             observation = self.get_observation(analysis)
             # append the observations
