@@ -187,7 +187,7 @@ class NotifyAdapter(object):
             "type": "transaction",
             "entry": entries
         }
-
+        import pdb; pdb.set_trace()
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
@@ -269,9 +269,9 @@ class NotifyAdapter(object):
                 "value": analysis.getResult(),
                 "unit": analysis.getUnit(),
             }
-            reference_range = self.get_reference_range(analysis)
-            if reference_range:
-                observation["referenceRange"] = reference_range
+        reference_range = self.get_reference_range(analysis)
+        if reference_range:
+            observation["referenceRange"] = reference_range
 
         # assign the person who verified the analysis (performer)
         performer = self.get_performer(analysis)
@@ -345,36 +345,45 @@ class NotifyAdapter(object):
         quantitative analysis.
         """
         # including this duplicated check in case function is reused
-        if analysis.getStringResult() or analysis.getResultOptions():
-            # qualitative not quantitative
-            return None
-        # Qualitative
         results_range = analysis.getResultsRange()
-
         if not results_range:
             return None
-        low = results_range.get('min')
-        high = results_range.get('max')
 
-        if not low and not high:
+        range_comment = results_range.get("rangecomment")
+        low = results_range.get("min")
+        high = results_range.get("max")
+
+        if not low and not high and not range_comment:
             return None
 
+        unit = analysis.getUnit()
         reference_range = {}
+
+        def make_quantity(value):
+            try:
+                quantity = {"value": float(value)}
+            except (TypeError, ValueError):
+                return None
+            if unit:
+                quantity.update({
+                    "unit": unit,
+                    "system": "http://unitsofmeasure.org",
+                    "code": unit,
+                })
+            return quantity
+
         if low:
-            reference_range['low'] = {
-                'value': float(low),
-                'unit': analysis.getUnit(),
-                'system': 'http://unitsofmeasure.org',
-                'code': analysis.getUnit(),
-            }
+            quantity = make_quantity(low)
+            if quantity:
+                reference_range["low"] = quantity
 
         if high:
-            reference_range['high'] = {
-                'value': float(high),
-                'unit': analysis.getUnit(),
-                'system': 'http://unitsofmeasure.org',
-                'code': analysis.getUnit(),
-            }
+            quantity = make_quantity(high)
+            if quantity:
+                reference_range["high"] = quantity
+
+        if range_comment:
+            reference_range["text"] = range_comment
 
         return [reference_range]
 
