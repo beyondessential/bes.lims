@@ -187,7 +187,6 @@ class NotifyAdapter(object):
             "type": "transaction",
             "entry": entries
         }
-        import pdb; pdb.set_trace()
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
