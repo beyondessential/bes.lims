@@ -346,6 +346,23 @@ class NotifyAdapter(object):
         result_type = analysis.getResultType()
         return result_type == "numeric"
 
+    def to_quantity(self, value, unit):
+        """Returns a representation of a quantity as a dict or None
+        """
+        if not api.is_floatable(value):
+            return None
+
+        quantity = {
+            "value": float(value),
+        }
+        if unit:
+            quantity.update({
+                "unit": unit,
+                "system": "http://unitsofmeasure.org",
+                "code": unit,
+            })
+        return quantity
+
     def get_reference_range(self, analysis):
         """This will return a FHIR Observation's reference range for a
         quantitative analysis.
@@ -357,47 +374,26 @@ class NotifyAdapter(object):
         if not results_range:
             return None
 
+        reference_range = {}
+        unit = analysis.getUnit()
+
+        low = results_range.get("min")
+        quantity = self.to_quantity(low, unit)
+        if quantity:
+            reference_range["low"] = quantity
+
+        high = results_range.get("max")
+        quantity = self.to_quantity(high, unit)
+        if quantity:
+            reference_range["high"] = quantity
 
         # TODO Toggle after Tamanu supports text for referenceRange
         range_comment = None
         # range_comment = results_range.get("rangecomment")
-
-        low = results_range.get("min")
-        high = results_range.get("max")
-
-        if not low and not high and not range_comment:
-            return None
-
-        unit = analysis.getUnit()
-        reference_range = {}
-
-        def make_quantity(value):
-            try:
-                quantity = {"value": float(value)}
-            except (TypeError, ValueError):
-                return None
-            if unit:
-                quantity.update({
-                    "unit": unit,
-                    "system": "http://unitsofmeasure.org",
-                    "code": unit,
-                })
-            return quantity
-
-        if low:
-            quantity = make_quantity(low)
-            if quantity:
-                reference_range["low"] = quantity
-
-        if high:
-            quantity = make_quantity(high)
-            if quantity:
-                reference_range["high"] = quantity
-
         if range_comment:
             reference_range["text"] = range_comment
 
-        return [reference_range]
+        return [reference_range] if reference_range else None
 
 
 def can_notify(sample):
