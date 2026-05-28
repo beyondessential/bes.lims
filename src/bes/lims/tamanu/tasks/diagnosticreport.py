@@ -260,14 +260,14 @@ class NotifyAdapter(object):
         }
 
         # assign the (formatted) result
-        formatted_result = analysis.getFormattedResult(html=False)
-        if self.is_quantitative(analysis):
+        result = analysis.getFormattedResult(html=False)
+        if self.is_quantitative(analysis) and api.is_floatable(result):
             observation["valueQuantity"] = {
-                "value": formatted_result,
+                "value": result,
                 "unit": analysis.getUnit(),
             }
         else:
-            observation["valueString"] = formatted_result
+            observation["valueString"] = result
 
         reference_range = self.get_reference_range(analysis)
         if reference_range:
