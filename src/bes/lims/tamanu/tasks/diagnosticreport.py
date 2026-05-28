@@ -339,11 +339,20 @@ class NotifyAdapter(object):
             }
         }]
 
+    def is_quantitative(self, analysis):
+        """Returns whether the result for the analysis passed-in is expected to
+        be quantitative or not
+        """
+        result_type = analysis.getResultType()
+        return result_type == "numeric"
+
     def get_reference_range(self, analysis):
         """This will return a FHIR Observation's reference range for a
         quantitative analysis.
         """
-        # including this duplicated check in case function is reused
+        if not self.is_quantitative(analysis):
+            return None
+
         results_range = analysis.getResultsRange()
         if not results_range:
             return None
