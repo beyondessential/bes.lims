@@ -258,16 +258,17 @@ class NotifyAdapter(object):
             "status": status,
             "code": ordered_test,
         }
-        # quantitative / qualitative
-        if analysis.getStringResult() or analysis.getResultOptions():
-            # qualitative
-            observation["valueString"] = analysis.getFormattedResult()
-        else:
-            # quantitative
+
+        # assign the (formatted) result
+        formatted_result = analysis.getFormattedResult()
+        if self.is_quantitative(analysis):
             observation["valueQuantity"] = {
-                "value": analysis.getResult(),
+                "value": formatted_result,
                 "unit": analysis.getUnit(),
             }
+        else:
+            observation["valueString"] = formatted_result
+
         reference_range = self.get_reference_range(analysis)
         if reference_range:
             observation["referenceRange"] = reference_range
