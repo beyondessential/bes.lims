@@ -260,7 +260,7 @@ class NotifyAdapter(object):
         }
 
         # assign the (formatted) result
-        formatted_result = analysis.getFormattedResult()
+        formatted_result = analysis.getFormattedResult(html=False)
         if self.is_quantitative(analysis):
             observation["valueQuantity"] = {
                 "value": formatted_result,
