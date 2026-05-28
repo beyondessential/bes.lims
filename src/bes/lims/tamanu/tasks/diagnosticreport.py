@@ -357,7 +357,11 @@ class NotifyAdapter(object):
         if not results_range:
             return None
 
-        range_comment = results_range.get("rangecomment")
+
+        # TODO Toggle after Tamanu supports text for referenceRange
+        range_comment = None
+        # range_comment = results_range.get("rangecomment")
+
         low = results_range.get("min")
         high = results_range.get("max")
 
