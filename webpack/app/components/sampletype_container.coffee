@@ -38,7 +38,10 @@ class SampleTypeContainerController
       bottles = document.querySelector("div[data-fieldname='Bottles']")
       if bottles
         el = document.querySelector "input[id='Volume']"
-        el.setAttribute("readonly", "readonly")
+        if el and @uses_automatic_bottle_volume()
+          el.setAttribute("readonly", "readonly")
+        else if el
+          el.removeAttribute "readonly"
 
     return @
 
@@ -116,6 +119,8 @@ class SampleTypeContainerController
     # Get the index of the column (each column represents a Sample)
     sample_idx = @get_sample_index el
 
+    return unless @uses_automatic_bottle_volume sample_idx
+
     # Recalculate the volume of the bottles and sample
     @calculate_volume sample_idx
 
@@ -130,6 +135,8 @@ class SampleTypeContainerController
 
     # Get the index of the column (each column represents a Sample)
     sample_idx = @get_sample_index el
+
+    return unless @uses_automatic_bottle_volume sample_idx
 
     # Recalculate the volume of the bottles and sample
     @calculate_volume sample_idx
@@ -187,9 +194,10 @@ class SampleTypeContainerController
         @toggle_container_visibility sample_index, show_container
 
         # Enable/Disable Volume depending on the visibility of Container
-        @set_volume_readonly sample_index, not show_container
+        automatic_volume = not show_container and @uses_automatic_bottle_volume sample_index
+        @set_volume_readonly sample_index, automatic_volume
 
-        if not show_container
+        if automatic_volume
           # Volume field is calculated automatically
           @calculate_volume sample_index
 
@@ -203,6 +211,17 @@ class SampleTypeContainerController
     @set_visible "Container", sample_index, show_container
     @set_visible "Bottles", sample_index, not show_container
 
+
+  ###
+  Returns whether bottle volume is auto-calculated for the current sample
+  ###
+  uses_automatic_bottle_volume: (sample_index) =>
+    selector = "#Bottles-Volume-0"
+    if sample_index
+      selector = "#Bottles-#{ sample_index }-Volume-0"
+    el = document.querySelector selector
+    return false unless el
+    return el.hasAttribute "readonly"
 
   ###
   Sets the readonly mode of the Volume field
@@ -224,6 +243,7 @@ class SampleTypeContainerController
   ###
   calculate_volume: (sample_index) =>
     @debug "calculate_volume:sample_index=#{ sample_index }"
+    return unless @uses_automatic_bottle_volume sample_index
     total_volume = 0
 
     # Walk-through all record rows from Bottles Widget
