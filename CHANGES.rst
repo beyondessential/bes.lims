@@ -5,6 +5,8 @@ Changelog
 -----
 
 - #137 Port BaseAnalysis ResultOptions schema to bes.lims
+- #136 Add ProfileAnalyses column to Analysis Profiles listing
+- #148 Only send verified or published analyses to Tamanu
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
 - #141 Tamanu integration: handle new tests added after ServiceRequest received
 - #140 Including the method where available in the Observation results to Tamanu
