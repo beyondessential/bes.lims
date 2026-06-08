@@ -5,6 +5,8 @@ Changelog
 -----
 
 - #144 Adding reference results to Tamanu FHIR Observations
+- #137 Port BaseAnalysis ResultOptions schema to bes.lims
+- #152 Compatibility with core#2810 (Laboratory to DX)
 - #136 Add ProfileAnalyses column to Analysis Profiles listing
 - #148 Only send verified or published analyses to Tamanu
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
