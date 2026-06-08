@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #152 Compatibility with core#2810 (Laboratory to DX)
 - #136 Add ProfileAnalyses column to Analysis Profiles listing
 - #148 Only send verified or published analyses to Tamanu
 - #142 Replace Tamanu tasks queue PersistentList with OOBTree
