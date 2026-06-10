@@ -175,3 +175,18 @@ def read_csv(infile):
 
     # Build a list of row dicts
     return [dict(zip(header, row)) for row in raw_rows]
+
+
+def get_laboratory():
+    """Returns the laboratory object
+    """
+    # Laboratory was migrated to Dexterity in senaite.core 2.7 and
+    # now lives under `portal.setup` instead of `portal.bika_setup`.
+    senaite_setup = api.get_senaite_setup()
+    lab = senaite_setup.get("laboratory")
+    if lab:
+        return lab
+
+    # Fallback to pre core#2810 and core#2821, before the migration to DX
+    setup = api.get_setup()
+    return setup.laboratory

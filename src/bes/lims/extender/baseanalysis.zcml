@@ -1,0 +1,9 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Schema modifier for Service/Analysis-like types -->
+  <adapter
+      name="bes.lims.baseanalysis.schemamodifier"
+      provides="archetypes.schemaextender.interfaces.ISchemaModifier"
+      factory=".baseanalysis.BaseAnalysisSchemaModifier" />
+
+</configure>
