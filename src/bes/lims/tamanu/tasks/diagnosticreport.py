@@ -187,7 +187,6 @@ class NotifyAdapter(object):
             "type": "transaction",
             "entry": entries
         }
-
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
@@ -259,16 +258,20 @@ class NotifyAdapter(object):
             "status": status,
             "code": ordered_test,
         }
-        # quantitative / qualitative
-        if analysis.getStringResult() or analysis.getResultOptions():
-            # qualitative
-            observation["valueString"] = analysis.getFormattedResult()
-        else:
-            # quantitative
+
+        # assign the (formatted) result
+        result = analysis.getFormattedResult(html=False)
+        if self.is_quantitative(analysis) and api.is_floatable(result):
             observation["valueQuantity"] = {
-                "value": analysis.getResult(),
+                "value": result,
                 "unit": analysis.getUnit(),
             }
+        else:
+            observation["valueString"] = result
+
+        reference_range = self.get_reference_range(analysis)
+        if reference_range:
+            observation["referenceRange"] = reference_range
 
         # assign the person who verified the analysis (performer)
         performer = self.get_performer(analysis)
@@ -336,6 +339,62 @@ class NotifyAdapter(object):
                 "value": user_id,
             }
         }]
+
+    def is_quantitative(self, analysis):
+        """Returns whether the result for the analysis passed-in is expected to
+        be quantitative or not
+        """
+        result_type = analysis.getResultType()
+        return result_type == "numeric"
+
+    def to_quantity(self, value, unit):
+        """Returns a representation of a quantity as a dict or None
+        """
+        if not api.is_floatable(value):
+            return None
+
+        quantity = {
+            "value": float(value),
+        }
+        if unit:
+            quantity.update({
+                "unit": unit,
+                "system": "http://unitsofmeasure.org",
+                "code": unit,
+            })
+        return quantity
+
+    def get_reference_range(self, analysis):
+        """This will return a FHIR Observation's reference range for a
+        quantitative analysis.
+        """
+        if not self.is_quantitative(analysis):
+            return None
+
+        results_range = analysis.getResultsRange()
+        if not results_range:
+            return None
+
+        reference_range = {}
+        unit = analysis.getUnit()
+
+        low = results_range.get("min")
+        quantity = self.to_quantity(low, unit)
+        if quantity:
+            reference_range["low"] = quantity
+
+        high = results_range.get("max")
+        quantity = self.to_quantity(high, unit)
+        if quantity:
+            reference_range["high"] = quantity
+
+        # TODO Toggle after Tamanu supports text for referenceRange
+        range_comment = None
+        # range_comment = results_range.get("rangecomment")
+        if range_comment:
+            reference_range["text"] = range_comment
+
+        return [reference_range] if reference_range else None
 
 
 def can_notify(sample):
