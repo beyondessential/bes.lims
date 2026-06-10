@@ -46,6 +46,7 @@ from bika.lims.utils.analysisrequest import \
     create_analysisrequest as create_sample
 from bika.lims.workflow import doActionFor
 from requests import ConnectionError
+from requests import Timeout
 from senaite.core.api import dtime
 from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import CONTACT_CATALOG
@@ -888,14 +889,18 @@ def main(app):
 
     # Start a session with Tamanu server
     session = TamanuSession(host)
-    logged = session.login(user, password)
+    try:
+        logged = session.login(user, password)
+    except (ConnectionError, Timeout) as e:
+        # a stalled/unreachable server must not hang the run; exit cleanly
+        connection_error(str(e))
     if not logged:
         error("Cannot login, wrong credentials")
 
     try:
         # Call the sync function
         sync_func(session, since)
-    except ConnectionError as e:
+    except (ConnectionError, Timeout) as e:
         connection_error(str(e))
 
     if args.dry:
