@@ -59,7 +59,8 @@ SEND_OBSERVATIONS = True
 SAMPLE_STATUSES = (
     # mapping between sample status and tamanu statuses
     ("sample_received", "partial"),
-    ("to_be_verified", "preliminary"),
+    # Do not notify Tamanu when sample transitions to 'to_be_verified'
+    # ("to_be_verified", "preliminary"),
     ("published", "final"),
     ("invalid", "entered-in-error"),
     # Tamanu is notified back with the rejection report (Attachment) instead of
