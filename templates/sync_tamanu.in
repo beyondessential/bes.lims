@@ -1,4 +1,24 @@
 #!/usr/bin/env bash
+#
+# Tamanu sync wrapper.
+#
+#   * One lock for the whole run (no interleave window between steps).
+#   * A held lock is surfaced (exit 75 + log line), not swallowed as success.
+#   * Each step has a hard wall-clock cap via `timeout`, so a hung request is
+#     reaped, the lock is released, and the next cron cycle self-recovers.
+#   * `set -o pipefail` propagates the real step exit code through the `tee`
+#     pipe (a bare `... |& tee` always returns tee's 0), so an external monitor
+#     (e.g. cronitor exec) reflects failures instead of false greens.
+#
+# NOTE: the per-step `timeout` is the safety net. The clean fix is the HTTP
+# timeouts in bes.lims/tamanu/session.py, which let the script exit gracefully
+# via its own ConnectionError handler instead of being SIGKILLed mid-run.
+#
+# Bash refs use the plain $NAME form on purpose. The brace form (dollar +
+# braces) collides with buildout's section:option substitution that renders
+# this template, so it is avoided throughout.
+
+set -uo pipefail
 
 SINCE_SERVICE_REQUEST=${sync_tamanu:sample_since}
 SINCE_PATIENTS=${sync_tamanu:patients_since}
@@ -6,16 +26,44 @@ SINCE_PATIENTS=${sync_tamanu:patients_since}
 BIN_DIR=${buildout:directory}/bin
 SRC_DIR=${buildout:directory}/src/bes.lims/scripts
 ZEO_DIR=${buildout:var-dir}/${sync_tamanu:zeoclient}
-FLOCK="flock -n /tmp/sync_tamanu.lock"
+ZEOCLIENT=${sync_tamanu:zeoclient}
+LOCK=/tmp/sync_tamanu.lock
 
 # Tamanu host and credentials are read from the control panel
 # (@@tamanu-controlpanel). Configure them there before running this script.
 
+# Acquire the lock once for the whole run. A previous run still holding it is
+# itself the signal that something overran/wedged -> surface it (non-zero).
+exec 9>"$LOCK" || exit 3
+if ! flock -n 9; then
+    echo "$(date -Is) [SKIP] previous sync still holds the lock" \
+        | tee -a "$ZEO_DIR/event.log"
+    exit 75
+fi
+
+# Per-step wall-clock cap (SIGTERM, then SIGKILL after 30s if ignored).
+# Budget sums well under the cron cadence so a stuck step is always reaped
+# before the next run fires (no pile-ups, lock always freed).
+status=0
+
 # Synchronize service requests
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+timeout --signal=TERM --kill-after=30s 100s \
+    "$BIN_DIR/$ZEOCLIENT" run "$SRC_DIR/sync_tamanu.py" \
+    -r ServiceRequest -s "$SINCE_SERVICE_REQUEST" -c "$ZEO_DIR" 2>&1 \
+    | tee -a "$ZEO_DIR/event.log"
+rc=$?; [ "$rc" -ne 0 ] && status=$rc
 
 # Synchronize patients
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+timeout --signal=TERM --kill-after=30s 100s \
+    "$BIN_DIR/$ZEOCLIENT" run "$SRC_DIR/sync_tamanu.py" \
+    -r Patient -s "$SINCE_PATIENTS" -c "$ZEO_DIR" 2>&1 \
+    | tee -a "$ZEO_DIR/event.log"
+rc=$?; [ "$rc" -ne 0 ] && status=$rc
 
 # Run Tamanu specific tasks
-$FLOCK $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log
+timeout --signal=TERM --kill-after=30s 45s \
+    "$BIN_DIR/$ZEOCLIENT" run "$SRC_DIR/exec_tamanu_tasks.py" -m 10 2>&1 \
+    | tee -a "$ZEO_DIR/event.log"
+rc=$?; [ "$rc" -ne 0 ] && status=$rc
+
+exit "$status"
