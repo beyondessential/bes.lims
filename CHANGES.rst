@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #156 Prevent the Tamanu sync from hanging indefinitely
 - #144 Adding reference results to Tamanu FHIR Observations
 - #137 Port BaseAnalysis ResultOptions schema to bes.lims
 - #152 Compatibility with core#2810 (Laboratory to DX)
