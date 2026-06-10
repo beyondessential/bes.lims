@@ -24,6 +24,12 @@ TAMANU_STORAGE = "senaite.tamanu.storage"
 
 TAMANU_TASKS_QUEUE = "senaite.tamanu.queue.storage"
 
+# Dead-letter store for tasks that exhausted their retries. Keeps the failed
+# task id, last error and attempt count so the failure is visible (alerting)
+# and the task can be inspected/re-injected after the root cause is fixed,
+# instead of silently blocking the queue head forever.
+TAMANU_TASKS_DEADLETTER = "senaite.tamanu.queue.deadletter"
+
 TAMANU_SEXES = (
     ("male", "m"),
     ("female", "f"),
