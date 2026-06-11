@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #156 Prevent the Tamanu sync from hanging indefinitely
 - #159 Use FHIR comparator for out-of-detection-limit results sent to Tamanu
 - #155 Disable notification for sample status transition to 'to_be_verified'
 - #144 Adding reference results to Tamanu FHIR Observations

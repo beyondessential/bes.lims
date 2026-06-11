@@ -43,20 +43,33 @@ HEADERS = (
     ("Content-Type", "application/json"),
 )
 
+# Default (connect, read) timeouts in seconds for every Tamanu HTTP call.
+# Without a timeout, `requests` blocks forever on a stalled socket (server
+# overloaded, half-open connection, no RST), which hangs the whole sync run.
+DEFAULT_TIMEOUT = (10, 60)
+
+# Tighter (connect, read) timeout for login. It is the first call of every
+# run and the gate for everything after it, so we fail fast rather than let a
+# stalled auth request block the run indefinitely.
+LOGIN_TIMEOUT = (10, 30)
+
 
 class TamanuSession(object):
 
     token = "unk"
     _auth = None
 
-    def __init__(self, host):
+    def __init__(self, host, timeout=DEFAULT_TIMEOUT):
         self.host = host
+        # (connect, read) timeout applied to every request unless the caller
+        # passes an explicit `timeout` kwarg to get()/post()
+        self.timeout = timeout
 
     def login(self, email, password):
         # TODO remove _auth
         self._auth = (email, password)
         auth = dict(email=email, password=password)
-        resp = self.post("login", payload=auth)
+        resp = self.post("login", payload=auth, timeout=LOGIN_TIMEOUT)
         self.token = resp.json().get("token")
         if self.token:
             return True
@@ -93,6 +106,9 @@ class TamanuSession(object):
 
         kwargs["headers"] = headers
 
+        # bound the request so a stalled socket cannot block the run forever
+        kwargs.setdefault("timeout", self.timeout)
+
         # Send the POST request
         logger.info("[POST] {}".format(url))
         logger.debug("[POST PAYLOAD] {}".format(repr(payload)))
@@ -116,6 +132,9 @@ class TamanuSession(object):
         # inject the auth token
         headers["Authorization"] = "Bearer {}".format(self.token)
         kwargs["headers"] = headers
+
+        # bound the request so a stalled socket cannot block the run forever
+        kwargs.setdefault("timeout", self.timeout)
 
         # do the GET request
         logger.info("[GET] {} (params={})".format(url, repr(params)))
