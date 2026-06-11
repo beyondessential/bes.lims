@@ -259,15 +259,21 @@ class NotifyAdapter(object):
             "code": ordered_test,
         }
 
-        # assign the (formatted) result
-        result = analysis.getFormattedResult(html=False)
-        if self.is_quantitative(analysis) and api.is_floatable(result):
-            observation["valueQuantity"] = {
-                "value": result,
-                "unit": analysis.getUnit(),
-            }
+        # assign the (formatted) result; if the analysis is excluded from
+        # integration, send a placeholder so the recipient knows to check
+        # the PDF report for the actual result
+        service = analysis.getAnalysisService()
+        if service.getExcludeFromIntegration():
+            observation["valueString"] = "Refer to PDF report"
         else:
-            observation["valueString"] = result
+            result = analysis.getFormattedResult(html=False)
+            if self.is_quantitative(analysis) and api.is_floatable(result):
+                observation["valueQuantity"] = {
+                    "value": result,
+                    "unit": analysis.getUnit(),
+                }
+            else:
+                observation["valueString"] = result
 
         reference_range = self.get_reference_range(analysis)
         if reference_range:

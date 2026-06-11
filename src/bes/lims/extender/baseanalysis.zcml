@@ -1,9 +1,30 @@
-<configure xmlns="http://namespaces.zope.org/zope">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey">
 
-  <!-- Schema modifier for Service/Analysis-like types -->
+  <!-- Schema extender for Service/Analysis-like types (adds new fields) -->
+  <adapter
+      name="bes.lims.baseanalysis.schemaextender"
+      provides="archetypes.schemaextender.interfaces.ISchemaExtender"
+      factory=".baseanalysis.BaseAnalysisSchemaExtender" />
+
+  <!-- Schema modifier for Service/Analysis-like types (modifies existing fields) -->
   <adapter
       name="bes.lims.baseanalysis.schemamodifier"
       provides="archetypes.schemaextender.interfaces.ISchemaModifier"
       factory=".baseanalysis.BaseAnalysisSchemaModifier" />
+
+  <!-- Getters/Setters -->
+  <monkey:patch
+      class="bika.lims.content.abstractbaseanalysis.AbstractBaseAnalysis"
+      original="getExcludeFromIntegration"
+      ignoreOriginal="True"
+      replacement=".baseanalysis.getExcludeFromIntegration" />
+
+  <monkey:patch
+      class="bika.lims.content.abstractbaseanalysis.AbstractBaseAnalysis"
+      original="setExcludeFromIntegration"
+      ignoreOriginal="True"
+      replacement=".baseanalysis.setExcludeFromIntegration" />
 
 </configure>
