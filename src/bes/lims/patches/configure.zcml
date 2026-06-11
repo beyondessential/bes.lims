@@ -1,7 +1,6 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
   <!-- Package includes -->
-  <include package=".dynamicresultsrange"/>
   <include package=".beka"/>
   <include package=".vocabularies"/>
 
