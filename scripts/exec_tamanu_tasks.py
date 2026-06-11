@@ -10,6 +10,7 @@ from bes.lims.scripts import setup_script_environment
 from bes.lims.tamanu import logger
 from bes.lims.tamanu.tasks import queue
 from bika.lims import api
+from ZODB.POSException import ConflictError
 
 
 __doc__ = """
@@ -82,19 +83,42 @@ def main(app):
     # max number of tasks to process
     max_tasks = int(args.max_tasks)
     for num in range(0, max_tasks):
-        task = queue.get()
-        if not task:
+        task_id, task = queue.get()
+
+        # no more tasks ready to be processed
+        if not task_id:
             break
+
+        # head task popped but unresolvable (invalid id or context gone);
+        # commit the removal so it stops blocking the queue and move on
+        if task is None:
+            logger.warning("Dropping unresolvable task: %s" % task_id)
+            transaction.commit()
+            continue
 
         task_name = task.__class__.__name__
         logger.info("%s: %s ..." % (task_name, api.get_path(task.context)))
 
-        # try to process the task
-        task.process()
-        # do a transaction savepoint
-        transaction.savepoint(optimistic=True)
+        try:
+            # process the task and persist its removal + side effects together
+            task.process()
+            transaction.commit()
+        except ConflictError:
+            # transient write contention: leave the task queued untouched and
+            # let the next run retry it. Do not penalise the attempt count.
+            transaction.abort()
+            logger.warning(
+                "ConflictError on task %s; will retry next run" % task_id)
+            break
+        except Exception as e:
+            # a failing task must not abort the whole batch nor stay at the
+            # head forever. Discard its partial writes, then retry-with-backoff
+            # or dead-letter it in a fresh transaction.
+            logger.exception("Error processing task %s" % task_id)
+            transaction.abort()
+            queue.fail(task_id, error=repr(e))
+            transaction.commit()
 
-    transaction.commit()
     logger.info("Executing Tamanu-specific tasks [DONE]")
     logger.info("-" * 79)
 
