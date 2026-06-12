@@ -43,6 +43,9 @@ HEADERS = (
     ("Content-Type", "application/json"),
 )
 
+# request timeout in seconds (connect, read)
+TIMEOUT = (10, 120)
+
 
 class TamanuSession(object):
 
@@ -83,6 +86,9 @@ class TamanuSession(object):
         # raise on error?
         raise_for_status = kwargs.pop("raise_for_status", False)
 
+        # timeout
+        timeout = kwargs.pop("timeout", TIMEOUT)
+
         # add the default headers
         headers = kwargs.pop("headers", {})
         headers.update(dict(HEADERS))
@@ -96,7 +102,8 @@ class TamanuSession(object):
         # Send the POST request
         logger.info("[POST] {}".format(url))
         logger.debug("[POST PAYLOAD] {}".format(repr(payload)))
-        resp = requests.post(url, data=json.dumps(payload), **kwargs)
+        resp = requests.post(url, data=json.dumps(payload), timeout=timeout,
+                             **kwargs)
         if raise_for_status:
             resp.raise_for_status()
         code = resp.status_code
@@ -109,6 +116,12 @@ class TamanuSession(object):
     def get(self, endpoint, params=None, **kwargs):
         url = self.get_url(endpoint)
 
+        # raise on error?
+        raise_for_status = kwargs.pop("raise_for_status", False)
+
+        # timeout
+        timeout = kwargs.pop("timeout", TIMEOUT)
+
         # add the default headers
         headers = kwargs.pop("headers", {})
         headers.update(dict(HEADERS))
@@ -119,10 +132,16 @@ class TamanuSession(object):
 
         # do the GET request
         logger.info("[GET] {} (params={})".format(url, repr(params)))
-        resp = requests.get(url, params=params, **kwargs)
+        resp = requests.get(url, params=params, timeout=timeout, **kwargs)
+        if raise_for_status:
+            resp.raise_for_status()
 
         # return the response
-        return resp.json() or {}
+        try:
+            return resp.json() or {}
+        except ValueError:
+            logger.error("[ERROR {}]: {}".format(resp.status_code, resp.content))
+            return {}
 
     def get_resource_by_uid(self, resource_type, uid):
         endpoint = "{}/{}".format(resource_type, uid)
