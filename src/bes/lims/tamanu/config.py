@@ -53,13 +53,14 @@ SAMPLE_FINAL_STATUSES = (
     "invalid",
 )
 
-# Whether observations have to be included in DiagnosticReport
-SEND_OBSERVATIONS = False
+# Whether observations have to be included with DiagnosticReport Bundle
+SEND_OBSERVATIONS = True
 
 SAMPLE_STATUSES = (
     # mapping between sample status and tamanu statuses
     ("sample_received", "partial"),
-    ("to_be_verified", "preliminary"),
+    # Do not notify Tamanu when sample transitions to 'to_be_verified'
+    # ("to_be_verified", "preliminary"),
     ("published", "final"),
     ("invalid", "entered-in-error"),
     # Tamanu is notified back with the rejection report (Attachment) instead of
@@ -70,6 +71,12 @@ SAMPLE_STATUSES = (
 
 ANALYSIS_STATUSES = (
     # mapping between analyses status and tamanu statuses
+    ("registered", "partial"),
+    ("cancelled", "cancelled"),
+    ("unassigned", "partial"),
+    ("assigned", "partial"),
+    ("retracted", "cancelled"),
+    ("rejected", "cancelled"),
     ("to_be_verified", "partial"),
     ("verified", "preliminary"),
     ("published", "final"),

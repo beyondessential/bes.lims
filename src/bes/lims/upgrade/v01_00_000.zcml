@@ -3,6 +3,39 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Migrate Tamanu tasks queue to OOBTree"
+      description="
+        Replaces the PersistentList container used as the Tamanu tasks queue
+        with an OOBTree. The previous container had no conflict resolver, so
+        concurrent producers (e.g. publishing samples on different clients)
+        generated unresolvable ConflictErrors on the portal annotation.
+      "
+      source="1019"
+      destination="1020"
+      handler=".v01_00_000.migrate_tamanu_queue_to_btree"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
+      title="Add Tamanu host and credentials to control panel"
+      description="
+        Registers the new host, email and password fields of the Tamanu
+        control panel so they can be configured centrally, replacing the
+        per-object host and auth that used to be kept in annotation storage.
+      "
+      source="1018"
+      destination="1019"
+      handler=".v01_00_000.setup_tamanu_host_credentials"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
+      title="Setup Tamanu control panel"
+      description="Setup the Tamanu's synchronization configuration view"
+      source="1017"
+      destination="1018"
+      handler=".v01_00_000.setup_tamanu_controlpanel"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Fix cannot search by MRN or patient name in samples listing"
       description="Reindex listing_searchable_text from sample catalog"
       source="1016"

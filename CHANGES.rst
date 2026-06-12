@@ -5,6 +5,20 @@ Changelog
 -----
 
 - #125 Fix Tamanu sync freezing due to missing HTTP timeouts
+- #155 Disable notification for sample status transition to 'to_be_verified'
+- #144 Adding reference results to Tamanu FHIR Observations
+- #137 Port BaseAnalysis ResultOptions schema to bes.lims
+- #152 Compatibility with core#2810 (Laboratory to DX)
+- #136 Add ProfileAnalyses column to Analysis Profiles listing
+- #148 Only send verified or published analyses to Tamanu
+- #142 Replace Tamanu tasks queue PersistentList with OOBTree
+- #141 Tamanu integration: handle new tests added after ServiceRequest received
+- #140 Including the method where available in the Observation results to Tamanu
+- #134 Include the name of the verifier when sending results to Tamanu
+- #131 Push FHIR Observations to Tamanu using a FHIR Transaction Bundle
+- #133 Add microbiology statistic reports for contamination, pathogen, AST panel, and sample rejection
+- #132 Centralize Tamanu host and credentials in the control panel
+- #126 Disable automatic client creation on Tamanu sync by default
 - #124 Add result variables and improve result formatting to Tupaia export file
 - #119 Fix empty pdf when notifying DiagnosticReport to Tamanu
 - #116 Compatibility with core#2831 (Migrate ARReport to Dexterity)

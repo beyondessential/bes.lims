@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-HOST=${sync_tamanu:host}
-CREDS=${sync_tamanu:credentials}
-
 SINCE_SERVICE_REQUEST=${sync_tamanu:sample_since}
 SINCE_PATIENTS=${sync_tamanu:patients_since}
 

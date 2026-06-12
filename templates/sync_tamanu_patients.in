@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-HOST=${buildout:tamanu-host}
-CREDS=${buildout:tamanu-user}
-
 BASE=${buildout:directory}
 BIN_DIR=${buildout:directory}/bin
 SRC_DIR=${buildout:directory}/src
@@ -15,4 +12,7 @@ if [ -n "$1" ]; then
   SINCE=$1
 fi
 
-$BIN_DIR/client_reserved run $SRC -th $HOST -tu $CREDS -r Patient -s $SINCE -c $CACHE_DIR
+# Tamanu host and credentials are read from the control panel
+# (@@tamanu-controlpanel). Configure them there before running this script.
+
+$BIN_DIR/client_reserved run $SRC -r Patient -s $SINCE -c $CACHE_DIR
