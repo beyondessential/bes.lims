@@ -4,8 +4,7 @@ Changelog
 1.0.0
 -----
 
-- #159 Use FHIR comparator for out-of-detection-limit results sent to Tamanu
-- #155 Disable notification for sample status transition to 'to_be_verified'
+- # 155 Disable notification for sample status transition to 'to_be_verified'
 - #144 Adding reference results to Tamanu FHIR Observations
 - #137 Port BaseAnalysis ResultOptions schema to bes.lims
 - #152 Compatibility with core#2810 (Laboratory to DX)

@@ -261,25 +261,11 @@ class NotifyAdapter(object):
 
         # assign the (formatted) result
         result = analysis.getFormattedResult(html=False)
-        if self.is_quantitative(analysis):
-            if analysis.isBelowLowerDetectionLimit():
-                observation["valueQuantity"] = self.to_quantity(
-                    analysis.getLowerDetectionLimit(),
-                    analysis.getUnit(),
-                    "<"
-                )
-            elif analysis.isAboveUpperDetectionLimit():
-                observation["valueQuantity"] = self.to_quantity(
-                    analysis.getUpperDetectionLimit(),
-                    analysis.getUnit(),
-                    ">"
-                )
-            elif api.is_floatable(result):
-                observation["valueQuantity"] = self.to_quantity(
-                    result, analysis.getUnit(), None
-                )
-            else:
-                observation["valueString"] = result
+        if self.is_quantitative(analysis) and api.is_floatable(result):
+            observation["valueQuantity"] = {
+                "value": result,
+                "unit": analysis.getUnit(),
+            }
         else:
             observation["valueString"] = result
 
@@ -361,7 +347,7 @@ class NotifyAdapter(object):
         result_type = analysis.getResultType()
         return result_type == "numeric"
 
-    def to_quantity(self, value, unit, operator=None):
+    def to_quantity(self, value, unit):
         """Returns a representation of a quantity as a dict or None
         """
         if not api.is_floatable(value):
@@ -376,8 +362,6 @@ class NotifyAdapter(object):
                 "system": "http://unitsofmeasure.org",
                 "code": unit,
             })
-        if operator in ("<", "<=", ">", ">="):
-            quantity["comparator"] = operator
         return quantity
 
     def get_reference_range(self, analysis):
