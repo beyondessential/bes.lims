@@ -13,10 +13,10 @@ FLOCK="flock -n /tmp/sync_tamanu.lock"
 TIMEOUT="timeout 840"
 
 # Synchronize service requests
-$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r ServiceRequest -s $SINCE_SERVICE_REQUEST -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Synchronize patients
-$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -th $HOST -tu $CREDS -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
+$FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/sync_tamanu.py -r Patient -s $SINCE_PATIENTS -c $ZEO_DIR |& tee -a $ZEO_DIR/event.log
 
 # Run Tamanu specific tasks
 $FLOCK $TIMEOUT $BIN_DIR/${sync_tamanu:zeoclient} run $SRC_DIR/exec_tamanu_tasks.py -m 10 |& tee -a $ZEO_DIR/event.log
