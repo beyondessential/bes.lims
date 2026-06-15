@@ -259,15 +259,9 @@ class NotifyAdapter(object):
             "code": ordered_test,
         }
 
-        # assign the (formatted) result
-        result = analysis.getFormattedResult(html=False)
-        if self.is_quantitative(analysis) and api.is_floatable(result):
-            observation["valueQuantity"] = {
-                "value": result,
-                "unit": analysis.getUnit(),
-            }
-        else:
-            observation["valueString"] = result
+        # get the observation's result dict
+        result = self.get_observation_result(analysis)
+        observation.update(result)
 
         reference_range = self.get_reference_range(analysis)
         if reference_range:
@@ -283,6 +277,36 @@ class NotifyAdapter(object):
             observation["method"] = method
 
         return observation
+
+    def get_observation_result(self, analysis):
+        # assign the (formatted) result; if the analysis is excluded from
+        # integration, send a placeholder so the recipient knows to check
+        # the PDF report for the actual result
+        if analysis.getExcludeFromIntegration():
+            return {"valueString": "Refer to PDF report"}
+
+        result = analysis.getFormattedResult(html=False)
+        if not self.is_quantitative(analysis):
+            return {"valueString": result}
+
+        if analysis.isBelowLowerDetectionLimit():
+            ldl = analysis.getLowerDetectionLimit()
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(ldl, unit, operator="<")
+            return {"valueQuantity": quantity}
+
+        if analysis.isAboveUpperDetectionLimit():
+            udl = analysis.getUpperDetectionLimit()
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(udl, unit, operator=">")
+            return {"valueQuantity": quantity}
+
+        if api.is_floatable(result):
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(result, unit)
+            return {"valueQuantity": quantity}
+
+        return {"valueString": result}
 
     def get_order_detail(self, analysis):
         """Returns the orderDetail of the initial ServiceRequest that
@@ -347,7 +371,7 @@ class NotifyAdapter(object):
         result_type = analysis.getResultType()
         return result_type == "numeric"
 
-    def to_quantity(self, value, unit):
+    def to_quantity(self, value, unit, operator=None):
         """Returns a representation of a quantity as a dict or None
         """
         if not api.is_floatable(value):
@@ -362,6 +386,8 @@ class NotifyAdapter(object):
                 "system": "http://unitsofmeasure.org",
                 "code": unit,
             })
+        if operator in ("<", "<=", ">", ">="):
+            quantity["comparator"] = operator
         return quantity
 
     def get_reference_range(self, analysis):
