@@ -262,8 +262,7 @@ class NotifyAdapter(object):
         # assign the (formatted) result; if the analysis is excluded from
         # integration, send a placeholder so the recipient knows to check
         # the PDF report for the actual result
-        service = analysis.getAnalysisService()
-        if service.getExcludeFromIntegration():
+        if analysis.getExcludeFromIntegration():
             observation["valueString"] = "Refer to PDF report"
         else:
             result = analysis.getFormattedResult(html=False)
