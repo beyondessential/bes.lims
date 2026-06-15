@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #159 Use FHIR comparator for out-of-detection-limit results sent to Tamanu
 - #158 Add ExcludeFromIntegration field and update diagnostic report handling
 - #125 Fix Tamanu sync freezing due to missing HTTP timeouts
 - #155 Disable notification for sample status transition to 'to_be_verified'
