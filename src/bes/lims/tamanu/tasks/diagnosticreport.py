@@ -259,29 +259,9 @@ class NotifyAdapter(object):
             "code": ordered_test,
         }
 
-        # assign the (formatted) result
-        result = analysis.getFormattedResult(html=False)
-        if self.is_quantitative(analysis):
-            if analysis.isBelowLowerDetectionLimit():
-                observation["valueQuantity"] = self.to_quantity(
-                    analysis.getLowerDetectionLimit(),
-                    analysis.getUnit(),
-                    "<"
-                )
-            elif analysis.isAboveUpperDetectionLimit():
-                observation["valueQuantity"] = self.to_quantity(
-                    analysis.getUpperDetectionLimit(),
-                    analysis.getUnit(),
-                    ">"
-                )
-            elif api.is_floatable(result):
-                observation["valueQuantity"] = self.to_quantity(
-                    result, analysis.getUnit(), None
-                )
-            else:
-                observation["valueString"] = result
-        else:
-            observation["valueString"] = result
+        # get the observation's result dict
+        result = self.get_observation_result(analysis)
+        observation.update(result)
 
         reference_range = self.get_reference_range(analysis)
         if reference_range:
@@ -297,6 +277,36 @@ class NotifyAdapter(object):
             observation["method"] = method
 
         return observation
+
+    def get_observation_result(self, analysis):
+        # assign the (formatted) result; if the analysis is excluded from
+        # integration, send a placeholder so the recipient knows to check
+        # the PDF report for the actual result
+        if analysis.getExcludeFromIntegration():
+            return {"valueString": "Refer to PDF report"}
+
+        result = analysis.getFormattedResult(html=False)
+        if not self.is_quantitative(analysis):
+            return {"valueString": result}
+
+        if analysis.isBelowLowerDetectionLimit():
+            ldl = analysis.getLowerDetectionLimit()
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(ldl, unit, operator="<")
+            return {"valueQuantity": quantity}
+
+        if analysis.isAboveUpperDetectionLimit():
+            udl = analysis.getUpperDetectionLimit()
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(udl, unit, operator=">")
+            return {"valueQuantity": quantity}
+
+        if api.is_floatable(result):
+            unit = analysis.getUnit()
+            quantity = self.to_quantity(result, unit)
+            return {"valueQuantity": quantity}
+
+        return {"valueString": result}
 
     def get_order_detail(self, analysis):
         """Returns the orderDetail of the initial ServiceRequest that
