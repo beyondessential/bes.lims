@@ -188,6 +188,7 @@ class NotifyAdapter(object):
             "entry": entries
         }
         # notify back to Tamanu
+        import pdb;pdb.set_trace();
         return session.post("Bundle", bundle, raise_for_status=True)
 
     def get_observations(self, sample):
