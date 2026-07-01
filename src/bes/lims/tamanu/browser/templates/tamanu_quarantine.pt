@@ -1,0 +1,95 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master">
+<body>
+
+<metal:block fill-slot="content-core">
+
+  <h1>Tamanu Quarantined Tasks</h1>
+  <p>
+    Tasks listed here failed during processing and were quarantined to prevent
+    them from blocking the queue. Review the error details, then either
+    <strong>Retry</strong> (reschedule immediately) or <strong>Delete</strong>
+    the task.
+  </p>
+
+  <tal:no-tasks tal:condition="not: view/get_quarantined_tasks">
+    <p class="discreet">No quarantined tasks found.</p>
+  </tal:no-tasks>
+
+  <tal:has-tasks tal:condition="view/get_quarantined_tasks">
+    <table class="listing"
+           style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="padding:6px 8px; text-align:left;">Sample</th>
+          <th style="padding:6px 8px; text-align:left;">Task</th>
+          <th style="padding:6px 8px; text-align:left; white-space:nowrap;">Quarantined At</th>
+          <th style="padding:6px 8px; text-align:left;">Error</th>
+          <th style="padding:6px 8px; text-align:left;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr tal:repeat="task view/get_quarantined_tasks"
+            tal:attributes="class python: 'odd' if repeat['task'].odd() else 'even'">
+
+          <td style="padding:6px 8px; vertical-align:top;">
+            <a tal:condition="task/url"
+               tal:attributes="href task/url"
+               tal:content="task/title">Sample</a>
+            <span tal:condition="not: task/url"
+                  tal:content="task/title">Sample</span>
+          </td>
+
+          <td style="padding:6px 8px; vertical-align:top; font-family:monospace; font-size:0.85em;"
+              tal:content="task/name">Task name</td>
+
+          <td style="padding:6px 8px; vertical-align:top; white-space:nowrap;"
+              tal:content="task/quarantined_at">Date</td>
+
+          <td style="padding:6px 8px; vertical-align:top; max-width:480px;">
+            <pre style="margin:0; white-space:pre-wrap; word-break:break-word;
+                        font-size:0.8em; background:#f8f8f8; padding:4px 6px;
+                        border:1px solid #ddd; border-radius:3px;"
+                 tal:content="task/error">Error</pre>
+          </td>
+
+          <td style="padding:6px 8px; vertical-align:top; white-space:nowrap;">
+
+            <!-- Retry -->
+            <form method="POST" style="display:inline; margin-right:4px;">
+              <input type="hidden" name="task_id"
+                     tal:attributes="value task/task_id" />
+              <input type="hidden" name="action" value="retry" />
+              <input type="hidden" name="_authenticator"
+                     tal:attributes="value context/@@authenticator/authenticator" />
+              <button type="submit"
+                      class="context"
+                      style="cursor:pointer;">Retry</button>
+            </form>
+
+            <!-- Delete -->
+            <form method="POST" style="display:inline;"
+                  tal:attributes="onsubmit string:return confirm('Delete task ${task/task_id}?')">
+              <input type="hidden" name="task_id"
+                     tal:attributes="value task/task_id" />
+              <input type="hidden" name="action" value="delete" />
+              <input type="hidden" name="_authenticator"
+                     tal:attributes="value context/@@authenticator/authenticator" />
+              <button type="submit"
+                      class="destructive"
+                      style="cursor:pointer;">Delete</button>
+            </form>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </tal:has-tasks>
+
+</metal:block>
+
+</body>
+</html>

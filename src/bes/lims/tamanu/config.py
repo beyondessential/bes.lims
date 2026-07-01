@@ -24,6 +24,8 @@ TAMANU_STORAGE = "senaite.tamanu.storage"
 
 TAMANU_TASKS_QUEUE = "senaite.tamanu.queue.storage"
 
+TAMANU_QUARANTINE_QUEUE = "senaite.tamanu.quarantine.storage"
+
 TAMANU_SEXES = (
     ("male", "m"),
     ("female", "f"),

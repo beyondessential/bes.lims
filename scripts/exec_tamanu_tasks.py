@@ -89,8 +89,22 @@ def main(app):
         task_name = task.__class__.__name__
         logger.info("%s: %s ..." % (task_name, api.get_path(task.context)))
 
-        # try to process the task
-        task.process()
+        try:
+            task.process()
+        except Exception as e:
+            error_msg = str(e)
+            # include the HTTP response body when available (e.g. HTTPError)
+            response = getattr(e, "response", None)
+            if response is not None:
+                try:
+                    error_msg = "%s\n\nResponse: %s" % (error_msg, response.text)
+                except Exception:
+                    pass
+            logger.error("%s: failed - %s" % (task_name, error_msg))
+            queue.quarantine(task.task_id, error_msg)
+            transaction.savepoint(optimistic=True)
+            continue
+
         # do a transaction savepoint
         transaction.savepoint(optimistic=True)
 
