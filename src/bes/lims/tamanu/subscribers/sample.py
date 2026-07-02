@@ -31,8 +31,7 @@ from zope.component import getMultiAdapter
 def _generate_invalidation_report(success, uid=None, request=None):
     """After-commit hook that generates and stores a report for the invalidated
     sample. Runs in a fresh transaction after the invalidate has committed, so
-    the sample state is already 'invalid' and _p_jar.sync() in the storage
-    adapter does not roll back the transition.
+    the sample state is already 'invalid' and the storage adapter does not roll back the transition.
     """
     if not success:
         return
