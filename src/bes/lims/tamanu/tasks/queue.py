@@ -50,9 +50,11 @@ def _parse_task_id(task_id):
 def get():
     """Pops the next non-quarantined task whose scheduled time has elapsed
     """
+    # get the tasks
     tasks = _get_tasks()
     quarantine = _get_quarantine()
 
+    # current time in seconds since the epoch
     now = int(time.time())
 
     task_id = None
@@ -67,6 +69,7 @@ def get():
     if not task_id:
         return None
 
+    # remove the task from the queue
     del tasks[task_id]
 
     uid, name = _parse_task_id(task_id)
@@ -102,9 +105,10 @@ def put(name, context, delay=120):
     uid = api.get_uid(context)
     task_id = "%s-%s" % (uid, name)
     tasks = _get_tasks()
+    quarantine = _get_quarantine()
 
-    # do not add unless new
-    if task_id in tasks:
+    # do not add unless new and not in quarantine
+    if task_id in tasks  or task_id in quarantine:
         return False
 
     # current time in seconds since the epoch + delay
@@ -118,7 +122,7 @@ def put(name, context, delay=120):
 
 @synchronized(max_connections=1)
 def quarantine(task_id, error):
-    """Moves a task to the quarantine store with the given error message.
+    """Creates a task in the quarantine store with the given error message.
     The task will be skipped by get() until retried or deleted.
     :param task_id: The task identifier (``"<uid>-<name>"``)
     :param error: Error message or response text from the failed POST
@@ -126,7 +130,7 @@ def quarantine(task_id, error):
     store = _get_quarantine()
     store[task_id] = {
         "quarantined_at": int(time.time()),
-        "error": str(error),
+        "error": str(error), # this could be later refined in bes.lims#i163
     }
     logger.warning("Task %s [quarantined]: %s" % (task_id, error))
 
@@ -175,7 +179,7 @@ def retry(task_id, delay=0):
 
 @synchronized(max_connections=1)
 def delete(task_id):
-    """Permanently removes a task from the quarantine store.
+    """Permanently removes a task from the quarantine store and task store
     :param task_id: The task identifier
     :returns: True if the task was found and removed
     :rtype: bool
@@ -187,4 +191,15 @@ def delete(task_id):
 
     del store[task_id]
     logger.info("Task %s [deleted from quarantine]" % task_id)
+
+    # Now remove from tasks - note an error here is not critical as it will
+    # amount to a retry given the task_id is removed from quarantine (no longer
+    # a skipped task)
+    tasks = _get_tasks()
+    if task_id not in tasks:
+        logger.warning("Task %s not in found in tasks, cannot delete" % task_id)
+        return False
+
+    del tasks[task_id]
+    logger.info("Task %s [deleted from tasks]" % task_id)
     return True
