@@ -5,6 +5,7 @@ Changelog
 -----
 
 - #165 Add bottles reference widget with inline search and results dropdown
+- #168 Give priority to last published sample on searches by tamanu_uid
 - #146 Support DynamicAnalysisSpec range comment text for 0/0 ranges
 - #159 Use FHIR comparator for out-of-detection-limit results sent to Tamanu
 - #158 Add ExcludeFromIntegration field and update diagnostic report handling
