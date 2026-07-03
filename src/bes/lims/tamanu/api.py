@@ -143,6 +143,28 @@ def get_brain_by_tamanu_uid(uid, default=None):
 
     uc = api.get_tool(api.UID_CATALOG)
     brains = uc(tamanu_uid=uid)
+
+    if len(brains) == 1:
+        return brains[0]
+
+    elif len(brains) > 1:
+        # group by status
+        target = None
+        by_status = dict()
+        for brain in brains:
+            obj = api.get_object(brain)
+            status = api.get_review_status(obj)
+            by_status.setdefault(status, []).append(brain)
+            if status not in ["cancelled"]:
+                target = brain
+
+        # give priority to published samples first
+        published = by_status.get("published")
+        target = published[-1] if published else target
+
+        # if no target (all cancelled), return last brain
+        return target if target else brains[-1]
+
     if len(brains) != 1:
         return default
     return brains[0]
