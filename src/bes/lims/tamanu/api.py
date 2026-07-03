@@ -148,6 +148,8 @@ def get_brain_by_tamanu_uid(uid, default=None):
         return brains[0]
 
     elif len(brains) > 1:
+        # TODO Consider to remove this, as it was added because of a manual and
+        #      not documented modification found at Nauru's P-System
         # group by status
         target = None
         by_status = dict()
