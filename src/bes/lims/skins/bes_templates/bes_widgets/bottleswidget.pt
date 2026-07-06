@@ -45,6 +45,8 @@
               tal:attributes="href string:${bes_path}/bottleswidget.css"/>
         <script type="text/javascript"
                 tal:attributes="src string:${senaite_path}/recordswidget.js"></script>
+        <script type="text/javascript"
+                tal:attributes="src string:${bes_path}/bottleswidget.js"></script>
       </tal:static>
 
       <metal:use use-macro="here/widgets/field/macros/edit">
@@ -98,9 +100,41 @@
                               maxlength python:field.getSubfieldMaxlength(key);
                               maxlength python:maxlength&gt;0 and maxlength or None;">
 
-                      <!-- string -->
+                      <!-- string with combogrid: reference widget style (search input + inline dropdown) -->
 
-                      <tal:string condition="python: type == 'string' and not field.isSelection(key)">
+                      <tal:ref condition="python: type == 'string' and not field.isSelection(key) and combogrid_options.get(key)">
+                        <tal:ref_define define="ref_opts python:combogrid_options.get(key, {})">
+                          <div class="bottles-ref-widget"
+                               style="width:250px;max-width:250px;overflow:hidden"
+                               tal:attributes="data-url python:ref_opts.get('url', '');
+                                               data-fieldname fieldName;
+                                               data-subfield key;
+                                               data-colmodel python:widget.jsondumps(ref_opts.get('colModel', []))">
+                            <div class="input-group searchfield input-group-sm">
+                              <input
+                                type="text"
+                                autocomplete="off"
+                                tal:attributes="class string:form-control records_inputstring bottles-ref-input;
+                                      id string:${fieldName}-${key}-${repeat/idx/index};
+                                      name string:${fieldName}.${key}:records:ignore_empty;
+                                      value python:field.getSubfieldValue(values, idx, key);
+                                      tabindex tabindex/next|nothing;"/>
+                              <div class="input-group-append">
+                                <button type="button" class="btn btn-sm btn-outline-secondary bottles-ref-clear">
+                                  <i class="fas fa-times"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary bottles-ref-search" style="z-index:0">
+                                  <i class="fas fa-search"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </tal:ref_define>
+                      </tal:ref>
+
+                      <!-- plain string (no combogrid) -->
+
+                      <tal:string condition="python: type == 'string' and not field.isSelection(key) and not combogrid_options.get(key)">
                         <input
                           type="text"
                           name=""
@@ -114,8 +148,7 @@
                                 size python:field.getSubfieldSize(key);
                                 maxlength maxlength|nothing;
                                 readonly python:hasattr(field, 'subfield_readonly') and field.subfield_readonly.get(key, False) or False;
-                                tabindex tabindex/next|nothing;
-                                combogrid_options python: widget.jsondumps(combogrid_options.get(key, ''))"/>
+                                tabindex tabindex/next|nothing;"/>
                       </tal:string>
 
                       <!-- selection -->
