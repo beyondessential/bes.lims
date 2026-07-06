@@ -573,3 +573,13 @@ def migrate_tamanu_queue_to_btree(tool):
 
     annotation[TAMANU_TASKS_QUEUE] = new_queue
     logger.info("Migrate Tamanu tasks queue to OOBTree [DONE]")
+
+
+def setup_tamanu_quarantined_tasks_action(tool):
+    """Adds the Tamanu quarantined tasks action
+    """
+    logger.info("Setup Tamanu Quarantined Tasks action ...")
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    setup.runImportStepFromProfile(profile, "actions")
+    logger.info("Setup Tamanu Quarantined Tasks action [DONE]")
