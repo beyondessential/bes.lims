@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #166 Add quarantine with view to handle erroring tasks in queue
 - #165 Add bottles reference widget with inline search and results dropdown
 - #168 Give priority to last published sample on searches by tamanu_uid
 - #146 Support DynamicAnalysisSpec range comment text for 0/0 ranges
