@@ -2,13 +2,13 @@
 
 import time
 
-from BTrees.OOBTree import OOBTree
 from bes.lims.tamanu import logger
 from bes.lims.tamanu.config import TAMANU_QUARANTINE_QUEUE
 from bes.lims.tamanu.config import TAMANU_TASKS_QUEUE
 from bes.lims.tamanu.interfaces import ITamanuTask
 from bika.lims import api
 from bika.lims.decorators import synchronized
+from BTrees.OOBTree import OOBTree
 from zope.annotation.interfaces import IAnnotations
 from zope.component import queryAdapter
 
@@ -108,7 +108,7 @@ def put(name, context, delay=120):
     quarantine = _get_quarantine()
 
     # do not add unless new and not in quarantine
-    if task_id in tasks  or task_id in quarantine:
+    if task_id in tasks or task_id in quarantine:
         return False
 
     # current time in seconds since the epoch + delay
@@ -130,25 +130,23 @@ def quarantine(task_id, error):
     store = _get_quarantine()
     store[task_id] = {
         "quarantined_at": int(time.time()),
-        "error": str(error), # this could be later refined in bes.lims#i163
+        "error": str(error),  # this could be later refined in bes.lims#i163
     }
     logger.warning("Task %s [quarantined]: %s" % (task_id, error))
 
 
 def get_quarantined():
     """Returns a list of dicts describing all quarantined tasks.
-    Each dict has: task_id, uid, name, obj, quarantined_at, error.
+    Each dict has: task_id, uid, name, quarantined_at, error.
     """
     store = _get_quarantine()
     records = []
     for task_id, info in store.items():
         uid, name = _parse_task_id(task_id)
-        obj = api.get_object_by_uid(uid, None)
         records.append({
             "task_id": task_id,
             "uid": uid,
             "name": name,
-            "obj": obj,
             "quarantined_at": info.get("quarantined_at", 0),
             "error": info.get("error", ""),
         })
@@ -197,7 +195,7 @@ def delete(task_id):
     # a skipped task)
     tasks = _get_tasks()
     if task_id not in tasks:
-        logger.warning("Task %s not in found in tasks, cannot delete" % task_id)
+        logger.warning("Task %s not found in tasks, cannot delete" % task_id)
         return False
 
     del tasks[task_id]
