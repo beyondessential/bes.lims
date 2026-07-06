@@ -35,6 +35,21 @@
       <property name="visible">True</property>
     </object>
 
+    <!-- Tamanu quarantine tasks -->
+    <object name="tamanu_quarantine" meta_type="CMF Action" i18n:domain="bes.lims">
+      <property name="title" i18n:translate="">Tamanu Quarantined Tasks</property>
+      <property name="description" i18n:translate=""/>
+      <property name="url_expr">string:$portal_url/tamanu-quarantine</property>
+      <property name="link_target"/>
+      <property name="icon_expr"/>
+      <property name="available_expr"/>
+      <property name="permissions">
+        <element value="senaite.core: Manage Bika"/>
+      </property>
+      <property name="visible">True</property>
+    </object>
+
+
   </object>
 
 </object>
