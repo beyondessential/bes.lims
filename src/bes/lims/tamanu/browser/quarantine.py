@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import transaction
 from datetime import datetime
 
-from Products.Five.browser import BrowserView
 from bes.lims.tamanu.tasks import queue
 from bika.lims import api
+from Products.Five.browser import BrowserView
 
 
 class TamanuQuarantineView(BrowserView):
@@ -21,10 +20,8 @@ class TamanuQuarantineView(BrowserView):
             if task_id:
                 if action == "retry":
                     queue.retry(task_id, delay=0)
-                    transaction.commit()
                 elif action == "delete":
                     queue.delete(task_id)
-                    transaction.commit()
             return self.request.response.redirect(self.request.URL)
         return self.index()
 
@@ -33,17 +30,18 @@ class TamanuQuarantineView(BrowserView):
         """
         records = []
         for rec in queue.get_quarantined():
-            obj = rec["obj"]
+            uid = rec.get("uid")
+            obj = api.get_object_by_uid(uid, default=None)
             if obj:
                 title = "%s (%s)" % (api.get_id(obj), api.get_title(obj))
                 url = api.get_url(obj)
             else:
-                title = rec["uid"]
+                title = uid
                 url = ""
 
             records.append({
                 "task_id": rec["task_id"],
-                "uid": rec["uid"],
+                "uid": uid,
                 "name": rec["name"],
                 "title": title,
                 "url": url,
