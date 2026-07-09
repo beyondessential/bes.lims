@@ -18,6 +18,7 @@
 # Copyright 2024-2025 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+
 from bes.lims.tamanu.tasks import diagnosticreport
 
 
