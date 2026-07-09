@@ -47,17 +47,19 @@ class NotifyAdapter(object):
         # send the diagnostic report
         return self.send_diagnostic_report(self.context, report)
 
+    # _status_ is an override from diagnostic_report_status
     def send_diagnostic_report(self, sample, report, status=None):
         if not status:
-            status = api.get_review_status(sample)
-            if status in ["sample_received"]:
+            # differentiating between sample_status and diagnostic_report_status
+            sample_status = api.get_review_status(sample)
+            # if sample_status in ["sample_received"]:
                 # do not notify back unless a report was created
-                if not report:
-                    return None
+                # if not report:
+                #    return None
 
             # handle the status to report back to Tamanu
             # registered | partial | preliminary | final | entered-in-error
-            status = dict(SAMPLE_STATUSES).get(status)
+            status = dict(SAMPLE_STATUSES).get(sample_status)
             if not status:
                 # does not match any of the supported statuses, do nothing
                 return None
@@ -137,7 +139,7 @@ class NotifyAdapter(object):
         obs_refs = []
         entries = []
         if SEND_OBSERVATIONS:
-            obs_list = self.get_observations(sample)
+            obs_list = self.get_observations(sample, sample_status = status)
             for obs_id, obs in obs_list:
                 display = obs.get("code", {}).get("text", "")
                 obvs_reference = "Observation/{}".format(obs_id)
@@ -190,7 +192,7 @@ class NotifyAdapter(object):
         # notify back to Tamanu
         return session.post("Bundle", bundle, raise_for_status=True)
 
-    def get_observations(self, sample):
+    def get_observations(self, sample, sample_status):
         """Returns a list of observation records suitable as a Tamanu payload
         """
         # add the observations (analyses included in the results report)
@@ -201,12 +203,16 @@ class NotifyAdapter(object):
                 continue
 
             # only report analyses that are either verified or published
-            status = api.get_review_status(analysis)
-            if status not in ["verified", "published"]:
+            analysis_status = api.get_review_status(analysis)
+
+            # we are also getting the sample status as analyses will remain published
+            # even if the sample is invalidated
+            is_sample_invalidated = sample_status == "entered-in-error"
+            if analysis_status not in ["verified", "published"]:
                 continue
 
             # get the representation of the analysis as a FHIR Observation
-            observation = self.get_observation(analysis)
+            observation = self.get_observation(analysis, is_sample_invalidated)
             # append the observations
             observations.append((observation["id"], observation))
         return observations
@@ -228,7 +234,7 @@ class NotifyAdapter(object):
             }
         return None
 
-    def get_observation(self, analysis):
+    def get_observation(self, analysis, is_sample_invalidated=None):
         """Returns a dict that represents a FHIR Observation counterpart of the
         analysis passed-in
         """
@@ -250,8 +256,13 @@ class NotifyAdapter(object):
             }
             ordered_test = {"coding": [coding]}
         # E.g. https://hl7.org/fhir/R4B/observation-example-f001-glucose.json.html
-        status = api.get_review_status(analysis)
-        status = dict(ANALYSIS_STATUSES).get(status, "partial")
+        if not is_sample_invalidated:
+            status = api.get_review_status(analysis)
+            status = dict(ANALYSIS_STATUSES).get(status, "partial")
+        else:
+            # defer to the sample's status as invalidated
+            status = 'entered-in-error'
+
         observation = {
             "resourceType": "Observation",
             "id": obs_id,
