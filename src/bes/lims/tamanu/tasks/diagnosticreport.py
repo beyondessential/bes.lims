@@ -19,8 +19,12 @@ from bes.lims.utils import is_reportable
 from bika.lims import api
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.utils import tmpID
+from bika.lims.workflow import getTransitionDate
 from senaite.core.api import dtime
+from senaite.impress.interfaces import IPdfReportStorage
+from senaite.impress.publishview import PublishView
 from zope.component import adapter
+from zope.component import getMultiAdapter
 from zope.interface import implementer
 
 
@@ -42,10 +46,59 @@ class NotifyAdapter(object):
         return reports[-1]
 
     def process(self):
+        sample = self.context
+
+        # For an invalidated Tamanu sample there is no report reflecting the
+        # 'invalid' state yet (the last one, if any, predates the
+        # invalidation). Generate a fresh report so the watermarked PDF added
+        # by bes.lims DefaultReportView travels with the entered-in-error
+        # DiagnosticReport. Report generation self-commits and calls
+        # _p_jar.sync(); that is safe here because this task runs in its own
+        # transaction in scripts/exec_tamanu_tasks.py, unlike the
+        # workflow-event thread where it would abort the in-progress transition.
+        if api.get_review_status(sample) == "invalid":
+            if not self.has_current_invalid_report(sample):
+                self.generate_report(sample)
+
         # get the last report of the sample, if any
-        report = self.get_last_report(self.context)
+        report = self.get_last_report(sample)
         # send the diagnostic report
-        return self.send_diagnostic_report(self.context, report)
+        return self.send_diagnostic_report(sample, report)
+
+    def has_current_invalid_report(self, sample):
+        """Returns whether the last report already reflects the invalidated
+        state of the sample, so we do not regenerate it on re-notify or on a
+        task retry
+        """
+        report = self.get_last_report(sample)
+        if not report:
+            return False
+        invalidated_on = getTransitionDate(
+            sample, "invalidate", return_as_datetime=True)
+        if not invalidated_on:
+            return False
+        return api.get_creation_date(report) >= invalidated_on
+
+    def generate_report(self, sample):
+        """Generates and stores a PDF report for the sample in its current
+        workflow state (watermarked automatically when 'invalid') and returns
+        the created ResultsReport, or None if no report could be generated
+        """
+        uid = api.get_uid(sample)
+        request = api.get_request()
+        view = PublishView(sample, request)
+        reports = view.generate_reports_for([uid])
+        if not reports:
+            logger.warning(
+                "No report generated for invalidated sample %s" % uid)
+            return None
+        report = reports[0]
+        timestamp = dtime.DateTime().ISO()
+        meta = report.get_metadata(
+            contained_requests=[uid], timestamp=timestamp)
+        storage = getMultiAdapter((sample, request), IPdfReportStorage)
+        stored = storage.store(report.pdf, report.html, [uid], metadata=meta)
+        return stored[0] if stored else None
 
     def send_diagnostic_report(self, sample, report, status=None):
         if not status:
