@@ -7,3 +7,54 @@
 .ArchetypesBottlesWidget table tr td input.form-control {
   min-width: unset;
 }
+
+/* ── Bottle reference widget ── */
+
+.bottles-ref-widget {
+  position: relative;
+}
+.bottles-ref-widget .searchfield {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+.bottles-ref-widget .form-control {
+  min-width: unset;
+  width: auto !important;
+}
+
+/* ── Inline results dropdown panel ── */
+
+.bottles-results-panel {
+  display: none;
+  position: fixed;
+  z-index: 999999;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.bottles-results-loading {
+  padding: 0.6rem 1rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.queryselectwidget-results-table th {
+  border-left: none;
+  border-right: none;
+}
+.queryselectwidget-results-table td {
+  border-left: none;
+  border-right: none;
+  word-break: break-word;
+  white-space: normal;
+}
+.queryselectwidget-results-table tbody tr {
+  cursor: pointer;
+}
+.queryselectwidget-results-table tbody tr:hover > td {
+  background-color: #e9f5fb;
+}

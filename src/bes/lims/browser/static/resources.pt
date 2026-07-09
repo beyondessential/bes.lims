@@ -1,1 +1,1 @@
-<script tal:attributes="src string:${view/site_url}/++plone++bes.lims.static/bundles/bes.lims.a435ec7c6ea1d88e080c.js"></script><link href="#" rel="stylesheet" tal:attributes="href string:${view/site_url}/++plone++bes.lims.static/bundles/bes.lims.a435ec7c6ea1d88e080c.css"/>
+<script tal:attributes="src string:${view/site_url}/++plone++bes.lims.static/bundles/bes.lims.55845b52992a0a82b4bb.js"></script><link href="#" rel="stylesheet" tal:attributes="href string:${view/site_url}/++plone++bes.lims.static/bundles/bes.lims.55845b52992a0a82b4bb.css"/>

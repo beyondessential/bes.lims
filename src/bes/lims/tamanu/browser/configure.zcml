@@ -29,4 +29,13 @@
       permission="senaite.core.permissions.ManageBika"
       layer="bes.lims.interfaces.IBESLimsLayer" />
 
+  <!-- Quarantined tasks management view (LabManager only) -->
+  <browser:page
+      name="tamanu-quarantine"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".quarantine.TamanuQuarantineView"
+      template="templates/tamanu_quarantine.pt"
+      permission="senaite.core.permissions.ManageBika"
+      layer="bes.lims.interfaces.IBESLimsLayer"/>
+
 </configure>
