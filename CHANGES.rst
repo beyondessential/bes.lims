@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #170 Revert comparator for valueQuantity results
 - #154 Watermarked invalid report to be generated automatically
 - #166 Add quarantine with view to handle erroring tasks in queue
 - #165 Add bottles reference widget with inline search and results dropdown
