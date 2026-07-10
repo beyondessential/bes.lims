@@ -342,17 +342,21 @@ class NotifyAdapter(object):
         if not self.is_quantitative(analysis):
             return {"valueString": result}
 
-        if analysis.isBelowLowerDetectionLimit():
-            ldl = analysis.getLowerDetectionLimit()
-            unit = analysis.getUnit()
-            quantity = self.to_quantity(ldl, unit, operator="<")
-            return {"valueQuantity": quantity}
+        # Uncomment after Tamanu supports `comparator` for ValueQuantity
+        # See https://github.com/beyondessential/bes.lims/issues/153
+        # ----->
+        #if analysis.isBelowLowerDetectionLimit():
+        #    ldl = analysis.getLowerDetectionLimit()
+        #    unit = analysis.getUnit()
+        #    quantity = self.to_quantity(ldl, unit, operator="<")
+        #    return {"valueQuantity": quantity}
 
-        if analysis.isAboveUpperDetectionLimit():
-            udl = analysis.getUpperDetectionLimit()
-            unit = analysis.getUnit()
-            quantity = self.to_quantity(udl, unit, operator=">")
-            return {"valueQuantity": quantity}
+        #if analysis.isAboveUpperDetectionLimit():
+        #    udl = analysis.getUpperDetectionLimit()
+        #    unit = analysis.getUnit()
+        #    quantity = self.to_quantity(udl, unit, operator=">")
+        #    return {"valueQuantity": quantity}
+        # <-----
 
         if api.is_floatable(result):
             unit = analysis.getUnit()
