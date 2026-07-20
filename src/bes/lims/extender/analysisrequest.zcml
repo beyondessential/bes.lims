@@ -8,6 +8,12 @@
       provides="archetypes.schemaextender.interfaces.ISchemaExtender"
       factory=".analysisrequest.AnalysisRequestSchemaExtender"/>
 
+  <!-- Schema modifier for AnalysisRequest (modifies existing fields) -->
+  <adapter
+      name="bes.lims.analysisrequest.schemamodifier"
+      provides="archetypes.schemaextender.interfaces.ISchemaModifier"
+      factory=".analysisrequest.AnalysisRequestSchemaModifier"/>
+
   <!-- Getters/Setters -->
   <monkey:patch
       class="bika.lims.content.analysisrequest.AnalysisRequest"
@@ -20,6 +26,18 @@
       original="setCollector"
       ignoreOriginal="True"
       replacement=".analysisrequest.setCollector" />
+
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="getSite"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.getSite" />
+
+  <monkey:patch
+      class="bika.lims.content.analysisrequest.AnalysisRequest"
+      original="setSite"
+      ignoreOriginal="True"
+      replacement=".analysisrequest.setSite" />
 
   <monkey:patch
       class="bika.lims.content.analysisrequest.AnalysisRequest"

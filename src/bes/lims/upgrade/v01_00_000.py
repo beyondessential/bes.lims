@@ -45,6 +45,7 @@ from senaite.core.decorators import retriable
 from senaite.core.migration.migrator import get_attribute_storage
 from senaite.core.permissions import FieldEditAnalysisRemarks
 from senaite.core.upgrade import upgradestep
+from senaite.core.upgrade.utils import uncatalog_brain
 from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.workflow import ANALYSIS_WORKFLOW
 from senaite.core.workflow import DUPLICATE_ANALYSIS_WORKFLOW
@@ -583,3 +584,41 @@ def setup_tamanu_quarantined_tasks_action(tool):
     setup = portal.portal_setup
     setup.runImportStepFromProfile(profile, "actions")
     logger.info("Setup Tamanu Quarantined Tasks action [DONE]")
+
+
+def set_site_from_samplepoint(tool):
+    """Re-assigns the value of the Site field with the existing value of
+    SamplePoint. This is necessary because of the introduction of the new Site
+    field, that besides the selection of a SamplePoint object, also allows a
+    custom text value. Thus, although SamplePoint field is no longer visible,
+    its value must be proxied to Site so at least index searches keep working
+    as expected
+    """
+    logger.info("Set Site value from SamplePoint ...")
+    query = {"portal_type": "AnalysisRequest"}
+    brains = api.search(query, SAMPLE_CATALOG)
+    total = len(brains)
+
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Update Site value {0}/{1}".format(num, total))
+
+        obj = get_object(brain)
+        if not obj:
+            uncatalog_brain(brain)
+            continue
+
+        site = obj.getSite()
+        if site:
+            obj._p_deactivate()
+            continue
+
+        sample_point = obj.getRawSamplePoint()
+        if not api.is_uid(sample_point):
+            continue
+
+        obj.setSite(sample_point)
+        obj.reindexObject()
+        obj._p_deactivate()
+
+    logger.info("Set Site value from SamplePoint [DONE]")
