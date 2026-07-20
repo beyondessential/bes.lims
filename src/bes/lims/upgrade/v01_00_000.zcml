@@ -3,6 +3,22 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Allow custom text for Site field"
+      description="
+        Walks through all AnalysisRequest (samples) objects, gets the value of
+        the field SamplePoint and, if the Site field is empty, assigns it to the
+        new Site field. This is necessary because of the introduction of the new
+        Site field, that besides the selection of a SamplePoint object also
+        allows a custom text value. Thus, although the SamplePoint field is no
+        longer visible, its value must be proxied to Site so at least index
+        searches keep working as expected.
+      "
+      source="1021"
+      destination="1022"
+      handler=".v01_00_000.set_site_from_samplepoint"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Add Tamanu Quarantined Tasks view"
       description="
         Adds a view with the list of Tamanu tasks that failed during processing
