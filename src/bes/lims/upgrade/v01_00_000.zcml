@@ -3,6 +3,17 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="Exclude AST services and analyses from integration"
+      description="
+        Walks through all AST-specific services and analyses and disable their
+        integration with integrated systems.
+      "
+      source="1022"
+      destination="1023"
+      handler=".v01_00_000.step_ast_integration"
+      profile="bes.lims:default"/>
+
+  <genericsetup:upgradeStep
       title="Allow custom text for Site field"
       description="
         Walks through all AnalysisRequest (samples) objects, gets the value of

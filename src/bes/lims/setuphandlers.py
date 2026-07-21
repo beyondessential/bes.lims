@@ -220,6 +220,9 @@ def setup_handler(context):
     # Setup microbiology department and assign ast-analyses
     setup_microbiology_department(portal)
 
+    # Do not sync AST tests with integrated systems
+    setup_ast_integration(portal)
+
     logger.info("BES setup handler [DONE]")
 
 
@@ -339,6 +342,7 @@ def setup_microbiology_department(portal):
     # assign the Microbiology department to all AST-like services
     brains = sc(portal_type="AnalysisService",
                 point_of_capture=AST_POINT_OF_CAPTURE)
+    total = len(brains)
     for num, brain in enumerate(brains):
         if num and num % 100 == 0:
             logger.info("Updating analyses {0}/{1}".format(num, total))
@@ -369,3 +373,44 @@ def setup_microbiology_department(portal):
         deactivate(analysis)
 
     logger.info("Setup microbiology department [DONE]")
+
+
+def setup_ast_integration(portal):
+    """Walks through all AST services and analyses and flag them to not be
+    sent to integrated systems through DiagnosticReport payloads
+    """
+    logger.info("Setup integration of AST services and analyses ...")
+
+    # fix services
+    sc = api.get_tool(SETUP_CATALOG)
+    brains = sc(portal_type="AnalysisService", point_of_capture="ast")
+
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating services {0}/{1}".format(num, total))
+
+        obj = get_safe_object(brain)
+        if not obj:
+            continue
+
+        obj.setExcludeFromIntegration(True)
+        obj.reindexObject()
+        deactivate(obj)
+
+    # fix analyses
+    ac = api.get_tool(ANALYSIS_CATALOG)
+    brains = ac(portal_type="Analysis", getPointOfCapture="ast")
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating analyses {0}/{1}".format(num, total))
+
+        obj = get_safe_object(brain)
+        if not obj:
+            continue
+
+        obj.setExcludeFromIntegration(True)
+        deactivate(obj)
+
+    logger.info("Setup integration of AST services and analyses [DONE]")
