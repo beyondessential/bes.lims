@@ -20,6 +20,7 @@
 
 import copy
 import transaction
+from bes.lims.setuphandlers import setup_ast_integration
 
 from BTrees.OOBTree import OOBTree
 from bes.lims import PRODUCT_NAME as product
@@ -622,3 +623,8 @@ def set_site_from_samplepoint(tool):
         obj._p_deactivate()
 
     logger.info("Set Site value from SamplePoint [DONE]")
+
+
+def step_ast_integration(tool):
+    portal = tool.aq_inner.aq_parent
+    setup_ast_integration(portal)
