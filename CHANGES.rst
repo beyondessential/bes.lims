@@ -4,6 +4,7 @@ Changelog
 1.0.0
 -----
 
+- #175 Exclude AST-like services and analyses from integration
 - #173 Allow custom text for SamplePoint (Site) field
 - #170 Revert comparator for valueQuantity results
 - #154 Watermarked invalid report to be generated automatically
