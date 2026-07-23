@@ -207,7 +207,7 @@ class NotifyAdapter(object):
 
             # we are also getting the sample status as analyses will remain published
             # even if the sample is invalidated
-            is_sample_invalidated = sample_status == "entered-in-error"
+            is_sample_invalidated = sample_status == dict(SAMPLE_STATUSES).get("invalid")
             if analysis_status not in ["verified", "published"]:
                 continue
 
@@ -261,8 +261,7 @@ class NotifyAdapter(object):
             status = dict(ANALYSIS_STATUSES).get(status, "partial")
         else:
             # defer to the sample's status as invalidated
-            status = 'entered-in-error'
-
+            status = dict(ANALYSIS_STATUSES).get("cancelled")
         observation = {
             "resourceType": "Observation",
             "id": obs_id,

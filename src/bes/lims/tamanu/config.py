@@ -74,6 +74,9 @@ SAMPLE_STATUSES = (
 ANALYSIS_STATUSES = (
     # mapping between analyses status and tamanu statuses
     ("registered", "partial"),
+    # Definition of 'entered-in-error' https://hl7.org/fhir/R5/codesystem-observation-status.html#observation-status-entered-in-error
+    # "This electronic record should never have existed, though it is possible that real-world decisions were based on it.
+    # (If real-world activity has occurred, the status should be "cancelled" rather than "entered-in-error".)."
     ("cancelled", "cancelled"),
     ("unassigned", "partial"),
     ("assigned", "partial"),
