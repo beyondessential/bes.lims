@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+BIN=${buildout:astm-bin}
+PORT=${buildout:astm-port}
+URL=${buildout:astm-url}
+CONSUMER=${buildout:astm-consumer}
+RETRIES=${buildout:astm-retries}
+DELAY=${buildout:astm-delay}
+LOG_DIR=${buildout:astm-log-dir}
+LOG_FILE=$LOG_DIR/server.log
+
+# create the log directory just in case it does not exist yet
+mkdir -p "$LOG_DIR"
+
+# run the astm server (with output files)
+# $BIN -p $PORT -o "$LOG_DIR" --logfile "$LOG_FILE" -u "$URL" -c "$CONSUMER" -d $DELAY -r $RETRIES
+$BIN -p $PORT --logfile "$LOG_FILE" -u "$URL" -c "$CONSUMER" -d $DELAY -r $RETRIES
